@@ -1,0 +1,220 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SOURCE_DIR="$ROOT_DIR/.opencode"
+DIST_DIR="${PORTABLE_BUNDLE_DIST:-$ROOT_DIR/dist}"
+DEFAULT_ARCHIVE="$DIST_DIR/portable-config-bundle.tar.gz"
+INSTALL_ROOT_DEFAULT="${PORTABLE_BUNDLE_INSTALL:-${OPENCODE_CONFIG_DIR:-$HOME/.config/opencode}}"
+BUNDLE_ROOT="${PORTABLE_BUNDLE_ROOT:-$INSTALL_ROOT_DEFAULT/portable-config-bundle}"
+DEFAULT_BUNDLE_CONTENTS="$BUNDLE_ROOT/.opencode"
+DEFAULT_SHARED_DIR_NAME="shared"
+DEFAULT_LOCAL_DIR_NAME="local"
+PORTABLE_BUNDLE_TMP_DIR=""
+
+log() {
+  printf '[portable-config-bundle] %s\n' "$*"
+}
+
+error() {
+  printf '[portable-config-bundle] ERROR: %s\n' "$*" >&2
+  exit 1
+}
+
+require_cmd() {
+  command -v "$1" >/dev/null 2>&1 || error "Required command '$1' not found in PATH"
+}
+
+usage() {
+  cat <<'EOF'
+Usage: bin/portable-config-bundle <command> [options]
+
+Commands:
+  package [--output PATH] [--include-node-modules]
+      Create a tarball containing the shared .opencode bundle.
+  install [--archive PATH] [--dest PATH]
+      Extract a previously packaged bundle into a config directory (default: ~/.config/opencode/portable-config-bundle).
+  update --repo PATH [--bundle-dir PATH] [--shared-dir NAME] [--local-dir NAME]
+      Sync the shared bundle into a repository while preserving local overrides.
+  inventory
+      List top-level assets that will be included in the bundle.
+  verify [--repo PATH]
+      Run package + install + update against a sample repository to ensure the workflow succeeds.
+  help
+      Show this message.
+EOF
+}
+
+package_bundle() {
+  local archive_path="$1"
+  local include_node_modules="$2"
+  require_cmd tar
+  mkdir -p "$(dirname "$archive_path")"
+  local -a tar_args=("--exclude=.git" "--exclude=.DS_Store" "--exclude=dist")
+  if [[ "$include_node_modules" != "true" ]]; then
+    tar_args+=("--exclude=.opencode/node_modules")
+  fi
+  log "Packaging shared assets from $SOURCE_DIR"
+  tar "${tar_args[@]}" -czf "$archive_path" -C "$ROOT_DIR" .opencode
+  log "Wrote bundle archive to $archive_path"
+}
+
+install_bundle() {
+  local archive_path="$1"
+  local dest_dir="$2"
+  [[ -f "$archive_path" ]] || error "Archive '$archive_path' does not exist"
+  require_cmd tar
+  mkdir -p "$dest_dir"
+  tar -xzf "$archive_path" -C "$dest_dir"
+  log "Installed bundle into $dest_dir (contents in $dest_dir/.opencode)"
+}
+
+sync_repo_with_bundle() {
+  local repo_path="$1"
+  local bundle_contents="$2"
+  local shared_dir_name="$3"
+  local local_dir_name="$4"
+  [[ -d "$repo_path" ]] || error "Repo '$repo_path' not found"
+  [[ -d "$bundle_contents" ]] || error "Bundle contents '$bundle_contents' not found"
+  local repo_config="$repo_path/.opencode"
+  local shared_dir="$repo_config/$shared_dir_name"
+  local local_dir="$repo_config/$local_dir_name"
+  mkdir -p "$shared_dir" "$local_dir"
+  require_cmd rsync
+  rsync -a --delete "$bundle_contents/" "$shared_dir/"
+  log "Synced bundle into $shared_dir (local overrides stay in $local_dir)"
+}
+
+inventory_assets() {
+  log "Portable bundle inventory (depth <= 2, skipping node_modules):"
+  find "$SOURCE_DIR" -maxdepth 2 -mindepth 1 -type d \
+    -not -path "$SOURCE_DIR/node_modules*" \
+    -not -path "$SOURCE_DIR/*/node_modules*" \
+    | sed "s|$SOURCE_DIR|.opencode|"
+}
+
+cleanup_tmp_dir() {
+  if [[ -n "$PORTABLE_BUNDLE_TMP_DIR" && -d "$PORTABLE_BUNDLE_TMP_DIR" ]]; then
+    rm -rf "$PORTABLE_BUNDLE_TMP_DIR"
+  fi
+}
+
+verify_workflow() {
+  local repo_path="$1"
+  [[ -d "$repo_path" ]] || error "Sample repo '$repo_path' not found"
+  PORTABLE_BUNDLE_TMP_DIR="$(mktemp -d)"
+  trap cleanup_tmp_dir EXIT
+  local tmp_archive="$PORTABLE_BUNDLE_TMP_DIR/portable-config-bundle.tar.gz"
+  local install_dir="$PORTABLE_BUNDLE_TMP_DIR/install"
+  package_bundle "$tmp_archive" "false"
+  install_bundle "$tmp_archive" "$install_dir"
+  sync_repo_with_bundle "$repo_path" "$install_dir/.opencode" "$DEFAULT_SHARED_DIR_NAME" "$DEFAULT_LOCAL_DIR_NAME"
+  log "Verification completed successfully against $repo_path"
+}
+
+main() {
+  local command="${1:-help}"
+  if [[ $# -gt 0 ]]; then
+    shift
+  fi
+  case "$command" in
+    help|-h|--help)
+      usage
+      ;;
+    package)
+      local archive_path="$DEFAULT_ARCHIVE"
+      local include_node_modules="false"
+      while [[ $# -gt 0 ]]; do
+        case "$1" in
+          --output|-o)
+            archive_path="$2"
+            shift 2
+            ;;
+          --include-node-modules)
+            include_node_modules="true"
+            shift
+            ;;
+          *)
+            error "Unknown option for package: $1"
+            ;;
+        esac
+      done
+      package_bundle "$archive_path" "$include_node_modules"
+      ;;
+    install)
+      local archive_path="$DEFAULT_ARCHIVE"
+      local dest_dir="$BUNDLE_ROOT"
+      while [[ $# -gt 0 ]]; do
+        case "$1" in
+          --archive|-a)
+            archive_path="$2"
+            shift 2
+            ;;
+          --dest|-d)
+            dest_dir="$2"
+            shift 2
+            ;;
+          *)
+            error "Unknown option for install: $1"
+            ;;
+        esac
+      done
+      install_bundle "$archive_path" "$dest_dir"
+      ;;
+    update)
+      local repo_path=""
+      local bundle_contents="$DEFAULT_BUNDLE_CONTENTS"
+      local shared_dir_name="$DEFAULT_SHARED_DIR_NAME"
+      local local_dir_name="$DEFAULT_LOCAL_DIR_NAME"
+      while [[ $# -gt 0 ]]; do
+        case "$1" in
+          --repo|-r)
+            repo_path="$2"
+            shift 2
+            ;;
+          --bundle-dir|-b)
+            bundle_contents="$2"
+            shift 2
+            ;;
+          --shared-dir)
+            shared_dir_name="$2"
+            shift 2
+            ;;
+          --local-dir)
+            local_dir_name="$2"
+            shift 2
+            ;;
+          *)
+            error "Unknown option for update: $1"
+            ;;
+        esac
+      done
+      [[ -n "$repo_path" ]] || error "--repo is required for update"
+      sync_repo_with_bundle "$repo_path" "$bundle_contents" "$shared_dir_name" "$local_dir_name"
+      ;;
+    inventory)
+      inventory_assets
+      ;;
+    verify)
+      local repo_path="$ROOT_DIR/examples/sample-service"
+      while [[ $# -gt 0 ]]; do
+        case "$1" in
+          --repo|-r)
+            repo_path="$2"
+            shift 2
+            ;;
+          *)
+            error "Unknown option for verify: $1"
+            ;;
+        esac
+      done
+      verify_workflow "$repo_path"
+      ;;
+    *)
+      usage
+      exit 1
+      ;;
+  esac
+}
+
+main "$@"
