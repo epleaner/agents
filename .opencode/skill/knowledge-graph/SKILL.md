@@ -17,7 +17,7 @@ Source: Slack #eng-sync (2026-01-05 10:12 PT)
 Summary: QA confirmed Playwright suite passes on codex migration branch.
 Links: beads agents-zr8, change plan-opencode-setup, PR #12
 Owners: QA agent
-Next Steps: Deploy agent packages cloud bundle once CI green
+Next Steps: Release agent packages cloud bundle once CI green
 ```
 
 ## Notes

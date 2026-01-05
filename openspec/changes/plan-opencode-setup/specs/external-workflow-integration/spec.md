@@ -12,6 +12,6 @@ The OpenCode setup SHALL integrate with Slack, Jira, Linear, Fathom, and GitHub 
 - **THEN** the integration updates linked Jira/Linear tickets (status, labels, comments) so external stakeholders see consistent information
 - **AND** the knowledge graph records the change for later queries.
 
-#### Scenario: Broadcast build/deploy outcomes
-- **WHEN** QA or Deploy completes validation
+#### Scenario: Broadcast build/release outcomes
+- **WHEN** QA or Release completes validation
 - **THEN** the integration posts results to Slack (or other communication channels), attaches relevant GitHub PR/CI links, and references the governing beads/OpenSpec IDs so downstream conversations stay traceable.

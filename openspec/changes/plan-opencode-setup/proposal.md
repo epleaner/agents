@@ -5,7 +5,7 @@ We need a durable plan for configuring OpenCode across multiple machines and pro
 
 ## What Changes
 - Capture requirements for a cross-project OpenCode configuration bundle and distribution process.
-- Define the GPT-5.1 Codex–centric multi-agent lineup (Orchestrator, Planner, PM, Builder, QA plus Researcher/Debugger/Writer/Deploy) along with research tooling and browser access expectations.
+- Define the GPT-5.1 Codex–centric multi-agent lineup (Orchestrator, Planner, PM, Builder, QA plus Researcher/Debugger/Writer/Release) along with research tooling and browser access expectations.
 - Document reusable workflow commands that chain the specialized agents, enforce todos, and keep async subagents/parallel workstreams coordinated via beads.
 - Describe how beads issues and OpenSpec changes stay linked throughout the workflow.
 - Outline external integration connectors (Jira, Linear, Slack, Fathom, GitHub) via MCP or custom tooling.

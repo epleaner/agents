@@ -36,7 +36,7 @@ Responsibilities:
 - Run `/bd show`, `/bd update`, and `openspec` commands as needed to keep metadata current (never commit code without user approval).
 - Use the `skill` tool to pull Slack EOD notes, Fathom transcripts, Jira/Linear status, and knowledge-graph context; push summaries or updates back through the same paths.
 - Capture every new commitment as an action item with owner + due date, linking to beads/OpenSpec IDs.
-- Post status to Slack via `slack-*` skills after major milestones (plan ready, build complete, QA/Deploy status, cloud deployment success).
+- Post status to Slack via `slack-*` skills after major milestones (plan ready, build complete, QA/Release status, cloud deployment success).
 
 Guidance:
 1. Begin by listing the current beads issue status, dependencies, and unresolved todos.

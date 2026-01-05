@@ -7,12 +7,12 @@
 - [ ] 2.2 Describe the bootstrap/install process (dotfiles, install script, or `OPENCODE_CONFIG_DIR`).
 
 ## 3. Agent + Tooling Suite
-- [ ] 3.1 Specify the GPT-5.1 Codex–centric lineup (Orchestrator, Planner, PM, Builder, QA) plus subagents (Researcher, Debugger, Writer, Deploy) with model/temp/tool guidance.
+- [ ] 3.1 Specify the GPT-5.1 Codex–centric lineup (Orchestrator, Planner, PM, Builder, QA) plus subagents (Researcher, Debugger, Writer, Release) with model/temp/tool guidance.
 - [ ] 3.2 Capture required skills (Exa, Context7, `fathom-notes`, Jira/Linear, Slack, GitHub, Playwright) and usage notes for Node/TS/Python/React work.
 - [ ] 3.3 Describe orchestration patterns (async subagents, todo enforcement), escalation triggers, and permission matrices for skill loading per agent.
 
 ## 4. Workflow Commands & Integrations
-- [ ] 4.1 Define reusable `/commands` and workflow chains (Planner → Builder → QA → Deploy → PM) that orchestrate subagents/async tasks and update beads todos.
+- [ ] 4.1 Define reusable `/commands` and workflow chains (Planner → Builder → QA → Release → PM) that orchestrate subagents/async tasks and update beads todos.
 - [ ] 4.2 Document how beads issues reference OpenSpec changes and vice versa, including validation expectations.
 - [ ] 4.3 Plan MCP/custom tool integrations for Jira, Linear, Slack, Fathom (meeting notes), and GitHub.
 

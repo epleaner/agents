@@ -13,13 +13,13 @@ Channel: #eng-ai
 Title: QA pass for GPT-5.1 Codex agents
 Beads: agents-zr8
 Change: plan-opencode-setup
-Status: QA complete; handing off to Deploy
+Status: QA complete; handing off to Release
 Highlights:
 - ✅ Lint/test suite (npm run test) PASS
 - ✅ Playwright smoke PASS
 - ⚠️ Cloud deploy pending (needs secrets)
 Actions:
-- Deploy agent to run cloud workflow
+- Release agent to run cloud workflow
 - PM to sync Jira task JIRA-123 with new status
 Links: PR #12, Test log gist
 ```

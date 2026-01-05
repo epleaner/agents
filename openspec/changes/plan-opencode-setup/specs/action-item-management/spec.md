@@ -4,7 +4,7 @@
 The OpenCode setup SHALL maintain a synchronized action-item system that spans `todowrite`, beads issues, Slack/Fathom-derived tasks, and knowledge-graph nodes so no commitment is lost.
 
 #### Scenario: Track action items end-to-end
-- **WHEN** an action is created (from Planner clarifications, Slack EOD, Fathom transcript, QA gate, or Deploy/CI feedback)
+- **WHEN** an action is created (from Planner clarifications, Slack EOD, Fathom transcript, QA gate, or Release/CI feedback)
 - **THEN** it is inserted into the shared todo system with references to beads/change IDs, assigned owners, and due dates
 - **AND** the todo enforcer plus PM workflows ensure the item is either completed or explicitly re-triaged before session completion.
 
