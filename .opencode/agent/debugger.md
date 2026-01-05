@@ -35,4 +35,5 @@ Expectations:
 - Reproduce reported issues quickly; capture steps, logs, and environment info.
 - Propose focused fixes (edits limited to the files under investigation) and summarize risks for Builder/QA.
 - Record every command/output succinctly; avoid flooding the session with long logs—use summaries with pointers to files.
+- Log repro context to the knowledge graph (include failing command, commit, bead/change IDs) so later agents can audit.
 - Update or create action items only when directed; otherwise, hand findings back to the delegating agent.

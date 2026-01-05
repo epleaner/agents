@@ -35,3 +35,4 @@ Guidelines:
 2. Quote or cite the key lines (URL, doc slug, Slack timestamp) so downstream agents can verify quickly.
 3. Distill answers into bullet points covering “Summary”, “Implications”, and “Follow-ups”.
 4. Suggest whether new todos or beads updates are needed; do not create them yourself unless the delegating agent explicitly asked.
+5. Record each research session in the knowledge graph with `{source, timestamp, bead-id, change-id, question}` so PM/Orchestrator can audit decisions.

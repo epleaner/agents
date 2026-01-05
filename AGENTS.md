@@ -31,6 +31,15 @@ bd close <id>         # Complete work
 bd sync               # Sync with git
 ```
 
+## Meta-Learnings Workflow
+
+- Capture operational/meta insights under `learnings/` using the required template for each ledger. Do **not** store domain facts here; those belong in the knowledge graph.
+- Update `learnings/index.md` whenever you add or modify an entry so other agents can quickly find status, owners, and follow-up links.
+- Before closing a session, run `./bin/review-learnings`:
+  - Lists entries in `new`, `needs-agents-update`, or `needs-spec-change` states.
+  - Prompts you to adjust status/owners/follow-up links and writes the updates back to both the ledger and index.
+- When an entry requires action, immediately promote it by updating the relevant AGENTS section, filing a beads issue, or drafting an OpenSpec change. Always reference the ledger entry ID in those follow-ups and mark the entry as `promoted` once done.
+
 ## Using Beads and OpenSpec Together
 
 1. **Start with beads**: every task must have an issue. Use `bd ready`/`bd create` to select or add work, then claim it via `bd update <id> --status in_progress` before making spec changes.
@@ -70,3 +79,22 @@ bd sync               # Sync with git
 - NEVER say "ready to push when you are" - YOU must push
 - If push fails, resolve and retry until it succeeds
 
+## Codex Multi-Agent Skill Catalog
+
+Every skill invocation must cite the active beads/change IDs and, when the action produces new context, log a short summary via the `knowledge-graph` skill so downstream agents can audit decisions. Meta-Agent usage of `bd`, `openspec`, `knowledge-graph`, and `slack-notify` MUST additionally include the improvement hypothesis, impacted workflow, and links to transcripts/todos.
+
+| Skill | Purpose | Allowed agents |
+| --- | --- | --- |
+| `exa-search`, `context7-docs` | Research APIs/docs before coding | Orchestrator, Planner, Builder, Researcher |
+| `knowledge-graph` | Query or append structured context | Orchestrator, Planner, PM, Builder, Researcher, QA, Release, Writer, Meta-Agent |
+| `fathom-notes` | Pull meeting transcripts + action items | Planner, PM, Researcher |
+| `slack-notify` | Broadcast plan/build/QA/release status | Orchestrator, PM, QA, Release, Writer, Meta-Agent |
+| `openspec` | Inspect proposals/spec deltas, run validations, and document governance updates | Planner, PM, Meta-Agent |
+| `bd` | Manage beads issues, todos, and workflow status | Orchestrator, PM, Meta-Agent |
+| `action-items` | Create/escalate todos with owners/dates | Orchestrator, Planner, PM, Builder, QA, Meta-Agent |
+| `jira-lookup` / `jira-update`, `linear-sync` | Synchronize Jira/Linear tickets | PM, Writer (update), Orchestrator (lookup) |
+| `github-review` | Prepare/read PRs and reviews | QA (read), Release (create/update) |
+| `playwright` | Execute browser tests and report logs | QA only |
+| `cloud-deploy` | Package + deploy `.opencode/` bundle | Release only |
+
+> If a task requires a skill not listed for your persona, ask Orchestrator to delegate to the agent that owns it instead of proceeding directly.
