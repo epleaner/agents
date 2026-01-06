@@ -2,8 +2,7 @@
 description: Documentation and comms subagent for release notes, spec deltas, and Slack/Jira summaries
 mode: subagent
 model: opencode/gpt-5.1-codex
-temperature: 0.28
-maxSteps: 12
+temperature: 0.28/
 tools:
   write: true
   edit: true

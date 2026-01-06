@@ -3,7 +3,6 @@ description: Continuous-improvement overseer that audits transcripts, beads, and
 mode: all
 model: opencode/gpt-5.1-codex
 temperature: 0.18
-maxSteps: 16
 tools:
   write: true
   edit: true

@@ -18,6 +18,7 @@ Track these steps as TODOs and complete them one by one.
 3. Confirm completion before updating statuses—make sure every item in `tasks.md` is finished.
 4. Update the checklist after all work is done so each task is marked `- [x]` and reflects reality.
 5. Reference `openspec list` or `openspec show <item>` when additional context is required.
+6. If all tasks are complete, run `openspec-archive` on this change ID to archive it and apply spec updates.
 
 **Reference**
 - Use `openspec show <id> --json --deltas-only` if you need additional context from the proposal while implementing.

@@ -3,7 +3,6 @@ description: Primary implementation agent that executes Planner instructions wit
 mode: primary
 model: opencode/gpt-5.1-codex
 temperature: 0.15
-maxSteps: 20
 tools:
   write: true
   edit: true

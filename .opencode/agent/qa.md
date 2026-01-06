@@ -3,7 +3,6 @@ description: Quality gatekeeper handling lint, tests, Playwright checks, and for
 mode: primary
 model: opencode/gpt-5.1-codex
 temperature: 0.2
-maxSteps: 18
 tools:
   write: true
   edit: true

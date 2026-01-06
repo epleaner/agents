@@ -3,7 +3,6 @@ description: Operations/PM agent that keeps beads, OpenSpec, Jira/Linear, Slack,
 mode: primary
 model: opencode/gpt-5.1-codex
 temperature: 0.25
-maxSteps: 14
 tools:
   write: true
   edit: true

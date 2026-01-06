@@ -3,7 +3,6 @@ description: Focused diagnostic subagent for reproducing failures, running targe
 mode: subagent
 model: opencode/gpt-5.1-codex
 temperature: 0.2
-maxSteps: 16
 tools:
   write: true
   edit: true

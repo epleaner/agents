@@ -3,7 +3,6 @@ description: Release and deployment subagent handling git hygiene, PR prep, CI/C
 mode: subagent
 model: opencode/gpt-5.1-codex
 temperature: 0.18
-maxSteps: 16
 tools:
   write: true
   edit: true

@@ -3,7 +3,6 @@ description: Read-only research subagent for documentation, knowledge-graph, Sla
 mode: subagent
 model: opencode/gpt-5.1-codex
 temperature: 0.35
-maxSteps: 12
 tools:
   write: false
   edit: false
