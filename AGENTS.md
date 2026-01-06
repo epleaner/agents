@@ -21,6 +21,27 @@ Keep this managed block so 'openspec update' can refresh the instructions.
 
 This project uses **bd** (beads) for issue tracking. Run `bd onboard` to get started.
 
+## Using This Repository as a Blueprint
+
+This repository can be used as a blueprint for other projects using **yepe**:
+
+```bash
+# In your target repository
+npx @yepe/init
+
+# Or without Node.js
+curl -fsSL https://yepe.dev/install.sh | bash
+```
+
+yepe copies the following assets:
+- **AGENTS.md** - AI assistant instructions
+- **.opencode/** - Agent definitions, commands, skills
+- **openspec/** - Change proposal framework
+- **learnings/** - Meta-learnings ledgers
+- **bin/** - Helper scripts
+
+For more information, see the [yepe documentation](packages/yepe/README.md).
+
 ## Quick Reference
 
 ```bash
