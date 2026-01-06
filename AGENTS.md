@@ -85,11 +85,11 @@ Every skill invocation must cite the active beads/change IDs and, when the actio
 
 | Skill | Purpose | Allowed agents |
 | --- | --- | --- |
-| `exa-search`, `context7-docs` | Research APIs/docs before coding | Orchestrator, Planner, Builder, Researcher |
-| `knowledge-graph` | Query or append structured context | Orchestrator, Planner, PM, Builder, Researcher, QA, Release, Writer, Meta-Agent |
+| `exa-search`, `context7-docs` | Research APIs/docs before coding | Orchestrator, Proposal, Planner, Builder, Researcher |
+| `knowledge-graph` | Query or append structured context | Orchestrator, Proposal, Planner, PM, Builder, Researcher, QA, Release, Writer, Meta-Agent |
 | `fathom-notes` | Pull meeting transcripts + action items | Planner, PM, Researcher |
 | `slack-notify` | Broadcast plan/build/QA/release status | Orchestrator, PM, QA, Release, Writer, Meta-Agent |
-| `openspec` | Inspect proposals/spec deltas, run validations, and document governance updates | Planner, PM, Meta-Agent |
+| `openspec` | Inspect proposals/spec deltas, run validations, and document governance updates | Proposal, Planner, PM, Meta-Agent |
 | `bd` | Manage beads issues, todos, and workflow status | Orchestrator, PM, Meta-Agent |
 | `action-items` | Create/escalate todos with owners/dates | Orchestrator, Planner, PM, Builder, QA, Meta-Agent |
 | `jira-lookup` / `jira-update`, `linear-sync` | Synchronize Jira/Linear tickets | PM, Writer (update), Orchestrator (lookup) |
@@ -98,3 +98,9 @@ Every skill invocation must cite the active beads/change IDs and, when the actio
 | `cloud-deploy` | Package + deploy `.opencode/` bundle | Release only |
 
 > If a task requires a skill not listed for your persona, ask Orchestrator to delegate to the agent that owns it instead of proceeding directly.
+
+## Proposal Agent Engagement
+- Orchestrator MUST capture bead/change IDs, user intent, constraints, and desired outcomes before spawning `@proposal`; proposals without that bundle get bounced back.
+- Proposal agent owns drafting `openspec/changes/<id>/` artifacts (proposal, tasks, design, spec deltas) and SHALL keep all edits scoped to `openspec/`.
+- Proposal agent SHALL cite every research source (exa/context7/library docs) directly inside the proposal and log highlights via knowledge-graph entries (or coordinate with Orchestrator if tooling gaps persist).
+- Planner refuses to proceed until the Proposal agent’s clarifications, validation output (`openspec validate <id> --strict`), and outstanding questions are documented for Builder/QA.
