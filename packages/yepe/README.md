@@ -29,6 +29,8 @@ yepe copies the following from the [agents blueprint repository](https://github.
 **New in v0.2.0:** yepe now prompts for project information and automatically customizes:
 - `openspec/project.md` with your tech stack, architecture, and conventions
 - `AGENTS.md` with your project name, purpose, and domain context
+- **Skill selection**: Choose which external integration skills to include
+- **Clean learnings**: Copies template-only learnings files (no blueprint repo entries)
 
 ## Prerequisites
 
@@ -52,17 +54,21 @@ git init
 npx @yepe/init
 
 # You'll be prompted for:
-# - Project name
-# - Purpose/goals
-# - Tech stack
-# - Code style
+# Required fields (marked with *):
+# - * Project name
+# - * Purpose/goals (1-2 sentences)
+# - * Beads prefix (2-4 characters)
+#
+# Optional fields (press Enter to skip):
+# - Tech stack (comma-separated)
+# - Code style & formatting
 # - Architecture patterns
 # - Testing strategy
 # - Git workflow
 # - Domain context
-# - Constraints
+# - Important constraints
 # - External dependencies
-# - Beads prefix
+# - Skill selection (which external integrations to include)
 
 # Review changes
 git status

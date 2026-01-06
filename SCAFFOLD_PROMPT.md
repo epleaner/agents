@@ -27,9 +27,14 @@ Make sure this repository has git initialized and a clean working tree, then run
 yepe
 ```
 
-You'll be prompted for project information:
-- Project name (required)
-- Purpose/goals (required, 1-2 sentences)
+You'll be prompted for project information (required fields marked with *):
+
+**Required:**
+- * Project name
+- * Purpose/goals (1-2 sentences)
+- * Beads prefix (2-4 characters for issue IDs)
+
+**Optional (press Enter to skip):**
 - Tech stack (comma-separated, e.g., "TypeScript, React, Node.js")
 - Code style (e.g., "Prettier, ESLint, 2-space indent")
 - Architecture patterns (e.g., "Clean Architecture, DDD")
@@ -38,13 +43,21 @@ You'll be prompted for project information:
 - Domain context (what should AI know about your business domain?)
 - Important constraints (technical, business, regulatory)
 - Key external dependencies (APIs, services)
-- Beads prefix (2-4 characters for issue IDs)
+- **Skill selection** (choose which external integration skills to include)
+  - Options: slack-notify, jira-lookup, jira-update, linear-sync, fathom-notes, action-items, knowledge-graph, cloud-deploy
+  - You can select individual skills (e.g., "1,3,5"), all ("a"), or none ("0")
+
+**Error handling:**
+- If you miss a required field, you'll be re-prompted (no exit/restart needed)
+- Invalid beads prefix length will re-prompt
 
 yepe will:
 1. Copy all workflow files (AGENTS.md, .opencode/, openspec/, learnings/, bin/)
-2. Customize openspec/project.md with your project details
-3. Customize AGENTS.md header with your project name and context
-4. Generate a report in .yepe-report.json
+2. **Only copy selected skills** from .opencode/skill/
+3. Copy **template-only learnings files** (no actual entries from blueprint repo)
+4. Customize openspec/project.md with your project details
+5. Customize AGENTS.md header with your project name and context
+6. Generate a report in .yepe-report.json
 
 **Step 3: Review the changes**
 
@@ -53,6 +66,8 @@ git status                  # See what was added
 cat .yepe-report.json      # Review the detailed report
 cat openspec/project.md    # Check customized project info
 head -50 AGENTS.md         # Check customized header
+ls .opencode/skill/        # See which skills were installed
+cat learnings/index.md     # Check that learnings are template-only
 ```
 
 **Step 4: Initialize beads**

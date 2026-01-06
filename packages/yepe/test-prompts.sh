@@ -55,7 +55,7 @@ echo ""
 echo "4️⃣  Running yepe with simulated input..."
 echo ""
 
-# Create input file
+# Create input file (last line is skill selection: 1,3 = action-items, jira-lookup)
 cat > /tmp/yepe-input.txt <<EOF
 My Awesome App
 A modern web application for managing tasks and projects
@@ -68,6 +68,7 @@ Task management domain with projects, tasks, and user collaboration
 GDPR compliance required, data residency in EU
 Auth0 for authentication, Stripe for payments, SendGrid for emails
 myapp
+1,3
 EOF
 
 yepe < /tmp/yepe-input.txt || true
@@ -103,6 +104,27 @@ if [ -f ".yepe-report.json" ]; then
     echo "   ✅ .yepe-report.json created"
 else
     echo "   ❌ .yepe-report.json not found"
+fi
+
+echo ""
+
+if [ -f "learnings/index.md" ]; then
+    echo "   ✅ learnings/index.md created (template)"
+    echo ""
+    echo "📄 learnings/index.md (first 20 lines):"
+    head -20 learnings/index.md
+else
+    echo "   ❌ learnings/index.md not found"
+fi
+
+echo ""
+
+if [ -d ".opencode/skill" ]; then
+    echo "   ✅ .opencode/skill/ created"
+    echo "   Skills installed:"
+    ls -1 .opencode/skill/ | sed 's/^/      /'
+else
+    echo "   ❌ .opencode/skill/ not found"
 fi
 
 echo ""

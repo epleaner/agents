@@ -1,8 +1,9 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync, statSync, copyFileSync } from 'fs';
-import { join, dirname, relative } from 'path';
+import { join, dirname, relative, basename } from 'path';
 import { execSync } from 'child_process';
 import { ValidationError } from './validate.js';
 import { promptProjectInfo, generateProjectMd, generateAgentsMdHeader } from './prompts.js';
+import { getLearningsTemplate } from './learnings-templates.js';
 
 const BLUEPRINT_REPO = 'https://github.com/epleaner/agents.git';
 const STAGING_DIR = '.opencode/.yepe-tmp';
@@ -46,14 +47,14 @@ const BLUEPRINT_FILES = [
 export async function init(): Promise<void> {
   console.log('🚀 Initializing yepe blueprint...\n');
 
-  // Step 1: Gather project information
-  const projectInfo = await promptProjectInfo();
-
-  // Step 2: Clone/download blueprint assets
+  // Step 1: Clone/download blueprint assets first (needed for skill discovery)
   await downloadBlueprint();
 
+  // Step 2: Gather project information (including skill selection)
+  const projectInfo = await promptProjectInfo(STAGING_DIR);
+
   // Step 3: Detect conflicts and stage files
-  const report = await stageFiles();
+  const report = await stageFiles(projectInfo);
 
   // Step 4: Copy non-conflicting files
   await copyFiles(report);
@@ -95,11 +96,12 @@ async function downloadBlueprint(): Promise<void> {
   }
 }
 
-async function stageFiles(): Promise<Report> {
+async function stageFiles(projectInfo: any): Promise<Report> {
   console.log('🔍 Analyzing files...');
 
   const changes: FileChange[] = [];
   const conflicts: string[] = [];
+  const selectedSkills = new Set<string>(projectInfo.selectedSkills);
 
   for (const blueprintPath of BLUEPRINT_FILES) {
     const sourcePath = join(STAGING_DIR, blueprintPath);
@@ -112,7 +114,7 @@ async function stageFiles(): Promise<Report> {
     
     if (stat.isDirectory()) {
       // Process directory recursively
-      processDirectory(sourcePath, blueprintPath, changes, conflicts);
+      processDirectory(sourcePath, blueprintPath, changes, conflicts, selectedSkills);
     } else {
       // Process single file
       processFile(sourcePath, blueprintPath, changes, conflicts);
@@ -131,18 +133,26 @@ async function stageFiles(): Promise<Report> {
     },
   };
 
-  console.log(`✓ Analysis complete: ${report.summary.added} to add, ${report.summary.conflicts} conflicts\n`);
+  console.log(`✓ Analysis complete: ${report.summary.added} to add, ${report.summary.conflicts} conflicts, ${report.summary.skipped} skipped\n`);
 
   return report;
 }
 
-function processDirectory(sourcePath: string, blueprintPath: string, changes: FileChange[], conflicts: string[]): void {
+function processDirectory(sourcePath: string, blueprintPath: string, changes: FileChange[], conflicts: string[], selectedSkills?: Set<string>): void {
   const entries = readdirSync(sourcePath);
 
   for (const entry of entries) {
     // Skip git directory and node_modules
     if (entry === '.git' || entry === 'node_modules') {
       continue;
+    }
+
+    // Skip skills that weren't selected
+    if (selectedSkills && blueprintPath.includes('.opencode/skill/')) {
+      const skillName = blueprintPath.split('.opencode/skill/')[1]?.split('/')[0] || entry;
+      if (!selectedSkills.has(skillName)) {
+        continue;
+      }
     }
 
     const entrySourcePath = join(sourcePath, entry);
@@ -153,7 +163,7 @@ function processDirectory(sourcePath: string, blueprintPath: string, changes: Fi
     const stat = statSync(entrySourcePath);
 
     if (stat.isDirectory()) {
-      processDirectory(entrySourcePath, entryBlueprintPath, changes, conflicts);
+      processDirectory(entrySourcePath, entryBlueprintPath, changes, conflicts, selectedSkills);
     } else {
       processFile(entrySourcePath, entryBlueprintPath, changes, conflicts);
     }
@@ -195,7 +205,20 @@ async function copyFiles(report: Report): Promise<void> {
         mkdirSync(targetDir, { recursive: true });
       }
 
-      // Copy file
+      // Check if this is a learnings file - use template instead of copying
+      if (targetPath.startsWith('learnings/') && targetPath.endsWith('.md')) {
+        const filename = basename(targetPath);
+        const template = getLearningsTemplate(filename);
+        
+        if (template) {
+          // Write template instead of copying
+          writeFileSync(targetPath, template);
+          copied++;
+          continue;
+        }
+      }
+
+      // Copy file normally
       copyFileSync(sourcePath, targetPath);
       copied++;
     }

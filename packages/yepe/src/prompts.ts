@@ -12,12 +12,102 @@ export interface ProjectInfo {
   constraints: string;
   dependencies: string;
   beadsPrefix: string;
+  selectedSkills: string[];
+}
+
+export interface SkillInfo {
+  name: string;
+  description: string;
+}
+
+/**
+ * Discovers available skills from the blueprint
+ */
+export function discoverSkills(blueprintDir: string): SkillInfo[] {
+  const { readdirSync, existsSync, readFileSync, statSync } = require('fs');
+  const { join } = require('path');
+  
+  const skillsDir = join(blueprintDir, '.opencode/skill');
+  if (!existsSync(skillsDir)) {
+    return [];
+  }
+
+  const skills: SkillInfo[] = [];
+  const entries = readdirSync(skillsDir);
+
+  for (const entry of entries) {
+    const skillPath = join(skillsDir, entry);
+    const stat = statSync(skillPath);
+    
+    if (stat.isDirectory()) {
+      const skillMdPath = join(skillPath, 'SKILL.md');
+      if (existsSync(skillMdPath)) {
+        try {
+          const content = readFileSync(skillMdPath, 'utf-8');
+          // Extract description from frontmatter
+          const descMatch = content.match(/description:\s*(.+)/);
+          const description = descMatch ? descMatch[1].trim() : 'No description available';
+          
+          skills.push({
+            name: entry,
+            description,
+          });
+        } catch (error) {
+          // Skip skills that can't be read
+        }
+      }
+    }
+  }
+
+  return skills.sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/**
+ * Prompts the user to select skills
+ */
+async function promptSkillSelection(skills: SkillInfo[], question: (prompt: string) => Promise<string>): Promise<string[]> {
+  if (skills.length === 0) {
+    return [];
+  }
+
+  console.log('\n📦 Available skills:');
+  console.log('   (These are specialized capabilities for external integrations)\n');
+  
+  skills.forEach((skill, index) => {
+    console.log(`   ${index + 1}. ${skill.name}`);
+    console.log(`      ${skill.description}`);
+  });
+
+  console.log('\n   0. None (skip all skills)');
+  console.log('   a. All skills\n');
+
+  const answer = await question('Select skills (comma-separated numbers, "a" for all, "0" for none): ');
+  
+  if (answer.toLowerCase() === 'a') {
+    return skills.map(s => s.name);
+  }
+  
+  if (answer === '0' || answer === '') {
+    return [];
+  }
+
+  const selections = answer.split(',').map(s => s.trim());
+  const selectedSkills: string[] = [];
+
+  for (const selection of selections) {
+    const index = parseInt(selection, 10) - 1;
+    if (index >= 0 && index < skills.length) {
+      selectedSkills.push(skills[index].name);
+    }
+  }
+
+  return selectedSkills;
 }
 
 /**
  * Prompts the user for project information
  */
-export async function promptProjectInfo(): Promise<ProjectInfo> {
+export async function promptProjectInfo(blueprintDir: string): Promise<ProjectInfo> {
   const rl = createInterface({
     input: process.stdin,
     output: process.stdout,
@@ -31,49 +121,71 @@ export async function promptProjectInfo(): Promise<ProjectInfo> {
     });
   };
 
-  console.log('\n📝 Let\'s customize this blueprint for your project!\n');
-  console.log('Press Enter to skip any optional fields.\n');
+  console.log('\nProject configuration (required fields marked with *):\n');
 
   try {
-    // Required fields
-    const name = await question('Project name: ');
-    if (!name) {
-      throw new Error('Project name is required');
+    // Required: Project name
+    let name = '';
+    while (!name) {
+      name = await question('* Project name: ');
+      if (!name) {
+        console.log('  ❌ Project name is required\n');
+      }
     }
 
-    const purpose = await question('Project purpose (1-2 sentences): ');
-    if (!purpose) {
-      throw new Error('Project purpose is required');
+    // Required: Purpose
+    let purpose = '';
+    while (!purpose) {
+      purpose = await question('* Project purpose (1-2 sentences): ');
+      if (!purpose) {
+        console.log('  ❌ Project purpose is required\n');
+      }
     }
 
-    // Tech stack
+    // Optional: Tech stack
     console.log('\nTech stack (comma-separated, e.g., "TypeScript, React, Node.js"):');
     const techStackInput = await question('> ');
     const techStack = techStackInput
       ? techStackInput.split(',').map(t => t.trim()).filter(Boolean)
       : [];
 
-    // Optional but recommended
+    // Optional: Code style
     const codeStyle = await question('\nCode style & formatting (e.g., "Prettier, ESLint, 2-space indent"): ');
+    
+    // Optional: Architecture
     const architecture = await question('Architecture patterns (e.g., "Clean Architecture, DDD, Microservices"): ');
+    
+    // Optional: Testing
     const testing = await question('Testing strategy (e.g., "Jest unit tests, Playwright E2E, 80% coverage"): ');
+    
+    // Optional: Git workflow
     const gitWorkflow = await question('Git workflow (e.g., "trunk-based", "GitFlow", "feature branches"): ');
 
-    // Domain context
+    // Optional: Domain context
     const domain = await question('\nDomain context (what should AI know about your business domain?): ');
 
-    // Constraints
+    // Optional: Constraints
     const constraints = await question('Important constraints (technical, business, or regulatory): ');
 
-    // External dependencies
+    // Optional: External dependencies
     const dependencies = await question('Key external dependencies (APIs, services, systems): ');
 
-    // Beads prefix
-    console.log('\nBeads prefix (2-4 characters for issue IDs, e.g., "app", "api", "web"):');
-    const beadsPrefix = await question('> ');
-    if (!beadsPrefix || beadsPrefix.length < 2 || beadsPrefix.length > 4) {
-      throw new Error('Beads prefix must be 2-4 characters');
+    // Required: Beads prefix
+    let beadsPrefix = '';
+    while (!beadsPrefix) {
+      console.log('\n* Beads prefix (2-4 characters for issue IDs, e.g., "app", "api", "web"):');
+      beadsPrefix = await question('> ');
+      if (!beadsPrefix) {
+        console.log('  ❌ Beads prefix is required\n');
+      } else if (beadsPrefix.length < 2 || beadsPrefix.length > 4) {
+        console.log('  ❌ Beads prefix must be 2-4 characters\n');
+        beadsPrefix = '';
+      }
     }
+
+    // Optional: Skill selection
+    const skills = discoverSkills(blueprintDir);
+    const selectedSkills = await promptSkillSelection(skills, question);
 
     rl.close();
 
@@ -89,6 +201,7 @@ export async function promptProjectInfo(): Promise<ProjectInfo> {
       constraints,
       dependencies,
       beadsPrefix,
+      selectedSkills,
     };
   } catch (error) {
     rl.close();
