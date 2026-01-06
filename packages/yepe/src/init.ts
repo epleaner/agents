@@ -2,8 +2,9 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync, statSy
 import { join, dirname, relative } from 'path';
 import { execSync } from 'child_process';
 import { ValidationError } from './validate.js';
+import { promptProjectInfo, generateProjectMd, generateAgentsMdHeader } from './prompts.js';
 
-const BLUEPRINT_REPO = 'https://github.com/anomalyco/agents.git';
+const BLUEPRINT_REPO = 'https://github.com/epleaner/agents.git';
 const STAGING_DIR = '.opencode/.yepe-tmp';
 const REPORT_FILE = '.yepe-report.json';
 
@@ -45,23 +46,29 @@ const BLUEPRINT_FILES = [
 export async function init(): Promise<void> {
   console.log('🚀 Initializing yepe blueprint...\n');
 
-  // Step 1: Clone/download blueprint assets
+  // Step 1: Gather project information
+  const projectInfo = await promptProjectInfo();
+
+  // Step 2: Clone/download blueprint assets
   await downloadBlueprint();
 
-  // Step 2: Detect conflicts and stage files
+  // Step 3: Detect conflicts and stage files
   const report = await stageFiles();
 
-  // Step 3: Copy non-conflicting files
+  // Step 4: Copy non-conflicting files
   await copyFiles(report);
 
-  // Step 4: Generate report
+  // Step 5: Customize configuration files
+  await customizeFiles(projectInfo, report);
+
+  // Step 6: Generate report
   await generateReport(report);
 
-  // Step 5: Cleanup
+  // Step 7: Cleanup
   cleanup();
 
-  // Step 6: Print summary
-  printSummary(report);
+  // Step 8: Print summary
+  printSummary(report, projectInfo);
 }
 
 async function downloadBlueprint(): Promise<void> {
@@ -197,6 +204,56 @@ async function copyFiles(report: Report): Promise<void> {
   console.log(`✓ Copied ${copied} files\n`);
 }
 
+async function customizeFiles(projectInfo: any, report: Report): Promise<void> {
+  console.log('✏️  Customizing configuration files...');
+
+  let customized = 0;
+
+  // Customize openspec/project.md if it was added (not conflicted)
+  const projectMdPath = 'openspec/project.md';
+  const projectMdChange = report.changes.find(c => c.path === projectMdPath);
+  
+  if (projectMdChange && projectMdChange.status === 'added') {
+    const content = generateProjectMd(projectInfo);
+    writeFileSync(projectMdPath, content);
+    customized++;
+  }
+
+  // Customize AGENTS.md header if it was added (not conflicted)
+  const agentsMdPath = 'AGENTS.md';
+  const agentsMdChange = report.changes.find(c => c.path === agentsMdPath);
+  
+  if (agentsMdChange && agentsMdChange.status === 'added') {
+    // Read the template AGENTS.md
+    const templateContent = readFileSync(agentsMdPath, 'utf-8');
+    
+    // Find the section after the OpenSpec block (after <!-- OPENSPEC:END -->)
+    const openspecEndMarker = '<!-- OPENSPEC:END -->';
+    const openspecEndIndex = templateContent.indexOf(openspecEndMarker);
+    
+    if (openspecEndIndex !== -1) {
+      // Find the start of "## Quick Reference" or similar section
+      const quickRefMatch = templateContent.match(/\n## (Quick Reference|Beads Performance|Meta-Learnings|Using Beads)/);
+      
+      if (quickRefMatch && quickRefMatch.index) {
+        // Replace the header section between OPENSPEC:END and the first ## section
+        const beforeHeader = templateContent.substring(0, openspecEndIndex + openspecEndMarker.length);
+        const afterHeader = templateContent.substring(quickRefMatch.index);
+        
+        const customHeader = generateAgentsMdHeader(projectInfo);
+        // Extract just the custom header part (after OPENSPEC:END)
+        const customHeaderPart = customHeader.substring(customHeader.indexOf(openspecEndMarker) + openspecEndMarker.length);
+        
+        const newContent = beforeHeader + customHeaderPart + afterHeader;
+        writeFileSync(agentsMdPath, newContent);
+        customized++;
+      }
+    }
+  }
+
+  console.log(`✓ Customized ${customized} configuration files\n`);
+}
+
 async function generateReport(report: Report): Promise<void> {
   writeFileSync(REPORT_FILE, JSON.stringify(report, null, 2));
   console.log(`✓ Report saved to ${REPORT_FILE}\n`);
@@ -221,7 +278,7 @@ function getBlueprintVersion(): string {
   return 'unknown';
 }
 
-function printSummary(report: Report): void {
+function printSummary(report: Report, projectInfo: any): void {
   console.log('📊 Summary:');
   console.log(`   • Added: ${report.summary.added} files`);
   console.log(`   • Conflicts: ${report.summary.conflicts} files`);
@@ -244,9 +301,9 @@ function printSummary(report: Report): void {
     console.log('   3. Initialize OpenSpec: openspec init');
   }
   if (existsSync('.beads')) {
-    console.log('   4. Initialize beads: (already exists)');
+    console.log(`   4. Initialize beads: (already exists with prefix "${projectInfo.beadsPrefix}")`);
   } else {
-    console.log('   4. Initialize beads: bd init');
+    console.log(`   4. Initialize beads: bd init ${projectInfo.beadsPrefix}`);
   }
   console.log('   5. Commit changes: git add . && git commit -m "Add yepe blueprint"\n');
 }

@@ -18,13 +18,17 @@ curl -fsSL https://yepe.dev/install.sh | bash
 
 ## What it does
 
-yepe copies the following from the [agents blueprint repository](https://github.com/anomalyco/agents):
+yepe copies the following from the [agents blueprint repository](https://github.com/epleaner/agents):
 
 - **AGENTS.md** - AI assistant instructions and workflow documentation
 - **.opencode/** - OpenCode agent definitions, commands, and skills
 - **openspec/** - OpenSpec change proposal framework
 - **learnings/** - Meta-learnings and operational insights ledgers
 - **bin/** - Helper scripts (review-learnings, etc.)
+
+**New in v0.2.0:** yepe now prompts for project information and automatically customizes:
+- `openspec/project.md` with your tech stack, architecture, and conventions
+- `AGENTS.md` with your project name, purpose, and domain context
 
 ## Prerequisites
 
@@ -44,8 +48,21 @@ In a new repository:
 # Initialize git if needed
 git init
 
-# Run yepe
+# Run yepe (interactive)
 npx @yepe/init
+
+# You'll be prompted for:
+# - Project name
+# - Purpose/goals
+# - Tech stack
+# - Code style
+# - Architecture patterns
+# - Testing strategy
+# - Git workflow
+# - Domain context
+# - Constraints
+# - External dependencies
+# - Beads prefix
 
 # Review changes
 git status
@@ -139,7 +156,7 @@ After running yepe:
 
 - [OpenCode Documentation](https://opencode.ai/docs)
 - [beads Documentation](https://beads.sh)
-- [Blueprint Repository](https://github.com/anomalyco/agents)
+- [Blueprint Repository](https://github.com/epleaner/agents)
 
 ## License
 

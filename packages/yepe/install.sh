@@ -5,7 +5,7 @@
 set -e
 
 # Configuration
-BLUEPRINT_REPO="https://github.com/anomalyco/agents.git"
+BLUEPRINT_REPO="https://github.com/epleaner/agents.git"
 STAGING_DIR=".opencode/.yepe-tmp"
 REPORT_FILE=".yepe-report.json"
 
