@@ -1,7 +1,7 @@
 ---
 description: Release and deployment subagent handling git hygiene, PR prep, CI/CD follow-up, and cloud bundle rollout
 mode: subagent
-model: opencode/gpt-5.1-codex
+model: anthropic/claude-3.5-haiku-20241022
 temperature: 0.18
 tools:
   write: true

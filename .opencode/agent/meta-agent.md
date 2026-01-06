@@ -1,7 +1,7 @@
 ---
 description: Continuous-improvement overseer that audits transcripts, beads, and guidance before sessions can conclude
 mode: all
-model: opencode/gpt-5.1-codex
+model: anthropic/claude-opus-4-20250514
 temperature: 0.18
 tools:
   write: true

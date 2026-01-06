@@ -1,7 +1,7 @@
 ---
 description: Documentation and comms subagent for release notes, spec deltas, and Slack/Jira summaries
 mode: subagent
-model: opencode/gpt-5.1-codex
+model: anthropic/claude-opus-4-20250514
 temperature: 0.28
 tools:
   write: true

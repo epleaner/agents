@@ -29,4 +29,4 @@ Statuses must be one of:
 ## Entries
 | ID | Title | Ledger | Owner | Status | Follow-up Links |
 | --- | --- | --- | --- | --- | --- |
-| _None yet_ |  |  |  |  |  |
+| FR-20260105-001 | Beads daemon 5+ second startup causing workflow slowdowns | failures-and-resolutions.md | Meta-Agent | promoted | AGENTS.md beads troubleshooting section |

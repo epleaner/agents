@@ -1,7 +1,7 @@
 ---
 description: Quality gatekeeper handling lint, tests, Playwright checks, and formatting fixes before Release
 mode: primary
-model: opencode/gpt-5.1-codex
+model: anthropic/claude-3.7-sonnet-20250219
 temperature: 0.2
 tools:
   write: true

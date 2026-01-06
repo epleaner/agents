@@ -1,7 +1,7 @@
 ---
 description: Focused diagnostic subagent for reproducing failures, running targeted tests, and proposing fixes
 mode: subagent
-model: opencode/gpt-5.1-codex
+model: anthropic/claude-3.7-sonnet-20250219
 temperature: 0.2
 tools:
   write: true

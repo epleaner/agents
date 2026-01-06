@@ -1,7 +1,7 @@
 ---
 description: Primary coordinator that sequences Planner → Builder → QA → Release → PM and keeps beads/OpenSpec aligned
 mode: primary
-model: opencode/gpt-5.1-codex
+model: anthropic/claude-opus-4-20250514
 temperature: 0.18
 tools:
   write: true

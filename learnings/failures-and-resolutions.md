@@ -22,4 +22,22 @@ Document notable breakages, regressions, or slips along with how they were resol
 
 ## Entries
 
-_No entries recorded yet._
+### FR-20260105-001 Beads daemon 5+ second startup causing workflow slowdowns
+- Date: 2026-01-05
+- Session: Meta-Agent performance investigation
+- Knowledge Type: meta
+- Meta Category: failure-resolution
+- Owner: Meta-Agent
+- Status: promoted
+- Related IDs: none
+- Summary: Every `bd` command was taking 5+ seconds due to legacy database lacking repository fingerprint (pre-v0.17.5 schema). Daemon startup failed validation checks, forcing fallback to slow direct mode. This affected all Orchestrator/PM workflows using beads commands.
+- Root Cause: Database created before v0.17.5 lacked repository fingerprint, causing daemon to fail validation on every startup with "LEGACY DATABASE DETECTED" error.
+- Resolution: Ran `bd migrate --update-repo-id` to add fingerprint (repo ID: f19e22a9). Performance improved 94.5% (5.181s → 0.285s for `bd stats`).
+- Recommended Action: Add `bd doctor` check to onboarding/setup workflows. Update AGENTS.md with troubleshooting guidance for slow beads performance.
+- Supporting Links: 
+  - Daemon log: `.beads/daemon.log` (lines 1-312 show repeated fingerprint validation failures)
+  - Before: 5.181s for `bd stats --json`
+  - After: 0.285s for `bd stats --json` (94.5% improvement)
+- Follow-up Links: 
+  - AGENTS.md updated with beads troubleshooting section
+  - learnings/index.md entry added

@@ -1,7 +1,7 @@
 ---
-description: Primary implementation agent that executes Planner instructions with GPT-5.1 Codex and coordinates subagents as needed
+description: Primary implementation agent that executes Planner instructions with Claude 3.7 Sonnet and coordinates subagents as needed
 mode: primary
-model: opencode/gpt-5.1-codex
+model: anthropic/claude-3.7-sonnet-20250219
 temperature: 0.15
 tools:
   write: true

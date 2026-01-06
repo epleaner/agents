@@ -31,6 +31,41 @@ bd close <id>         # Complete work
 bd sync               # Sync with git
 ```
 
+## Beads Performance Troubleshooting
+
+If `bd` commands are slow (>1 second), run diagnostics:
+
+```bash
+bd doctor              # Check for issues
+```
+
+**Common issues and fixes:**
+
+1. **"Daemon took too long to start" or "LEGACY DATABASE DETECTED"**
+   - **Symptom:** Commands take 5+ seconds, daemon falls back to direct mode
+   - **Cause:** Database missing repository fingerprint (pre-v0.17.5 schema)
+   - **Fix:** `bd migrate --update-repo-id`
+   - **Expected improvement:** 90%+ faster (5s → 0.3s)
+
+2. **"Database out of sync" in sandboxed environments**
+   - **Symptom:** Daemon permission errors, sync conflicts
+   - **Cause:** Sandboxed environments (Claude Code, containers) restrict daemon
+   - **Fix:** Use `--sandbox` flag or `export BEADS_NO_DAEMON=1`
+
+3. **Git worktree conflicts**
+   - **Symptom:** Commits to wrong branch, shared database state issues
+   - **Cause:** Daemon mode doesn't support git worktrees
+   - **Fix:** `export BEADS_NO_DAEMON=1` when using worktrees
+
+4. **Outdated CLI version**
+   - **Check:** `bd --version` vs `bd doctor` output
+   - **Fix:** `brew upgrade bd` (macOS) or check installation docs
+
+**Performance expectations:**
+- **With daemon:** 50-300ms for most commands
+- **Without daemon (direct mode):** 1-5s for most commands
+- **Daemon startup:** <1s (if >5s, check for legacy database issue)
+
 ## Meta-Learnings Workflow
 
 - Capture operational/meta insights under `learnings/` using the required template for each ledger. Do **not** store domain facts here; those belong in the knowledge graph.

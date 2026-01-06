@@ -1,7 +1,7 @@
 ---
 description: Proposal-specialist agent that researches best practices and authors OpenSpec artifacts before implementation begins
 mode: primary
-model: opencode/gpt-5.1-codex
+model: anthropic/claude-3.7-sonnet-20250219
 temperature: 0.25
 tools:
   write: true

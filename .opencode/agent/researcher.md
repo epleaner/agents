@@ -1,7 +1,7 @@
 ---
 description: Read-only research subagent for documentation, knowledge-graph, Slack, and meeting-note lookups
-mode: subagent
-model: opencode/gpt-5.1-codex
+mode: all
+model: google/gemini-pro-1.5-exp
 temperature: 0.35
 tools:
   write: false

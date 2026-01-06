@@ -1,7 +1,7 @@
 ---
 description: Read-only planner that drives OpenSpec alignment, clarifying questions, and task breakdown before execution
 mode: primary
-model: opencode/gpt-5.1-codex
+model: anthropic/claude-3.7-sonnet-20250219
 temperature: 0.22
 tools:
   write: false
