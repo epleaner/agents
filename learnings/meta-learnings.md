@@ -24,4 +24,28 @@ Use the following structure for every entry. Replace angle-bracket placeholders 
 
 ## Entries
 
-_No entries recorded yet. Run `./bin/review-learnings` after adding entries to keep statuses up to date._
+### [ML-20260107-001] Orchestrator should delegate meeting queries to fathom subagent
+- Date: 2026-01-07
+- Session: orchestrator session - fathom meeting query
+- Knowledge Type: meta
+- Meta Category: meta-learning
+- Owner: orchestrator
+- Status: promoted
+- Related IDs: none
+- Summary: Orchestrator used fathom skills directly instead of delegating to @fathom subagent, resulting in verbose intermediate output visible to user. Meeting queries should be delegated so the subagent handles fetching internally and returns only the direct answer.
+- Recommended Action: Update orchestrator guidance to mandate delegation to @fathom for meeting questions.
+- Supporting Links: session transcript
+- Follow-up Links: .opencode/agent/orchestrator.md updated
+
+### [ML-20260107-002] Agent responses need direct communication style
+- Date: 2026-01-07
+- Session: orchestrator session - fathom meeting query
+- Knowledge Type: meta
+- Meta Category: meta-learning
+- Owner: all agents
+- Status: promoted
+- Related IDs: none
+- Summary: Agent responses included unnecessary preambles ("I'll help you...", "Let me..."), politeness padding, and "In summary" conclusions that buried the actual answer. Users want direct answers first, optional context second.
+- Recommended Action: Add communication style guidelines to AGENTS.md requiring direct answers without preambles or filler.
+- Supporting Links: session transcript
+- Follow-up Links: AGENTS.md updated with Communication Style section, .opencode/agent/orchestrator.md updated

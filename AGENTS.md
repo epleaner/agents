@@ -19,6 +19,22 @@ Keep this managed block so 'openspec update' can refresh the instructions.
 
 # Agent Instructions
 
+## Communication Style (All Agents)
+
+**Be direct. No preambles. No filler.**
+
+- Lead with the answer, not context
+- Skip phrases like "I'll help you with...", "Let me...", "Sure!", "Great question!"
+- No "In summary" or "To summarize" - just state the conclusion
+- Omit politeness padding - clarity over friendliness
+- If context is needed, put it after the answer in a brief note
+
+**Bad:** "I'll help you find that information. Let me search through the meeting transcripts. After reviewing the data, I found that... In summary, the answer is X."
+
+**Good:** "The answer is X." (then optional brief context if needed)
+
+---
+
 This project uses **bd** (beads) for issue tracking. Run `bd onboard` to get started.
 
 ## Using This Repository as a Blueprint
@@ -54,7 +70,7 @@ bd sync               # Sync with git
 
 ## Agents
 
-This project uses 4 agents:
+This project uses 5 agents:
 
 | Agent | Purpose |
 | --- | --- |
@@ -62,6 +78,7 @@ This project uses 4 agents:
 | **planner** | Creates OpenSpec proposals with tasks, spec deltas, and validation criteria |
 | **builder** | Implementation agent that executes plans using skills |
 | **researcher** | Read-only research agent for documentation and context lookups |
+| **fathom** | Meeting assistant for transcripts, action items, and Q&A on recordings |
 
 ## Commands
 
@@ -70,6 +87,7 @@ This project uses 4 agents:
 | `/research` | Look up documentation, APIs, or context |
 | `/plan` | Break down work into actionable steps (creates OpenSpec proposals) |
 | `/dev` | Run the full development workflow |
+| `/fathom` | Work with Fathom meeting recordings, transcripts, and action items |
 
 ## Skills
 
@@ -94,6 +112,8 @@ Skills are specialized capabilities that agents can invoke:
 | --- | --- |
 | `exa-search`, `context7-docs` | Research APIs/docs |
 | `knowledge-graph` | Query or append structured context |
+| `fathom-list-meetings` | List Fathom meetings in a date range |
+| `fathom-get-transcript` | Fetch transcript for a specific meeting |
 | `fathom-notes` | Pull meeting transcripts + action items |
 | `slack-notify` | Broadcast status updates |
 | `jira-lookup`, `jira-update`, `linear-sync` | Sync external trackers |

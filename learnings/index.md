@@ -30,3 +30,5 @@ Statuses must be one of:
 | ID | Title | Ledger | Owner | Status | Follow-up Links |
 | --- | --- | --- | --- | --- | --- |
 | FR-20260105-001 | Beads daemon 5+ second startup causing workflow slowdowns | failures-and-resolutions.md | Meta-Agent | promoted | AGENTS.md beads troubleshooting section |
+| ML-20260107-001 | Orchestrator should delegate meeting queries to fathom subagent | meta-learnings.md | orchestrator | promoted | .opencode/agent/orchestrator.md |
+| ML-20260107-002 | Agent responses need direct communication style | meta-learnings.md | all agents | promoted | AGENTS.md, .opencode/agent/orchestrator.md |
