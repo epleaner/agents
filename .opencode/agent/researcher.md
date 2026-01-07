@@ -1,7 +1,7 @@
 ---
 description: Read-only research subagent for documentation, knowledge-graph, Slack, and meeting-note lookups
 mode: all
-model: google/gemini-pro-1.5-exp
+model: openrouter/google/gemini-pro-1.5
 temperature: 0.35
 tools:
   write: false

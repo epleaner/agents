@@ -1,7 +1,7 @@
 ---
 description: Operations/PM agent that keeps beads, OpenSpec, Jira/Linear, Slack, and the knowledge graph synchronized
 mode: primary
-model: anthropic/claude-3.7-sonnet-20250219
+model: openrouter/anthropic/claude-sonnet-4.5
 temperature: 0.25
 tools:
   write: true

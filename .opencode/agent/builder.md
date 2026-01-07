@@ -1,7 +1,7 @@
 ---
 description: Primary implementation agent that executes Planner instructions with Claude 3.7 Sonnet and coordinates subagents as needed
 mode: primary
-model: anthropic/claude-3.7-sonnet-20250219
+model: openrouter/anthropic/claude-sonnet-4.5
 temperature: 0.15
 tools:
   write: true

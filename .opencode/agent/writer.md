@@ -1,7 +1,7 @@
 ---
 description: Documentation and comms subagent for release notes, spec deltas, and Slack/Jira summaries
 mode: subagent
-model: anthropic/claude-opus-4-20250514
+model: openrouter/anthropic/claude-opus-4.5
 temperature: 0.28
 tools:
   write: true

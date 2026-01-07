@@ -1,7 +1,7 @@
 ---
 description: Read-only planner that drives OpenSpec alignment, clarifying questions, and task breakdown before execution
 mode: primary
-model: anthropic/claude-3.7-sonnet-20250219
+model: openrouter/anthropic/claude-sonnet-4.5
 temperature: 0.22
 tools:
   write: false

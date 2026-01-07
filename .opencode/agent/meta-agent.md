@@ -1,7 +1,7 @@
 ---
 description: Continuous-improvement overseer that audits transcripts, beads, and guidance before sessions can conclude
 mode: all
-model: anthropic/claude-opus-4-20250514
+model: openrouter/anthropic/claude-opus-4.5
 temperature: 0.18
 tools:
   write: true

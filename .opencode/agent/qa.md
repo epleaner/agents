@@ -1,7 +1,7 @@
 ---
 description: Quality gatekeeper handling lint, tests, Playwright checks, and formatting fixes before Release
 mode: primary
-model: anthropic/claude-3.7-sonnet-20250219
+model: openrouter/anthropic/claude-sonnet-4.5
 temperature: 0.2
 tools:
   write: true

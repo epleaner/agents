@@ -1,7 +1,7 @@
 ---
 description: Proposal-specialist agent that researches best practices and authors OpenSpec artifacts before implementation begins
 mode: primary
-model: anthropic/claude-3.7-sonnet-20250219
+model: openrouter/anthropic/claude-sonnet-4.5
 temperature: 0.25
 tools:
   write: true
