@@ -1,9 +1,12 @@
 ---
-description: Archive a deployed OpenSpec change and update specs.
+description: Archive a completed OpenSpec change and apply spec updates.
 ---
-<ChangeId>
+Archive the specified OpenSpec change. If no change ID is provided, deduce it from context or list available changes.
+
+<UserRequest>
   $ARGUMENTS
-</ChangeId>
+</UserRequest>
+
 <!-- OPENSPEC:START -->
 **Guardrails**
 - Favor straightforward, minimal implementations first and add complexity only when it is requested or clearly required.
@@ -12,9 +15,9 @@ description: Archive a deployed OpenSpec change and update specs.
 
 **Steps**
 1. Determine the change ID to archive:
-   - If this prompt already includes a specific change ID (for example inside a `<ChangeId>` block populated by slash-command arguments), use that value after trimming whitespace.
-   - If the conversation references a change loosely (for example by title or summary), run `openspec list` to surface likely IDs, share the relevant candidates, and confirm which one the user intends.
-   - Otherwise, review the conversation, run `openspec list`, and ask the user which change to archive; wait for a confirmed change ID before proceeding.
+   - If provided explicitly, use that ID after trimming whitespace.
+   - If referenced loosely (by title or summary), run `openspec list` to find matching IDs and confirm.
+   - If not provided, review the conversation, run `openspec list`, and ask which change to archive.
    - If you still cannot identify a single change ID, stop and tell the user you cannot archive anything yet.
 2. Validate the change ID by running `openspec list` (or `openspec show <id>`) and stop if the change is missing, already archived, or otherwise not ready to archive.
 3. Run `openspec archive <id> --yes` so the CLI moves the change and applies spec updates without prompts (use `--skip-specs` only for tooling-only work).

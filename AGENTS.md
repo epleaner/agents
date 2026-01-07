@@ -52,6 +52,57 @@ bd close <id>         # Complete work
 bd sync               # Sync with git
 ```
 
+## Agents
+
+This project uses 4 agents:
+
+| Agent | Purpose |
+| --- | --- |
+| **orchestrator** | Primary coordinator that sequences planning, building, and release |
+| **planner** | Read-only planner that breaks down work into actionable steps |
+| **builder** | Implementation agent that executes plans using skills |
+| **researcher** | Read-only research agent for documentation and context lookups |
+
+## Commands
+
+| Command | Description |
+| --- | --- |
+| `/research` | Look up documentation, APIs, or context |
+| `/plan` | Break down work into actionable steps |
+| `/propose-new` | Create a new OpenSpec change proposal |
+| `/propose-go` | Implement an approved proposal |
+| `/propose-close` | Archive a completed proposal |
+| `/dev` | Run the full development workflow |
+
+## Skills
+
+Skills are specialized capabilities that agents can invoke:
+
+| Skill | Purpose |
+| --- | --- |
+| `research` | Documentation, API, and context lookups |
+| `debugger` | Reproduce failures and propose fixes |
+| `qa` | Run linters, tests, and formatters |
+| `release` | Git hygiene, commits, and PRs |
+| `writer` | Documentation and release notes |
+| `pm` | Sync beads, Jira/Linear, Slack status |
+| `self-improve` | Reflect on friction and file improvements |
+| `propose-new` | Create OpenSpec proposals |
+| `propose-go` | Implement proposals |
+| `propose-close` | Archive completed proposals |
+
+### External Skills
+
+| Skill | Purpose |
+| --- | --- |
+| `exa-search`, `context7-docs` | Research APIs/docs |
+| `knowledge-graph` | Query or append structured context |
+| `fathom-notes` | Pull meeting transcripts + action items |
+| `slack-notify` | Broadcast status updates |
+| `jira-lookup`, `jira-update`, `linear-sync` | Sync external trackers |
+| `action-items` | Create/escalate todos with owners |
+| `cloud-deploy` | Package + deploy bundles |
+
 ## Beads Performance Troubleshooting
 
 If `bd` commands are slow (>1 second), run diagnostics:
@@ -102,10 +153,10 @@ bd doctor              # Check for issues
 2. **Decide if OpenSpec is required**: when work implies a new capability, architecture shift, or ambiguous change, run `openspec list`, `openspec spec list --long`, and read `openspec/project.md` to confirm whether a proposal/delta already exists.
 3. **Create/associate change IDs**: note the beads issue ID inside the OpenSpec `proposal.md` (and vice versa) so status updates stay linked. Use verb-led `change-id`s and keep them scoped to a single beads issue whenever possible.
 4. **Work in lockstep**:
-   - Draft proposal/tasks/spec deltas under `openspec/changes/<change-id>/`.
+   - Use `/propose-new` to draft proposal/tasks/spec deltas under `openspec/changes/<change-id>/`.
    - Track progress using beads statuses (`in_progress`, `review`, `done`) and mirror the same milestones in `tasks.md`.
    - Before implementation, run `openspec validate <change-id> --strict` and attach the output or summary back to the beads issue.
-5. **Close out**: when the change is merged/deployed, archive the OpenSpec change if required and move the beads issue to `done`. Run `bd sync` so git commits and beads metadata stay aligned.
+5. **Close out**: when the change is merged/deployed, use `/propose-close` to archive the OpenSpec change and move the beads issue to `done`. Run `bd sync` so git commits and beads metadata stay aligned.
 
 > Tip: if you are unsure whether a task needs an OpenSpec proposal, leave a beads comment with your reasoning and ask for guidance before continuing.
 
@@ -116,7 +167,7 @@ bd doctor              # Check for issues
 **MANDATORY WORKFLOW:**
 
 1. **File issues for remaining work** - Create issues for anything that needs follow-up
-2. **Run quality gates** (if code changed) - Tests, linters, builds
+2. **Run quality gates** (if code changed) - Use `qa` skill for tests, linters, builds
 3. **Update issue status** - Close finished work, update in-progress items
 4. **PUSH TO REMOTE** - This is MANDATORY:
    ```bash
@@ -127,36 +178,11 @@ bd doctor              # Check for issues
    ```
 5. **Clean up** - Clear stashes, prune remote branches
 6. **Verify** - All changes committed AND pushed
-7. **Hand off** - Provide context for next session
+7. **Reflect** - Use `self-improve` skill to capture friction and improvements
+8. **Hand off** - Provide context for next session
 
 **CRITICAL RULES:**
 - Work is NOT complete until `git push` succeeds
 - NEVER stop before pushing - that leaves work stranded locally
 - NEVER say "ready to push when you are" - YOU must push
 - If push fails, resolve and retry until it succeeds
-
-## Codex Multi-Agent Skill Catalog
-
-Every skill invocation must cite the active beads/change IDs and, when the action produces new context, log a short summary via the `knowledge-graph` skill so downstream agents can audit decisions. Meta-Agent usage of `bd`, `openspec`, `knowledge-graph`, and `slack-notify` MUST additionally include the improvement hypothesis, impacted workflow, and links to transcripts/todos.
-
-| Skill | Purpose | Allowed agents |
-| --- | --- | --- |
-| `exa-search`, `context7-docs` | Research APIs/docs before coding | Orchestrator, Proposal, Planner, Builder, Researcher |
-| `knowledge-graph` | Query or append structured context | Orchestrator, Proposal, Planner, PM, Builder, Researcher, QA, Release, Writer, Meta-Agent |
-| `fathom-notes` | Pull meeting transcripts + action items | Planner, PM, Researcher |
-| `slack-notify` | Broadcast plan/build/QA/release status | Orchestrator, PM, QA, Release, Writer, Meta-Agent |
-| `openspec` | Inspect proposals/spec deltas, run validations, and document governance updates | Proposal, Planner, PM, Meta-Agent |
-| `bd` | Manage beads issues, todos, and workflow status | Orchestrator, PM, Meta-Agent |
-| `action-items` | Create/escalate todos with owners/dates | Orchestrator, Planner, PM, Builder, QA, Meta-Agent |
-| `jira-lookup` / `jira-update`, `linear-sync` | Synchronize Jira/Linear tickets | PM, Writer (update), Orchestrator (lookup) |
-| `github-review` | Prepare/read PRs and reviews | QA (read), Release (create/update) |
-| `playwright` | Execute browser tests and report logs | QA only |
-| `cloud-deploy` | Package + deploy `.opencode/` bundle | Release only |
-
-> If a task requires a skill not listed for your persona, ask Orchestrator to delegate to the agent that owns it instead of proceeding directly.
-
-## Proposal Agent Engagement
-- Orchestrator MUST capture bead/change IDs, user intent, constraints, and desired outcomes before spawning `@proposal`; proposals without that bundle get bounced back.
-- Proposal agent owns drafting `openspec/changes/<id>/` artifacts (proposal, tasks, design, spec deltas) and SHALL keep all edits scoped to `openspec/`.
-- Proposal agent SHALL cite every research source (exa/context7/library docs) directly inside the proposal and log highlights via knowledge-graph entries (or coordinate with Orchestrator if tooling gaps persist).
-- Planner refuses to proceed until the Proposal agent’s clarifications, validation output (`openspec validate <id> --strict`), and outstanding questions are documented for Builder/QA.
