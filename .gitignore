@@ -1,2 +1,4 @@
 dist/
 examples/sample-service/.opencode/shared/
+# OpenCode config with API keys
+opencode.json

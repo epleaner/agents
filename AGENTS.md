@@ -59,7 +59,7 @@ This project uses 4 agents:
 | Agent | Purpose |
 | --- | --- |
 | **orchestrator** | Primary coordinator that sequences planning, building, and release |
-| **planner** | Read-only planner that breaks down work into actionable steps |
+| **planner** | Creates OpenSpec proposals with tasks, spec deltas, and validation criteria |
 | **builder** | Implementation agent that executes plans using skills |
 | **researcher** | Read-only research agent for documentation and context lookups |
 
@@ -68,10 +68,7 @@ This project uses 4 agents:
 | Command | Description |
 | --- | --- |
 | `/research` | Look up documentation, APIs, or context |
-| `/plan` | Break down work into actionable steps |
-| `/propose-new` | Create a new OpenSpec change proposal |
-| `/propose-go` | Implement an approved proposal |
-| `/propose-close` | Archive a completed proposal |
+| `/plan` | Break down work into actionable steps (creates OpenSpec proposals) |
 | `/dev` | Run the full development workflow |
 
 ## Skills
@@ -153,10 +150,10 @@ bd doctor              # Check for issues
 2. **Decide if OpenSpec is required**: when work implies a new capability, architecture shift, or ambiguous change, run `openspec list`, `openspec spec list --long`, and read `openspec/project.md` to confirm whether a proposal/delta already exists.
 3. **Create/associate change IDs**: note the beads issue ID inside the OpenSpec `proposal.md` (and vice versa) so status updates stay linked. Use verb-led `change-id`s and keep them scoped to a single beads issue whenever possible.
 4. **Work in lockstep**:
-   - Use `/propose-new` to draft proposal/tasks/spec deltas under `openspec/changes/<change-id>/`.
+   - Use `propose-new` skill to draft proposal/tasks/spec deltas under `openspec/changes/<change-id>/`.
    - Track progress using beads statuses (`in_progress`, `review`, `done`) and mirror the same milestones in `tasks.md`.
    - Before implementation, run `openspec validate <change-id> --strict` and attach the output or summary back to the beads issue.
-5. **Close out**: when the change is merged/deployed, use `/propose-close` to archive the OpenSpec change and move the beads issue to `done`. Run `bd sync` so git commits and beads metadata stay aligned.
+5. **Close out**: when the change is merged/deployed, use `propose-close` skill to archive the OpenSpec change and move the beads issue to `done`. Run `bd sync` so git commits and beads metadata stay aligned.
 
 > Tip: if you are unsure whether a task needs an OpenSpec proposal, leave a beads comment with your reasoning and ask for guidance before continuing.
 
