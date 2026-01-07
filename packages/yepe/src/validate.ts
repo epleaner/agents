@@ -10,12 +10,18 @@ export class ValidationError extends Error {
 }
 
 export async function validatePrerequisites(): Promise<void> {
-  // Check if we're in a git repository
+  // Check if we're in a git repository, auto-initialize if not
   if (!existsSync('.git')) {
-    throw new ValidationError(
-      'Not a git repository',
-      'Run "git init" to initialize a git repository first'
-    );
+    console.log('📦 Initializing git repository...');
+    try {
+      execSync('git init', { stdio: 'ignore' });
+      console.log('✓ Git repository initialized\n');
+    } catch (error) {
+      throw new ValidationError(
+        'Failed to initialize git repository',
+        'Ensure git is installed and you have write permissions'
+      );
+    }
   }
 
   // Check if working tree is clean
