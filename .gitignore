@@ -4,3 +4,11 @@ examples/sample-service/.opencode/shared/
 opencode.json
 # Environment variables with secrets
 .env
+
+# Ralph mode - local session history (do not commit)
+.opencode/ralph/sessions.md
+.opencode/ralph/archive/
+.ralph-state/
+.ralph-metrics-*.json
+
+*.DS_Store

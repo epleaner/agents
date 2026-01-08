@@ -163,3 +163,122 @@ ralph:
 - How to handle interactive prompts during iterations (auto-skip, fail, prompt once)?
 - Should metrics be sent to external telemetry (Slack, dashboard)?
 - What's the right default checkpoint interval? (10 iterations may be too frequent for fast loops)
+
+## Reference Implementation Analysis
+
+Analysis of [mikeyobrien/ralph-orchestrator](https://github.com/mikeyobrien/ralph-orchestrator) (v1.2.2):
+
+### Key Patterns
+
+1. **Core Loop Algorithm**: The reference uses a simple while loop with three termination conditions:
+   - Max iterations reached (default: 100)
+   - Max runtime exceeded (default: 4 hours)
+   - Task completion marker detected
+   
+2. **Agent Scratchpad Mechanism**: ACP agents persist context across iterations via `.agent/scratchpad.md`. This enables agents to continue from where they left off rather than restarting each iteration. Key for maintaining continuity.
+
+3. **Multi-Agent Support with Auto-Detection**: Supports Claude, Kiro, Q, Gemini, and ACP-compliant agents. Auto-detects available agents and falls back gracefully.
+
+4. **Async-First Architecture**: Non-blocking I/O throughout (logging, git operations). Thread-safe async logging with rotation and security masking.
+
+5. **Permission Handling Modes**: Four modes for handling agent tool requests:
+   - `auto_approve`: Approve all requests automatically (CI/CD)
+   - `deny_all`: Deny all permission requests (testing)
+   - `allowlist`: Only approve matching patterns (production)
+   - `interactive`: Prompt user for each request (development)
+
+6. **Git-Based Checkpointing**: Async git checkpointing at configurable intervals (default: every 5 iterations). Enables recovery and history tracking.
+
+7. **State Persistence**: Saves metrics and state to `.ralph/` directory for analysis. Includes iteration count, runtime, errors, and token usage.
+
+### Safety Mechanisms
+
+- **Retry Logic**: Failed iterations retry after configurable delay with exponential backoff
+- **Error Limits**: Stops after 5 consecutive errors
+- **Timeout Protection**: 5-minute timeout per iteration
+- **Security Features**: Automatic masking of API keys and sensitive data in logs
+
+### Completion Detection
+
+- Primary: Explicit marker in agent output (`- [x] TASK_COMPLETE`)
+- Secondary: Check if all tasks in prompt are marked done
+- Fallback: Max iterations or runtime limit reached
+
+### Differences from Our Implementation
+
+| Aspect | Reference (Python) | Our Implementation (Bash) |
+|--------|-------------------|---------------------------|
+| Language | Python (~400 lines) | Bash (~600 lines) |
+| Agent Invocation | SDK/CLI adapters | OpenCode CLI |
+| State Storage | JSON files | JSON + git commits |
+| Todo Integration | None | beads integration |
+| Cross-Session | Scratchpad file | Session ledger + meta-learnings |
+| HITL | Permission modes | Interactive prompts |
+
+## OpenCode CLI Agent Invocation
+
+The OpenCode CLI provides the `run` subcommand for non-interactive agent execution:
+
+```bash
+# Basic invocation with inline message
+opencode run "Your task description here"
+
+# With specific agent
+opencode run --agent orchestrator "Your task description here"
+
+# With prompt from file (using cat)
+opencode run "$(cat /path/to/prompt.md)"
+
+# With JSON output format for parsing
+opencode run --format json "Your task"
+
+# Continue existing session
+opencode run --continue --session <session-id> "Follow-up message"
+
+# With file attachments
+opencode run --file context.md "Process this file"
+```
+
+**Key options for Ralph mode:**
+- `--agent <name>`: Specify which agent to use (orchestrator, builder, etc.)
+- `--format json`: Get structured JSON output for parsing completion markers
+- `--session <id>`: Continue a specific session for context continuity
+- `--continue`: Continue the last session
+- `--title <title>`: Set session title for tracking
+
+## Configuration Reference
+
+Ralph mode is configured via `ralph.yml` in your project root. See `.opencode/templates/ralph.yml` for the full template.
+
+### Core Settings
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `max_iterations` | 50 | Maximum iterations before stopping (1-1000) |
+| `timeout_minutes` | 120 | Maximum runtime in minutes (1-1440) |
+| `checkpoint_interval` | 10 | Git checkpoint every N iterations |
+
+### Safety Settings
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `safety.detect_infinite_loop` | true | Abort if N identical consecutive outputs |
+| `safety.max_identical_outputs` | 3 | Number of identical outputs to trigger abort |
+| `safety.sleep_between_iterations` | 2 | Seconds to sleep between iterations |
+
+### HITL Settings
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `hitl.enabled` | true | Enable Human-in-the-Loop intervention |
+| `hitl.mode` | "blocking" | "blocking" (pause) or "advisory" (log only) |
+| `hitl.triggers.high_risk_operations` | [...] | Operations that trigger HITL |
+| `hitl.triggers.iteration_milestones` | [10, 25, 40] | Trigger at these iteration counts |
+
+### CLI Override Priority
+
+Configuration is loaded in this order (later overrides earlier):
+1. Built-in defaults
+2. `ralph.yml` in project root
+3. `--config <file>` specified config
+4. CLI arguments (highest priority)
