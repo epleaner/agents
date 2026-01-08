@@ -1,5 +1,18 @@
 # Ralph Mode Usage Examples
 
+## Inline Prompt (Simplest)
+
+```bash
+# Quick task with inline prompt
+.opencode/scripts/ralph-orchestrator.sh "Implement user authentication with JWT tokens"
+
+# With options
+.opencode/scripts/ralph-orchestrator.sh "Fix the login bug and add tests" --max-iterations 10 --verbose
+
+# Dry run to test
+.opencode/scripts/ralph-orchestrator.sh "Refactor the database module" --dry-run
+```
+
 ## Basic Usage: Single Feature Implementation
 
 ```bash

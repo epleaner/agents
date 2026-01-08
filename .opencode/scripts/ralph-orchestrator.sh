@@ -53,6 +53,7 @@ DEFAULT_COMPLETION_MARKERS=(
 
 # Configuration (set by CLI args or config file)
 PROMPT_FILE=""
+PROMPT_TEXT=""  # Inline prompt text (overrides file)
 MAX_ITERATIONS="$DEFAULT_MAX_ITERATIONS"
 TIMEOUT_SECONDS="$DEFAULT_TIMEOUT_SECONDS"
 CHECKPOINT_INTERVAL="$DEFAULT_CHECKPOINT_INTERVAL"
@@ -183,13 +184,15 @@ ${BOLD}Ralph Orchestrator${NC} v${VERSION}
 Autonomous agent orchestration loop using the Ralph Wiggum technique.
 
 ${BOLD}USAGE:${NC}
+  $SCRIPT_NAME "inline prompt text" [options]
   $SCRIPT_NAME --prompt <file> [options]
   $SCRIPT_NAME --resume <session-id>
   $SCRIPT_NAME --rollback-to <iteration>
   $SCRIPT_NAME --help
 
-${BOLD}REQUIRED:${NC}
-  --prompt <file>         Path to prompt file containing task description
+${BOLD}PROMPT (one required):${NC}
+  "text"                  Inline prompt text (first positional argument)
+  -p, --prompt <file>     Path to prompt file containing task description
 
 ${BOLD}OPTIONS:${NC}
   --max-iterations <N>    Maximum iterations (default: $DEFAULT_MAX_ITERATIONS)
@@ -209,8 +212,14 @@ ${BOLD}SIGNALS:${NC}
   SIGUSR1                 Mark task as complete and generate success report
 
 ${BOLD}EXAMPLES:${NC}
-  # Basic usage
+  # Inline prompt (simplest)
+  $SCRIPT_NAME "Implement user authentication with JWT tokens"
+
+  # From file
   $SCRIPT_NAME --prompt task.md
+
+  # Inline with options
+  $SCRIPT_NAME "Fix the login bug" --max-iterations 10 --verbose
 
   # With limits
   $SCRIPT_NAME --prompt task.md --max-iterations 30 --timeout 3600
@@ -240,9 +249,16 @@ EOF
 # =============================================================================
 
 parse_args() {
+  # Check for inline prompt as first positional argument
+  # (must not start with - and must be before any flags)
+  if [[ $# -gt 0 && ! "$1" =~ ^- ]]; then
+    PROMPT_TEXT="$1"
+    shift
+  fi
+  
   while [[ $# -gt 0 ]]; do
     case "$1" in
-      --prompt)
+      -p|--prompt)
         PROMPT_FILE="$2"
         shift 2
         ;;
@@ -378,14 +394,16 @@ validate_config() {
     errors+=("checkpoint_interval must be between 1 and max_iterations (got: $CHECKPOINT_INTERVAL)")
   fi
   
-  # Validate prompt file (unless resuming)
+  # Validate prompt (file or inline text, unless resuming)
   if [[ -z "$RESUME_SESSION" && -z "$ROLLBACK_TO" ]]; then
-    if [[ -z "$PROMPT_FILE" ]]; then
-      errors+=("--prompt is required")
-    elif [[ ! -f "$PROMPT_FILE" ]]; then
-      errors+=("Prompt file not found: $PROMPT_FILE")
-    elif [[ ! -r "$PROMPT_FILE" ]]; then
-      errors+=("Prompt file not readable: $PROMPT_FILE")
+    if [[ -z "$PROMPT_FILE" && -z "$PROMPT_TEXT" ]]; then
+      errors+=("Prompt required: provide inline text or use --prompt <file>")
+    elif [[ -n "$PROMPT_FILE" ]]; then
+      if [[ ! -f "$PROMPT_FILE" ]]; then
+        errors+=("Prompt file not found: $PROMPT_FILE")
+      elif [[ ! -r "$PROMPT_FILE" ]]; then
+        errors+=("Prompt file not readable: $PROMPT_FILE")
+      fi
     fi
   fi
   
@@ -479,6 +497,12 @@ load_session_state() {
 # =============================================================================
 
 load_prompt() {
+  # Inline text takes precedence over file
+  if [[ -n "$PROMPT_TEXT" ]]; then
+    echo "$PROMPT_TEXT"
+    return
+  fi
+  
   if [[ ! -f "$PROMPT_FILE" ]]; then
     log_error "Prompt file not found: $PROMPT_FILE"
     exit 1
@@ -1019,6 +1043,14 @@ generate_metrics() {
     avg_iteration_time=$((duration / ITERATION))
   fi
   
+  # Determine prompt source for metrics
+  local prompt_source="file"
+  local prompt_value="$PROMPT_FILE"
+  if [[ -n "$PROMPT_TEXT" ]]; then
+    prompt_source="inline"
+    prompt_value="${PROMPT_TEXT:0:100}"
+  fi
+  
   cat > "$metrics_file" << EOF
 {
   "session_id": "$SESSION_ID",
@@ -1029,7 +1061,8 @@ generate_metrics() {
   "max_iterations": $MAX_ITERATIONS,
   "completed": $COMPLETED,
   "completion_reason": "$COMPLETION_REASON",
-  "prompt_file": "$PROMPT_FILE",
+  "prompt_source": "$prompt_source",
+  "prompt": "$prompt_value",
   "agent": "$AGENT_NAME",
   "metrics": {
     "avg_iteration_seconds": $avg_iteration_time,
@@ -1144,7 +1177,9 @@ add_session_entry() {
   local objective=""
   
   # Extract objective from prompt (first non-empty line)
-  if [[ -f "$PROMPT_FILE" ]]; then
+  if [[ -n "$PROMPT_TEXT" ]]; then
+    objective="${PROMPT_TEXT:0:80}"
+  elif [[ -f "$PROMPT_FILE" ]]; then
     objective=$(grep -v '^#' "$PROMPT_FILE" | grep -v '^$' | head -1 | cut -c1-80)
   fi
   
@@ -1196,7 +1231,13 @@ run_main_loop() {
   log_info "Session: $SESSION_ID"
   log_info "Max iterations: $MAX_ITERATIONS"
   log_info "Timeout: $((TIMEOUT_SECONDS / 60)) minutes"
-  log_info "Prompt file: $PROMPT_FILE"
+  if [[ -n "$PROMPT_TEXT" ]]; then
+    local preview="${PROMPT_TEXT:0:60}"
+    [[ ${#PROMPT_TEXT} -gt 60 ]] && preview="${preview}..."
+    log_info "Prompt: \"$preview\" (inline)"
+  else
+    log_info "Prompt file: $PROMPT_FILE"
+  fi
   echo
   
   while [[ $ITERATION -lt $MAX_ITERATIONS ]]; do

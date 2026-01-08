@@ -142,7 +142,7 @@ test_missing_prompt() {
   local output
   output=$("$RALPH_SCRIPT" 2>&1) || true
   
-  assert_contains "$output" "prompt is required" "Missing prompt shows error"
+  assert_contains "$output" "Prompt required" "Missing prompt shows error"
 }
 
 test_dry_run_basic() {
@@ -319,6 +319,17 @@ test_graceful_shutdown() {
   TESTS_RUN=$((TESTS_RUN + 1))
 }
 
+test_inline_prompt() {
+  log_test "Inline prompt support"
+  local output_file="$TEST_DIR/output11.txt"
+  
+  "$RALPH_SCRIPT" "Test inline prompt for Ralph" --max-iterations 2 --checkpoint 1 --dry-run > "$output_file" 2>&1 || true
+  local output=$(cat "$output_file")
+  
+  assert_contains "$output" "(inline)" "Inline prompt indicator shown"
+  assert_contains "$output" "Session Summary" "Inline prompt completed"
+}
+
 # =============================================================================
 # MAIN
 # =============================================================================
@@ -347,6 +358,7 @@ main() {
   test_verbose_mode
   test_config_validation
   test_graceful_shutdown
+  test_inline_prompt
   
   # Summary
   echo

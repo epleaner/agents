@@ -214,14 +214,17 @@ git reset HEAD path/to/unrelated/file
 Ralph mode enables autonomous multi-iteration agent execution using the Ralph Wiggum technique.
 
 ```bash
-# Run autonomous multi-iteration agent loop
+# Inline prompt (simplest)
+.opencode/scripts/ralph-orchestrator.sh "Implement user authentication with JWT"
+
+# From file
 .opencode/scripts/ralph-orchestrator.sh --prompt task.md --max-iterations 30
 
-# With verbose output
-.opencode/scripts/ralph-orchestrator.sh --prompt task.md --verbose
+# Inline with options
+.opencode/scripts/ralph-orchestrator.sh "Fix the login bug" --max-iterations 10 --verbose
 
 # Dry run (test without executing)
-.opencode/scripts/ralph-orchestrator.sh --prompt task.md --dry-run
+.opencode/scripts/ralph-orchestrator.sh "Test task" --dry-run
 
 # Resume interrupted session
 .opencode/scripts/ralph-orchestrator.sh --resume ralph-2026-01-08-103045
