@@ -1,0 +1,326 @@
+#!/usr/bin/env bash
+# Review task plans against LLM planning best practices
+
+set -euo pipefail
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Check if file path provided
+if [ $# -eq 0 ]; then
+    echo -e "${RED}Error: No file path provided${NC}"
+    echo "Usage: review-plan <path-to-tasks.md or plan.json>"
+    exit 1
+fi
+
+PLAN_FILE="$1"
+
+if [ ! -f "$PLAN_FILE" ]; then
+    echo -e "${RED}Error: File not found: $PLAN_FILE${NC}"
+    exit 1
+fi
+
+echo -e "${BLUE}=== Plan Review: $PLAN_FILE ===${NC}\n"
+
+# Extract change ID if it's in openspec structure
+CHANGE_ID=""
+if [[ "$PLAN_FILE" =~ openspec/changes/([^/]+)/ ]]; then
+    CHANGE_ID="${BASH_REMATCH[1]}"
+    echo -e "${GREEN}Change ID:${NC} $CHANGE_ID"
+fi
+
+# Read file content
+CONTENT=$(cat "$PLAN_FILE")
+
+# Initialize scores
+TASK_DECOMP_SCORE=0
+REASONING_SCORE=0
+ALTERNATIVES_SCORE=0
+REFLECTION_SCORE=0
+CONTEXT_SCORE=0
+CRITERIA_SCORE=0
+SPECIFICITY_SCORE=0
+DEPENDENCY_SCORE=0
+
+# Count metrics (using grep -c which returns count, defaulting to 0 on no match)
+TASK_COUNT=$(grep -cE '^\s*[0-9]+\.' "$PLAN_FILE" || echo "0")
+VALIDATION_COUNT=$(grep -ciE '(validation:|success:|test:|check:|\btest\b)' "$PLAN_FILE" || echo "0")
+FILE_PATH_COUNT=$(grep -cE 'File:|`[^`]*/[^`]+\.(ts|js|md|json|yaml|yml)`' "$PLAN_FILE" || echo "0")
+DEPENDENCY_MENTIONS=$(grep -ciE '(depends on|requires|after|blocks|prerequisite|phase)' "$PLAN_FILE" || echo "0")
+
+# Strip any whitespace and ensure numeric
+TASK_COUNT=$(echo "$TASK_COUNT" | tr -d ' \n\r')
+VALIDATION_COUNT=$(echo "$VALIDATION_COUNT" | tr -d ' \n\r')
+FILE_PATH_COUNT=$(echo "$FILE_PATH_COUNT" | tr -d ' \n\r')
+DEPENDENCY_MENTIONS=$(echo "$DEPENDENCY_MENTIONS" | tr -d ' \n\r')
+
+echo -e "${GREEN}Task count:${NC} $TASK_COUNT"
+echo -e "${GREEN}Validation mentions:${NC} $VALIDATION_COUNT"
+echo -e "${GREEN}File paths:${NC} $FILE_PATH_COUNT"
+echo -e "${GREEN}Dependency mentions:${NC} $DEPENDENCY_MENTIONS"
+echo ""
+
+# Scoring logic (0-5 scale per dimension)
+
+# 1. Task Decomposition
+if [ $TASK_COUNT -eq 0 ]; then
+    TASK_DECOMP_SCORE=0
+elif [ $TASK_COUNT -le 3 ]; then
+    TASK_DECOMP_SCORE=2  # Likely too coarse
+elif [ $TASK_COUNT -le 10 ]; then
+    TASK_DECOMP_SCORE=5  # Good granularity
+elif [ $TASK_COUNT -le 20 ]; then
+    TASK_DECOMP_SCORE=4  # Acceptable
+else
+    TASK_DECOMP_SCORE=3  # Possibly too fine-grained
+fi
+
+# Check for hierarchical structure
+if echo "$CONTENT" | grep -qE '(Phase|Stage|Step|###)'; then
+    TASK_DECOMP_SCORE=$((TASK_DECOMP_SCORE + 0))  # Already factored in
+else
+    TASK_DECOMP_SCORE=$((TASK_DECOMP_SCORE > 1 ? TASK_DECOMP_SCORE - 1 : 0))
+fi
+
+# 2. Step-by-Step Reasoning
+if echo "$CONTENT" | grep -qiE '(rationale|because|reason|why|justification)'; then
+    REASONING_SCORE=4
+else
+    REASONING_SCORE=2
+fi
+
+if echo "$CONTENT" | grep -qiE '(assumption|assumes|given that)'; then
+    REASONING_SCORE=$((REASONING_SCORE + 1))
+fi
+
+REASONING_SCORE=$((REASONING_SCORE > 5 ? 5 : REASONING_SCORE))
+
+# 3. Tree/Graph of Thoughts (alternatives)
+if echo "$CONTENT" | grep -qiE '(alternative|option [0-9]|approach [0-9]|consider|trade-?off)'; then
+    ALTERNATIVES_SCORE=4
+else
+    ALTERNATIVES_SCORE=1
+fi
+
+if echo "$CONTENT" | grep -qiE '(rollback|contingency|fallback|plan b)'; then
+    ALTERNATIVES_SCORE=$((ALTERNATIVES_SCORE + 1))
+fi
+
+ALTERNATIVES_SCORE=$((ALTERNATIVES_SCORE > 5 ? 5 : ALTERNATIVES_SCORE))
+
+# 4. Reflection
+if [ $VALIDATION_COUNT -gt 0 ]; then
+    REFLECTION_SCORE=3
+else
+    REFLECTION_SCORE=1
+fi
+
+if echo "$CONTENT" | grep -qiE '(risk|failure mode|edge case|limitation)'; then
+    REFLECTION_SCORE=$((REFLECTION_SCORE + 1))
+fi
+
+if echo "$CONTENT" | grep -qiE '(checkpoint|milestone|verify|validate)'; then
+    REFLECTION_SCORE=$((REFLECTION_SCORE + 1))
+fi
+
+REFLECTION_SCORE=$((REFLECTION_SCORE > 5 ? 5 : REFLECTION_SCORE))
+
+# 5. Context & Memory
+if echo "$CONTENT" | grep -qiE '(related to|see also|references|prior|existing|current)'; then
+    CONTEXT_SCORE=4
+else
+    CONTEXT_SCORE=2
+fi
+
+if echo "$CONTENT" | grep -qE 'openspec/(specs|changes)'; then
+    CONTEXT_SCORE=$((CONTEXT_SCORE + 1))
+fi
+
+CONTEXT_SCORE=$((CONTEXT_SCORE > 5 ? 5 : CONTEXT_SCORE))
+
+# 6. Success Criteria
+if [ $VALIDATION_COUNT -eq 0 ]; then
+    CRITERIA_SCORE=0
+elif [ $VALIDATION_COUNT -lt $TASK_COUNT ]; then
+    CRITERIA_SCORE=3  # Some tasks missing validation
+else
+    CRITERIA_SCORE=5  # Every task has validation
+fi
+
+# 7. Specificity & Clarity
+if [ $FILE_PATH_COUNT -eq 0 ]; then
+    SPECIFICITY_SCORE=1
+elif [ $FILE_PATH_COUNT -lt $((TASK_COUNT / 2)) ]; then
+    SPECIFICITY_SCORE=3
+else
+    SPECIFICITY_SCORE=5
+fi
+
+# Check for vague language
+if echo "$CONTENT" | grep -qiE '\b(fix|update|improve|enhance|handle|deal with)\b[^:]*$'; then
+    SPECIFICITY_SCORE=$((SPECIFICITY_SCORE > 1 ? SPECIFICITY_SCORE - 1 : 0))
+fi
+
+# 8. Dependency Management
+if [ $DEPENDENCY_MENTIONS -eq 0 ]; then
+    DEPENDENCY_SCORE=1
+elif [ $DEPENDENCY_MENTIONS -lt 3 ]; then
+    DEPENDENCY_SCORE=3
+else
+    DEPENDENCY_SCORE=5
+fi
+
+# Check for parallel work identification
+if echo "$CONTENT" | grep -qiE '(parallel|concurrent|independent|no dependencies)'; then
+    DEPENDENCY_SCORE=$((DEPENDENCY_SCORE < 5 ? DEPENDENCY_SCORE + 1 : 5))
+fi
+
+DEPENDENCY_SCORE=$((DEPENDENCY_SCORE > 5 ? 5 : DEPENDENCY_SCORE))
+
+# Calculate total
+TOTAL_SCORE=$((TASK_DECOMP_SCORE + REASONING_SCORE + ALTERNATIVES_SCORE + REFLECTION_SCORE + CONTEXT_SCORE + CRITERIA_SCORE + SPECIFICITY_SCORE + DEPENDENCY_SCORE))
+PERCENTAGE=$((TOTAL_SCORE * 100 / 40))
+
+# Print report
+echo -e "${BLUE}=== SCORE BREAKDOWN ===${NC}\n"
+
+echo "| Dimension                 | Score | Notes                                      |"
+echo "|---------------------------|-------|--------------------------------------------|"
+printf "| Task Decomposition        | ${TASK_DECOMP_SCORE}/5   | %d tasks found                              |\n" "$TASK_COUNT"
+printf "| Step-by-Step Reasoning    | ${REASONING_SCORE}/5   | Rationale: %s                       |\n" "$(echo "$CONTENT" | grep -qiE '(rationale|because)' && echo 'Present' || echo 'Missing')"
+printf "| Tree/Graph of Thoughts    | ${ALTERNATIVES_SCORE}/5   | Alternatives: %s                    |\n" "$(echo "$CONTENT" | grep -qiE '(alternative|option)' && echo 'Present' || echo 'Missing')"
+printf "| Reflection                | ${REFLECTION_SCORE}/5   | Validation steps: %d                        |\n" "$VALIDATION_COUNT"
+printf "| Context & Memory          | ${CONTEXT_SCORE}/5   | References: %s                      |\n" "$(echo "$CONTENT" | grep -qiE '(related|prior)' && echo 'Present' || echo 'Missing')"
+printf "| Success Criteria          | ${CRITERIA_SCORE}/5   | Validation/task ratio: %d/%d                |\n" "$VALIDATION_COUNT" "$TASK_COUNT"
+printf "| Specificity & Clarity     | ${SPECIFICITY_SCORE}/5   | File paths: %d                              |\n" "$FILE_PATH_COUNT"
+printf "| Dependency Management     | ${DEPENDENCY_SCORE}/5   | Dependency mentions: %d                     |\n" "$DEPENDENCY_MENTIONS"
+
+echo ""
+echo -e "${GREEN}OVERALL SCORE: $TOTAL_SCORE/40 ($PERCENTAGE%)${NC}\n"
+
+# Determine grade
+if [ $PERCENTAGE -ge 90 ]; then
+    GRADE="A (Excellent)"
+    COLOR=$GREEN
+elif [ $PERCENTAGE -ge 75 ]; then
+    GRADE="B (Good)"
+    COLOR=$GREEN
+elif [ $PERCENTAGE -ge 60 ]; then
+    GRADE="C (Acceptable with improvements)"
+    COLOR=$YELLOW
+elif [ $PERCENTAGE -ge 40 ]; then
+    GRADE="D (Needs significant work)"
+    COLOR=$YELLOW
+else
+    GRADE="F (Major revision required)"
+    COLOR=$RED
+fi
+
+echo -e "${COLOR}Grade: $GRADE${NC}\n"
+
+# Critical issues
+echo -e "${BLUE}=== CRITICAL ISSUES ===${NC}\n"
+
+ISSUES_FOUND=0
+
+if [ $TASK_DECOMP_SCORE -le 2 ]; then
+    echo -e "${RED}❌ Task Decomposition:${NC} Tasks are too coarse or poorly structured"
+    ISSUES_FOUND=$((ISSUES_FOUND + 1))
+fi
+
+if [ $VALIDATION_COUNT -eq 0 ]; then
+    echo -e "${RED}❌ No Validation Steps:${NC} No validation or success criteria found"
+    ISSUES_FOUND=$((ISSUES_FOUND + 1))
+fi
+
+if [ $FILE_PATH_COUNT -eq 0 ]; then
+    echo -e "${RED}❌ No File Paths:${NC} Tasks lack specific file references"
+    ISSUES_FOUND=$((ISSUES_FOUND + 1))
+fi
+
+if [ $DEPENDENCY_MENTIONS -eq 0 ] && [ $TASK_COUNT -gt 3 ]; then
+    echo -e "${RED}❌ No Dependencies:${NC} Task ordering and relationships unclear"
+    ISSUES_FOUND=$((ISSUES_FOUND + 1))
+fi
+
+if [ $REASONING_SCORE -le 2 ]; then
+    echo -e "${RED}❌ Missing Rationale:${NC} No explanation of why tasks are needed"
+    ISSUES_FOUND=$((ISSUES_FOUND + 1))
+fi
+
+if [ $ISSUES_FOUND -eq 0 ]; then
+    echo -e "${GREEN}✓ No critical issues found${NC}"
+fi
+
+echo ""
+
+# Recommendations
+echo -e "${BLUE}=== RECOMMENDATIONS ===${NC}\n"
+
+if [ $TASK_DECOMP_SCORE -le 3 ]; then
+    echo -e "${YELLOW}1. Task Decomposition:${NC}"
+    echo "   - Break tasks into smaller, atomic units (aim for 5-10 tasks)"
+    echo "   - Use phases or sections to group related tasks"
+    echo "   - Ensure each task has a single, clear objective"
+    echo ""
+fi
+
+if [ $SPECIFICITY_SCORE -le 3 ]; then
+    echo -e "${YELLOW}2. Specificity:${NC}"
+    echo "   - Add file paths for every task (e.g., 'File: src/services/auth.ts')"
+    echo "   - Replace vague verbs ('fix', 'update') with specific actions"
+    echo "   - Include examples for complex tasks"
+    echo ""
+fi
+
+if [ $CRITERIA_SCORE -le 3 ]; then
+    echo -e "${YELLOW}3. Success Criteria:${NC}"
+    echo "   - Add validation command for each task"
+    echo "   - Define measurable success criteria (not subjective)"
+    echo "   - Include test commands (e.g., 'npm test -- auth.test.ts')"
+    echo ""
+fi
+
+if [ $DEPENDENCY_SCORE -le 3 ]; then
+    echo -e "${YELLOW}4. Dependencies:${NC}"
+    echo "   - Explicitly state which tasks depend on others"
+    echo "   - Identify parallelizable work"
+    echo "   - Use phases to organize dependent tasks"
+    echo ""
+fi
+
+if [ $REASONING_SCORE -le 3 ]; then
+    echo -e "${YELLOW}5. Reasoning:${NC}"
+    echo "   - Add rationale section explaining approach"
+    echo "   - Document assumptions explicitly"
+    echo "   - Explain trade-offs and design decisions"
+    echo ""
+fi
+
+# Next steps
+echo -e "${BLUE}=== NEXT STEPS ===${NC}\n"
+
+if [ $PERCENTAGE -lt 75 ]; then
+    echo "1. Address critical issues listed above"
+    echo "2. Iterate on tasks.md based on recommendations"
+    echo "3. Re-run: .opencode/skill/review-plan/scripts/review-plan $PLAN_FILE"
+    echo "4. Target: ≥30/40 (75%) before proceeding"
+else
+    echo -e "${GREEN}✓ Plan is ready for validation${NC}"
+    if [ -n "$CHANGE_ID" ]; then
+        echo "  Run: openspec validate $CHANGE_ID --strict"
+    fi
+fi
+
+echo ""
+
+# Exit with appropriate code
+if [ $PERCENTAGE -ge 75 ]; then
+    exit 0
+else
+    exit 1
+fi
