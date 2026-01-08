@@ -23,12 +23,12 @@ The OpenCode setup SHALL define a GPT-5.1 Codex-centric lineup of six primary ag
 - **PM**: GPT-5.1 Codex (temperature <=0.25) with limited `write` (docs/AGENTS) and `bash` (bd, openspec, jira) permissions, skills `jira-lookup`, `jira-update`, `linear-sync`, `slack-notify`, `fathom-notes`. Maintains beads/OpenSpec linkage and external comms (Slack/Jira/Linear) referencing change IDs.
 - **Builder**: GPT-5.1 Codex (temperature <=0.15) with full `write/edit/bash`, skills `exa-search`, `context7-docs`, limited `slack-notify`. Executes implementation tasks from Planner/Orchestrator and may delegate to Debugger/Researcher/Writer while updating beads todos.
 - **QA**: GPT-5.1 Codex (temperature <=0.2) with `write` limited to test/format fixes, `bash` allowed for lint/test/Playwright, skills `playwright`, `slack-notify`, `github-review` (read). Owns lint/test/format gates prior to Release and logs outcomes back to beads/OpenSpec.
-- **Meta-Agent**: GPT-5.1 Codex (temperature <=0.2) with read access to transcripts, AGENTS files, beads/OpenSpec history, and limited `write/edit` for documentation/spec proposals; `bash` limited to `bd`, `openspec`, and reporting commands. Skills include `knowledge-graph`, `slack-notify`, `action-items`, and `context7-docs`. Audits workflows, captures improvement metrics, files follow-up issues/proposals, and updates AGENTS guidance while coordinating with Orchestrator/PM. When GPT-5.1 Codex is unavailable in a deployment, the Meta-Agent SHALL fall back to `anthropic/claude-3.5-sonnet` so continuous-improvement enforcement remains operable.
+- **Meta-Agent**: GPT-5.1 Codex (temperature <=0.2) with read access to transcripts, AGENTS files, beads/OpenSpec history, and limited `write/edit` for documentation/spec proposals; `bash` limited to `bd`, `openspec`, and reporting commands. Skills include `slack-notify`, `action-items`, and `context7-docs`. Audits workflows, captures improvement metrics, files follow-up issues/proposals, and updates AGENTS guidance while coordinating with Orchestrator/PM. When GPT-5.1 Codex is unavailable in a deployment, the Meta-Agent SHALL fall back to `anthropic/claude-3.5-sonnet` so continuous-improvement enforcement remains operable.
 
 #### Subagent Specifications
-- **Researcher**: GPT-5.1 Codex (temperature <=0.35) with `write/edit/bash`: deny, skills `exa-search`, `context7-docs`, `fathom-notes`, `knowledge-graph`. Supplies sourced findings (APIs, meeting notes, policy references) and cites beads/change IDs for Planner, Builder, and PM.
+- **Researcher**: GPT-5.1 Codex (temperature <=0.35) with `write/edit/bash`: deny, skills `exa-search`, `context7-docs`, `fathom-notes`. Supplies sourced findings (APIs, meeting notes, policy references) and cites beads/change IDs for Planner, Builder, and PM.
 - **Debugger**: GPT-5.1 Codex (temperature <=0.25) with `write/edit` limited to files under investigation and `bash` permitted for targeted diagnostics/tests. Produces concise repro steps, log summaries, and suggested fixes without altering unrelated files.
-- **Writer**: GPT-5.1 Codex or Gemini Flash (temperature <=0.28) with `write` limited to markdown/docs, `bash`: deny, skills `slack-notify`, `jira-update`, `knowledge-graph`. Drafts release notes, spec deltas, and external summaries referencing relevant beads/change IDs.
+- **Writer**: GPT-5.1 Codex or Gemini Flash (temperature <=0.28) with `write` limited to markdown/docs, `bash`: deny, skills `slack-notify`, `jira-update`. Drafts release notes, spec deltas, and external summaries referencing relevant beads/change IDs.
 - **Release**: GPT-5.1 Codex (temperature <=0.2) with `write/edit` for metadata/changelog, `bash` for git/bd/openspec, skills `github-review` (PR create/update), `slack-notify`, `cloud-deploy`. Handles commits, PRs, CI follow-up, and cloud bundle rollout while ensuring beads/OpenSpec are updated before closure.
 
 ### Requirement: Meta-Agent Continuous Improvement
@@ -36,7 +36,7 @@ The OpenCode Codex environment SHALL operate a dedicated Meta-Agent focused sole
 
 - **Model**: GPT-5.1 Codex (temperature ≤0.2) reserved for governance and improvement loops, with a required fallback to `anthropic/claude-3.5-sonnet` whenever Codex access is unavailable so the Meta-Agent can still engage.
 - **Access**: Read transcripts, AGENTS files, beads/OpenSpec history; limited `write/edit` for documentation and spec proposals; `bash` constrained to `bd`, `openspec`, and reporting utilities.
-- **Skills**: `knowledge-graph`, `slack-notify`, `action-items`, `context7-docs` for referencing external materials and logging traceability.
+- **Skills**: `slack-notify`, `action-items`, `context7-docs` for referencing external materials and logging traceability.
 - **Duties**: Detect recurring friction, quantify instrumentation gaps, propose improvements, file follow-up tasks or change proposals, and update AGENTS/spec guidance so future sessions inherit the fixes.
 
 #### Scenario: Meta-Agent audit triggers on repeated friction
@@ -52,15 +52,15 @@ The OpenCode Codex environment SHALL operate a dedicated Meta-Agent focused sole
 #### Scenario: Meta-Agent updates guidance artifacts
 - **WHEN** the Meta-Agent identifies missing or outdated instructions in AGENTS or related specs
 - **THEN** it patches the relevant guidance within its limited write scope
-- **AND** it announces the update via `slack-notify` (or equivalent) and logs the edit through the knowledge graph for downstream traceability.
+- **AND** it announces the update via `slack-notify` (or equivalent) and records the edit in the learnings ledger for downstream traceability.
 
 ### Requirement: Meta-Learnings Registry
-The Codex multi-agent suite SHALL maintain a `learnings/` directory at the repo root that contains separate markdown ledgers for (a) session meta learnings, (b) recurring manual tasks that might become commands or skills, (c) failures and their resolutions, and (d) candidate automations/skills, plus a shared `index.md`. Each ledger SHALL document a uniform entry template (date/session, bead/change IDs, knowledge type, subcategory, owner, summary, recommended action, status, and supporting links) so the Meta-Agent and Orchestrator can append structured rows without inventing new formats. The index SHALL summarize recent entries, their status, and any linked follow-up artifacts so agents can quickly locate relevant context. These ledgers and the index SHALL store only operational/meta knowledge; the knowledge graph remains domain-only context for agents.
+The Codex multi-agent suite SHALL maintain a `.opencode/learnings/` directory that contains separate markdown ledgers for (a) session meta learnings, (b) recurring manual tasks that might become commands or skills, (c) failures and their resolutions, and (d) candidate automations/skills, plus a shared `index.md`. Each ledger SHALL document a uniform entry template (date/session, bead/change IDs, knowledge type, subcategory, owner, summary, recommended action, status, and supporting links) so the Meta-Agent and Orchestrator can append structured rows without inventing new formats. The index SHALL summarize recent entries, their status, and any linked follow-up artifacts so agents can quickly locate relevant context.
 
 #### Scenario: Ledger and index scaffolding exist
 - **WHEN** a new repository clone is prepared or CI verifies project structure
-- **THEN** the `learnings/` directory contains the four mandated ledgers plus `index.md`
-- **AND** each file includes the required entry template and guidance reminding contributors to keep domain knowledge in the knowledge graph
+- **THEN** the `.opencode/learnings/` directory contains the four mandated ledgers plus `index.md`
+- **AND** each file includes the required entry template
 
 #### Scenario: Sessions append structured entries
 - **WHEN** a session uncovers a new meta learning, recurring task, failure pattern, or candidate command/skill
@@ -77,7 +77,6 @@ The Codex multi-agent suite SHALL maintain a `learnings/` directory at the repo 
 - **WHEN** a ledger entry meets promotion criteria (e.g., repeated twice, blocks delivery, or requires new automation/skill)
 - **THEN** the Meta-Agent files or updates the appropriate AGENTS section, configuration, beads issue, or OpenSpec change referencing the ledger entry ID
 - **AND** the ledger entry and `index.md` are updated with links to those follow-up artifacts and marked as "Promoted"
-- **AND** the knowledge graph continues to exclude meta learnings, ensuring agents query it only for domain context while consulting ledgers/AGENTS/specs for operational improvements.
 
 ### Requirement: Proposal Agent Ownership of OpenSpec Flow
 The Codex multi-agent suite SHALL route every new or ambiguous change request through the Proposal agent so it can gather clarifying questions, research best practices, and author the complete OpenSpec package (proposal, tasks, design, spec deltas) before Builder or QA engage. The Proposal agent SHALL cite its research sources, record outstanding questions, and limit all write operations to `openspec/` while using Orchestrator-managed beads for traceability.

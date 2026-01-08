@@ -18,19 +18,21 @@ curl -fsSL https://yepe.dev/install.sh | bash
 
 ## What it does
 
-yepe copies the following from the [agents blueprint repository](https://github.com/epleaner/agents):
+yepe copies the following from the [agents blueprint repository](https://github.com/epleaner/agents) into `.opencode/`:
 
-- **AGENTS.md** - AI assistant instructions and workflow documentation
-- **.opencode/** - OpenCode agent definitions, commands, and skills
-- **openspec/** - OpenSpec change proposal framework
-- **learnings/** - Meta-learnings and operational insights ledgers
-- **bin/** - Helper scripts (review-learnings, etc.)
+- **AGENTS.md** → `.opencode/AGENTS.md` - AI assistant instructions
+- **agent/** - Agent definitions (orchestrator, planner, builder, etc.)
+- **command/** - Slash commands (/plan, /dev, /research, etc.)
+- **skill/** - Specialized capabilities (qa, release, self-improve, etc.)
+- **openspec/** - Change proposal framework
+- **learnings/** - Meta-learnings ledgers
 
-**New in v0.2.0:** yepe now prompts for project information and automatically customizes:
-- `openspec/project.md` with your tech stack, architecture, and conventions
-- `AGENTS.md` with your project name, purpose, and domain context
-- **Skill selection**: Choose which external integration skills to include
-- **Clean learnings**: Copies template-only learnings files (no blueprint repo entries)
+**Key features:**
+- **Single folder footprint**: Everything lives in `.opencode/`
+- **Learnings preservation**: Existing learnings are never overwritten
+- **Custom config preserved**: Your custom agents/skills survive updates
+- **Agent re-application**: After update, an agent re-applies promoted learnings
+- **Project customization**: Prompts for tech stack, conventions, etc.
 
 ## Prerequisites
 
@@ -80,13 +82,19 @@ git commit -m "Add yepe blueprint"
 
 ### Updating Existing Setup
 
-yepe is idempotent - safe to re-run:
+yepe is safe to re-run:
 
 ```bash
 npx @yepe/init
 ```
 
-Files that already exist will be marked as conflicts in `.yepe-report.json`. You can manually merge updates as needed.
+**What happens on update:**
+- Base files (from blueprint) are updated
+- Custom agents/skills you added are preserved
+- Learnings with entries are never overwritten
+- After update, an agent re-applies your promoted learnings to restore customizations
+
+Files that conflict are listed in `.yepe-report.json`.
 
 ## Output
 
@@ -154,9 +162,21 @@ Check:
 After running yepe:
 
 1. **Initialize OpenSpec**: `openspec init` (if not already initialized)
-2. **Initialize beads**: `bd init` (if not already initialized)
-3. **Review AGENTS.md**: Customize for your project
+2. **Initialize beads**: `bd init <prefix>` (if not already initialized)
+3. **Review .opencode/AGENTS.md**: Customize for your project
 4. **Explore .opencode/**: Configure agents, commands, and skills
+5. **Add custom agents/skills**: Create new files in `.opencode/agent/`, `.opencode/skill/`, etc.
+
+## How Learnings Work
+
+Learnings are the persistence layer for project-specific customizations:
+
+1. **self-improve skill** writes insights to `.opencode/learnings/`
+2. **Direct edits** are made to agents/skills/AGENTS.md
+3. **Learnings record** what was changed and why
+4. **On yepe update**, an agent reads promoted learnings and re-applies them
+
+This means your customizations survive base config updates without complex merge logic.
 
 ## Learn More
 

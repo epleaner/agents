@@ -26,15 +26,15 @@
 - [x] 4.1 Remove `knowledge-graph` skill from `.opencode/skill/`
 - [x] 4.2 Remove knowledge-graph references from AGENTS.md
 - [x] 4.3 Remove knowledge-graph references from learnings/*.md templates
-- [ ] 4.4 Update specs to remove knowledge-graph separation language
-- [ ] 4.5 Remove `openspec/specs/knowledge-graph-platform/` spec
+- [x] 4.4 Update specs to remove knowledge-graph separation language
+- [x] 4.5 Remove `.opencode/openspec/specs/knowledge-graph-platform/` spec
 
 ## 5. Update Documentation References
 - [x] 5.1 Update `AGENTS.md` references from `learnings/` → `.opencode/learnings/`
 - [x] 5.2 Update `AGENTS.md` references from `openspec/` → `.opencode/openspec/`
 - [x] 5.3 Update `.opencode/openspec/AGENTS.md` internal path references
 - [x] 5.4 Update skill/command files referencing old paths
-- [ ] 5.5 Update yepe README to document structure
+- [x] 5.5 Update yepe README to document structure
 
 ## 6. Validation
 - [x] 6.1 Run existing tests (yepe build passes)
