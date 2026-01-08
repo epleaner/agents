@@ -56,20 +56,9 @@ git init
 npx @yepe/init
 
 # You'll be prompted for:
-# Required fields (marked with *):
-# - * Project name
-# - * Purpose/goals (1-2 sentences)
-# - * Beads prefix (2-4 characters)
-#
-# Optional fields (press Enter to skip):
-# - Tech stack (comma-separated)
-# - Code style & formatting
-# - Architecture patterns
-# - Testing strategy
-# - Git workflow
-# - Domain context
-# - Important constraints
-# - External dependencies
+# - Project name
+# - Project description (include tech stack, architecture, constraints, etc.)
+# - Beads prefix (2-4 characters for issue IDs)
 # - Skill selection (which external integrations to include)
 
 # Review changes
@@ -97,15 +86,7 @@ npx @yepe/init --non-interactive --config yepe.config.json
 ```json
 {
   "name": "my-project",
-  "purpose": "A brief description of the project",
-  "techStack": ["TypeScript", "React", "Node.js"],
-  "codeStyle": "Prettier, ESLint",
-  "architecture": "Clean Architecture",
-  "testing": "Jest, Playwright",
-  "gitWorkflow": "trunk-based",
-  "domain": "E-commerce platform",
-  "constraints": "GDPR compliance required",
-  "dependencies": "Stripe API, SendGrid",
+  "description": "E-commerce platform built with TypeScript/React. Uses Clean Architecture, Jest for testing, trunk-based development. Integrates with Stripe and SendGrid APIs.",
   "beadsPrefix": "app",
   "selectedSkills": ["research", "qa", "release"]
 }
@@ -113,7 +94,7 @@ npx @yepe/init --non-interactive --config yepe.config.json
 
 All fields are optional. Defaults:
 - `name`: Current directory name
-- `purpose`: `"{name} project"`
+- `description`: `"{name} project"`
 - `beadsPrefix`: First 3 characters of directory name
 - `selectedSkills`: Empty (no external skills)
 

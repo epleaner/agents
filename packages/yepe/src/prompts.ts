@@ -3,15 +3,7 @@ import { basename } from 'path';
 
 export interface ProjectInfo {
   name: string;
-  purpose: string;
-  techStack: string[];
-  codeStyle: string;
-  architecture: string;
-  testing: string;
-  gitWorkflow: string;
-  domain: string;
-  constraints: string;
-  dependencies: string;
+  description: string;
   beadsPrefix: string;
   selectedSkills: string[];
 }
@@ -119,15 +111,7 @@ function getDefaultProjectInfo(): ProjectInfo {
   
   return {
     name: dirName,
-    purpose: `${dirName} project`,
-    techStack: [],
-    codeStyle: '',
-    architecture: '',
-    testing: '',
-    gitWorkflow: '',
-    domain: '',
-    constraints: '',
-    dependencies: '',
+    description: `${dirName} project`,
     beadsPrefix: dirName.substring(0, 3).toLowerCase(),
     selectedSkills: [],
   };
@@ -144,22 +128,14 @@ export async function promptProjectInfo(blueprintDir: string, options: PromptOpt
     
     const projectInfo: ProjectInfo = {
       name: config.name || defaults.name,
-      purpose: config.purpose || defaults.purpose,
-      techStack: config.techStack || defaults.techStack,
-      codeStyle: config.codeStyle || defaults.codeStyle,
-      architecture: config.architecture || defaults.architecture,
-      testing: config.testing || defaults.testing,
-      gitWorkflow: config.gitWorkflow || defaults.gitWorkflow,
-      domain: config.domain || defaults.domain,
-      constraints: config.constraints || defaults.constraints,
-      dependencies: config.dependencies || defaults.dependencies,
+      description: config.description || defaults.description,
       beadsPrefix: config.beadsPrefix || defaults.beadsPrefix,
       selectedSkills: config.selectedSkills || defaults.selectedSkills,
     };
     
     console.log(`Using non-interactive mode with:`);
     console.log(`  • Name: ${projectInfo.name}`);
-    console.log(`  • Purpose: ${projectInfo.purpose}`);
+    console.log(`  • Description: ${projectInfo.description}`);
     console.log(`  • Beads prefix: ${projectInfo.beadsPrefix}`);
     if (projectInfo.selectedSkills.length > 0) {
       console.log(`  • Skills: ${projectInfo.selectedSkills.join(', ')}`);
@@ -183,59 +159,33 @@ export async function promptProjectInfo(blueprintDir: string, options: PromptOpt
     });
   };
 
-  console.log('\nProject configuration (required fields marked with *):\n');
+  console.log('\nProject configuration:\n');
 
   try {
     // Required: Project name
     let name = '';
     while (!name) {
-      name = await question('* Project name: ');
+      name = await question('Project name: ');
       if (!name) {
         console.log('  ❌ Project name is required\n');
       }
     }
 
-    // Required: Purpose
-    let purpose = '';
-    while (!purpose) {
-      purpose = await question('* Project purpose (1-2 sentences): ');
-      if (!purpose) {
-        console.log('  ❌ Project purpose is required\n');
+    // Required: Description
+    let description = '';
+    console.log('\nProject description (include relevant details like tech stack, architecture,');
+    console.log('testing strategy, domain context, constraints, or external dependencies):');
+    while (!description) {
+      description = await question('> ');
+      if (!description) {
+        console.log('  ❌ Project description is required\n');
       }
     }
-
-    // Optional: Tech stack
-    console.log('\nTech stack (comma-separated, e.g., "TypeScript, React, Node.js"):');
-    const techStackInput = await question('> ');
-    const techStack = techStackInput
-      ? techStackInput.split(',').map(t => t.trim()).filter(Boolean)
-      : [];
-
-    // Optional: Code style
-    const codeStyle = await question('\nCode style & formatting (e.g., "Prettier, ESLint, 2-space indent"): ');
-    
-    // Optional: Architecture
-    const architecture = await question('Architecture patterns (e.g., "Clean Architecture, DDD, Microservices"): ');
-    
-    // Optional: Testing
-    const testing = await question('Testing strategy (e.g., "Jest unit tests, Playwright E2E, 80% coverage"): ');
-    
-    // Optional: Git workflow
-    const gitWorkflow = await question('Git workflow (e.g., "trunk-based", "GitFlow", "feature branches"): ');
-
-    // Optional: Domain context
-    const domain = await question('\nDomain context (what should AI know about your business domain?): ');
-
-    // Optional: Constraints
-    const constraints = await question('Important constraints (technical, business, or regulatory): ');
-
-    // Optional: External dependencies
-    const dependencies = await question('Key external dependencies (APIs, services, systems): ');
 
     // Required: Beads prefix
     let beadsPrefix = '';
     while (!beadsPrefix) {
-      console.log('\n* Beads prefix (2-4 characters for issue IDs, e.g., "app", "api", "web"):');
+      console.log('\nBeads prefix (2-4 characters for issue IDs, e.g., "app", "api", "web"):');
       beadsPrefix = await question('> ');
       if (!beadsPrefix) {
         console.log('  ❌ Beads prefix is required\n');
@@ -253,15 +203,7 @@ export async function promptProjectInfo(blueprintDir: string, options: PromptOpt
 
     return {
       name,
-      purpose,
-      techStack,
-      codeStyle,
-      architecture,
-      testing,
-      gitWorkflow,
-      domain,
-      constraints,
-      dependencies,
+      description,
       beadsPrefix,
       selectedSkills,
     };
@@ -275,40 +217,10 @@ export async function promptProjectInfo(blueprintDir: string, options: PromptOpt
  * Generates customized project.md content
  */
 export function generateProjectMd(info: ProjectInfo): string {
-  const techStackList = info.techStack.length > 0
-    ? info.techStack.map(tech => `- ${tech}`).join('\n')
-    : '- [Add your technologies here]';
-
   return `# Project Context
 
-## Purpose
-${info.purpose}
-
-## Tech Stack
-${techStackList}
-
-## Project Conventions
-
-### Code Style
-${info.codeStyle || '[Describe your code style preferences, formatting rules, and naming conventions]'}
-
-### Architecture Patterns
-${info.architecture || '[Document your architectural decisions and patterns]'}
-
-### Testing Strategy
-${info.testing || '[Explain your testing approach and requirements]'}
-
-### Git Workflow
-${info.gitWorkflow || '[Describe your branching strategy and commit conventions]'}
-
-## Domain Context
-${info.domain || '[Add domain-specific knowledge that AI assistants need to understand]'}
-
-## Important Constraints
-${info.constraints || '[List any technical, business, or regulatory constraints]'}
-
-## External Dependencies
-${info.dependencies || '[Document key external services, APIs, or systems]'}
+## Description
+${info.description}
 `;
 }
 
@@ -341,11 +253,6 @@ This project uses **bd** (beads) for issue tracking. Run \`bd onboard\` to get s
 
 ## Project Overview
 
-**Purpose:** ${info.purpose}
-
-**Tech Stack:** ${info.techStack.join(', ') || 'See .opencode/openspec/project.md'}
-
-${info.domain ? `**Domain Context:** ${info.domain}\n` : ''}
-${info.constraints ? `**Key Constraints:** ${info.constraints}\n` : ''}
+${info.description}
 `;
 }

@@ -75,3 +75,16 @@ Use the following structure for every entry. Replace angle-bracket placeholders 
 - Recommended Action: Add --non-interactive flag to yepe CLI that accepts a JSON config file or uses sensible defaults.
 - Supporting Links: integration test in examples/test-project/
 - Follow-up Links: packages/yepe/src/cli.ts, packages/yepe/src/prompts.ts, packages/yepe/README.md
+
+### [ML-20260107-005] Planner should check for OpenSpec requirements before creating standalone specs
+- Date: 2026-01-07
+- Session: ralph-mode research and proposal
+- Knowledge Type: meta
+- Meta Category: meta-learning
+- Owner: planner
+- Status: needs-agents-update
+- Related IDs: change-add-ralph-mode
+- Summary: Planner agent created detailed standalone spec for Ralph Wiggum mode instead of recognizing it as a new capability requiring OpenSpec proposal. User had to ask "shouldn't this be in openspec?" to trigger the correct workflow.
+- Recommended Action: Update planner agent instructions with clear heuristics for "when to use OpenSpec" - new capabilities, breaking changes, architecture shifts should always go through OpenSpec first.
+- Supporting Links: session transcript
+- Follow-up Links: none
