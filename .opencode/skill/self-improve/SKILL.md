@@ -10,12 +10,33 @@ description: Reflect on session friction, tooling gaps, and process improvements
 - **Make direct edits** to agents/skills/AGENTS.md to fix issues.
 - File beads issues for larger systemic fixes.
 
+## Required Tools
+
+This skill requires write access to function fully:
+- **bash** - for running scripts and git commands
+- **write/edit** - for updating learnings ledgers and config files
+- **read/glob/grep** - for analyzing existing files
+
+**Document-only mode:** If invoked without write tools, the skill will document proposed changes but cannot apply them. The output will include exact file paths and content to add/modify, which can be applied manually or by an agent with write access.
+
 ## Usage Template
 ```
 Trigger: <end-of-session | friction-encountered | explicit-request>
 Context: <what happened, what went wrong>
 Scope: <agents | skills | workflows | docs | all>
+Focus: <optional - specific area to reflect on, e.g., "planner research workflow">
 ```
+
+## Focus Parameter
+
+When the user provides arguments or a prompt with the self-improve invocation:
+- **Focus on those specific areas** rather than doing a full session review
+- Treat user-provided context as the primary friction point to address
+- Still follow the full reflection process, but scoped to the focus area
+
+When no arguments are provided:
+- Review the full session context for patterns
+- Identify all friction points, not just the most recent
 
 ## Reflection Process
 
@@ -100,3 +121,5 @@ The script scans `.opencode/learnings/` for entries in `new`, `needs-agents-upda
 4. **Always make the direct edit** to fix the issue immediately.
 5. File beads issues for anything that can't be fixed immediately.
 6. If friction repeats twice, require a beads issue.
+7. **Focus on user-provided context first** - if arguments are given, prioritize those over full session review.
+8. **Graceful degradation** - if write tools unavailable, document changes with exact paths and content for manual application.

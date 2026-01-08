@@ -1,6 +1,8 @@
 ---
 description: Reflect on session friction, tooling gaps, and propose improvements.
+agent: orchestrator
 ---
+
 Reflect on the current session using the self-improve skill. Identify friction points, tooling gaps, and propose actionable improvements.
 
 <UserRequest>
@@ -8,6 +10,7 @@ Reflect on the current session using the self-improve skill. Identify friction p
 </UserRequest>
 
 **Context to Review**
+
 1. Current session history and any blockers encountered.
 2. Workarounds that were needed.
 3. Missing information or tools.
@@ -38,6 +41,7 @@ Reflect on the current session using the self-improve skill. Identify friction p
    - Update relevant docs inline when possible.
 
 **Output Format**
+
 ```
 ## Session Reflection
 
@@ -55,6 +59,7 @@ Reflect on the current session using the self-improve skill. Identify friction p
 ```
 
 **Guidelines**
+
 1. Be specific about friction—vague complaints don't lead to fixes.
 2. Propose concrete, actionable improvements.
 3. File issues for anything that can't be fixed immediately.
