@@ -10,3 +10,5 @@ opencode.json
 .opencode/ralph/archive/
 .ralph-state/
 .ralph-metrics-*.json
+
+*.DS_Store
