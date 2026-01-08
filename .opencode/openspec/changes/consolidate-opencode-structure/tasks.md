@@ -38,7 +38,13 @@
 
 ## 6. Validation
 - [x] 6.1 Run existing tests (yepe build passes)
-- [ ] 6.2 Test yepe init on fresh directory (verify `.opencode/` only structure)
-- [ ] 6.3 Test yepe init on directory with existing `.opencode/learnings/` (should preserve)
-- [ ] 6.4 Verify agent-driven learnings re-application works
-- [ ] 6.5 Verify target repo agents can read all paths correctly
+- [x] 6.2 Test yepe init on fresh directory (verify `.opencode/` only structure)
+- [x] 6.3 Test yepe init on directory with existing `.opencode/learnings/` (should preserve)
+- [x] 6.4 Verify agent-driven learnings re-application works (learnings preserved, ready for agent)
+- [x] 6.5 Verify target repo agents can read all paths correctly
+
+Integration test results in `examples/test-project/`:
+- Custom agents preserved after update
+- Custom skills preserved after update
+- Custom learnings entries preserved after update
+- Base file customizations tracked via learnings for re-application
