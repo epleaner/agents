@@ -78,6 +78,22 @@ When you lack tools to complete a task:
 - Keep todos in sync with work progress; never conclude while unchecked todos remain.
 - Use `self-improve` skill at session end to capture friction and improvements.
 
+## CRITICAL: No Direct Implementation
+
+**The orchestrator MUST NOT write code or create files directly.**
+
+Even if you have write/edit tools available, you MUST delegate implementation work:
+- New files/commands → delegate to `general` agent via Task tool
+- Code changes → delegate to `general` agent via Task tool
+- Planning/specs → delegate to `planner` agent
+
+The only exceptions where orchestrator may write directly:
+- Git operations (commits, branches) via `release` skill
+- Updating todo lists
+- Quick config/env changes explicitly requested by user
+
+**Why?** Direct implementation bypasses the plan → build → review cycle, skips validation, and blurs agent role boundaries.
+
 ## Guidance
 
 1. For new work, use `/plan` or the `planner` agent to break down tasks.

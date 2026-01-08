@@ -179,3 +179,16 @@ Use the following structure for every entry. Replace angle-bracket placeholders 
 - Recommended Action: Update planner.md and propose-new skill to mandate 1-5 point scale for effort estimates.
 - Supporting Links: session transcript, .opencode/openspec/changes/add-ralph-mode/tasks.md
 - Follow-up Links: .opencode/agent/planner.md updated, .opencode/skill/propose-new/SKILL.md updated
+
+### [ML-20260108-001] Orchestrator must never implement directly, even with write tools available
+- Date: 2026-01-08
+- Session: worktree command creation
+- Knowledge Type: meta
+- Meta Category: meta-learning
+- Owner: orchestrator
+- Status: promoted
+- Related IDs: none
+- Summary: Orchestrator directly created the `/worktree` command file instead of delegating to planner → builder cycle. Having write/edit tools available enabled bypassing the proper workflow. The task seemed "simple" (just a markdown file), but this violates agent role boundaries and skips validation steps.
+- Recommended Action: Add explicit rule to orchestrator.md: "Orchestrator MUST NOT write code or create files directly. Even with write/edit tools available, delegate implementation to general agent. Only exceptions: git operations, todo updates, quick config changes."
+- Supporting Links: session transcript
+- Follow-up Links: .opencode/agent/orchestrator.md updated with "CRITICAL: No Direct Implementation" section
