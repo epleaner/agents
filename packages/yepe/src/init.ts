@@ -4,6 +4,7 @@ import { execSync } from 'child_process';
 import { ValidationError } from './validate.js';
 import { promptProjectInfo, generateProjectMd, generateAgentsMdHeader, ProjectInfo } from './prompts.js';
 import { getLearningsTemplate } from './learnings-templates.js';
+import { getConfigTemplate } from './config-templates.js';
 
 const BLUEPRINT_REPO = 'https://github.com/epleaner/agents.git';
 const STAGING_DIR = '.opencode/.yepe-tmp';
@@ -38,6 +39,8 @@ interface Report {
  * Target paths are relative to the target repo
  */
 const BLUEPRINT_MAP: Record<string, string> = {
+  // opencode.json from root goes to root (with placeholder API key)
+  'opencode.json': 'opencode.json',
   // AGENTS.md from root goes into .opencode/
   'AGENTS.md': '.opencode/AGENTS.md',
   // .opencode contents copy directly
@@ -306,6 +309,16 @@ async function copyFiles(report: Report): Promise<void> {
       const targetDir = dirname(targetPath);
       if (!existsSync(targetDir)) {
         mkdirSync(targetDir, { recursive: true });
+      }
+
+      // Check if this is a config file - use template instead of copying
+      if (targetPath === 'opencode.json') {
+        const template = getConfigTemplate('opencode.json');
+        if (template) {
+          writeFileSync(targetPath, template);
+          copied++;
+          continue;
+        }
       }
 
       // Check if this is a learnings file - use template instead of copying
