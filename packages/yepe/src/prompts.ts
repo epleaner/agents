@@ -1,5 +1,6 @@
 import { createInterface } from 'readline';
-import { basename } from 'path';
+import { readdirSync, existsSync, readFileSync, statSync } from 'fs';
+import { basename, join } from 'path';
 
 export interface ProjectInfo {
   name: string;
@@ -22,8 +23,6 @@ export interface SkillInfo {
  * Discovers available skills from the blueprint
  */
 export function discoverSkills(blueprintDir: string): SkillInfo[] {
-  const { readdirSync, existsSync, readFileSync, statSync } = require('fs');
-  const { join } = require('path');
   
   const skillsDir = join(blueprintDir, '.opencode/skill');
   if (!existsSync(skillsDir)) {

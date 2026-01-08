@@ -9,7 +9,8 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "test": "node --test"
+    "test": "npm run build && node --test dist/*.test.js",
+    "test:watch": "tsc --watch & node --test --watch dist/*.test.js"
   },
   "keywords": [
     "blueprint",
