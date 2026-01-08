@@ -84,7 +84,7 @@ After deployment, create separate PR to:
 - Show details:
   - Spec: `openspec show <spec-id> --type spec` (use `--json` for filters)
   - Change: `openspec show <change-id> --json --deltas-only`
-- Full-text search (use ripgrep): `rg -n "Requirement:|Scenario:" openspec/specs`
+- Full-text search (use ripgrep): `rg -n "Requirement:|Scenario:" .opencode/openspec/specs`
 
 ## Quick Start
 
@@ -274,7 +274,7 @@ Headers matched with `trim(header)` - whitespace ignored.
 Common pitfall: Using MODIFIED to add a new concern without including the previous text. This causes loss of detail at archive time. If you aren’t explicitly changing the existing requirement, add a new requirement under ADDED instead.
 
 Authoring a MODIFIED requirement correctly:
-1) Locate the existing requirement in `openspec/specs/<capability>/spec.md`.
+1) Locate the existing requirement in `.opencode/openspec/specs/<capability>/spec.md`.
 2) Copy the entire requirement block (from `### Requirement: ...` through its scenarios).
 3) Paste it under `## MODIFIED Requirements` and edit to reflect the new behavior.
 4) Ensure the header text matches exactly (whitespace-insensitive) and keep at least one `#### Scenario:`.
@@ -322,8 +322,8 @@ openspec show [spec] --json -r 1
 openspec spec list --long
 openspec list
 # Optional full-text search:
-# rg -n "Requirement:|Scenario:" openspec/specs
-# rg -n "^#|Requirement:" openspec/changes
+# rg -n "Requirement:|Scenario:" .opencode/openspec/specs
+# rg -n "^#|Requirement:" .opencode/openspec/changes
 
 # 2) Choose change id and scaffold
 CHANGE=add-two-factor-auth

@@ -21,7 +21,7 @@ Statuses must be one of:
 
 ## Promotion Workflow
 1. Append entries to the appropriate ledger during or immediately after sessions.
-2. Run `./bin/review-learnings` before closing each session. The command lists entries in `new`, `needs-agents-update`, or `needs-spec-change` states and provides prompts for follow-up.
+2. Run `.opencode/skill/self-improve/scripts/review-learnings` before closing each session. The command lists entries in `new`, `needs-agents-update`, or `needs-spec-change` states and provides prompts for follow-up.
 3. Decide whether to update AGENTS, file a beads issue, or draft an OpenSpec change. Reference the ledger entry ID in every follow-up artifact.
 4. Update both the ledger entry and this index with the new status, owner, and links (`Follow-up Links` column).
 5. When promotion is complete, mark the status `promoted` and keep the row for historical context.

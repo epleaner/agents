@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """Review meta-learning ledgers and optionally update statuses/owners.
 
-The script scans every markdown file under `learnings/` (excluding `index.md`),
+The script scans every markdown file under `.opencode/learnings/` (excluding `index.md`),
 finds entries using the standard template, and surfaces those that still need
 action (`new`, `needs-agents-update`, or `needs-spec-change` by default).
 
 For each entry, you can update the status, owner, and follow-up links directly
 from the prompt; the script rewrites the ledger file and keeps
-`learnings/index.md` in sync. Use Ctrl+C to abort without saving the current
+`.opencode/learnings/index.md` in sync. Use Ctrl+C to abort without saving the current
 entry.
 """
 from __future__ import annotations
@@ -19,7 +19,7 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent.parent.parent.parent
-LEARNINGS_DIR = REPO_ROOT / "learnings"
+LEARNINGS_DIR = REPO_ROOT / ".opencode" / "learnings"
 INDEX_FILE = LEARNINGS_DIR / "index.md"
 ALLOWED_STATUSES = [
     "new",

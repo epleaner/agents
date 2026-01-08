@@ -26,7 +26,7 @@ Statuses must be one of:
 
 ## Promotion Workflow
 1. Append entries to the appropriate ledger during or immediately after sessions.
-2. Run \`./bin/review-learnings\` before closing each session. The command lists entries in \`new\`, \`needs-agents-update\`, or \`needs-spec-change\` states and provides prompts for follow-up.
+2. Run \`.opencode/skill/self-improve/scripts/review-learnings\` before closing each session. The command lists entries in \`new\`, \`needs-agents-update\`, or \`needs-spec-change\` states and provides prompts for follow-up.
 3. Decide whether to update AGENTS, file a beads issue, or draft an OpenSpec change. Reference the ledger entry ID in every follow-up artifact.
 4. Update both the ledger entry and this index with the new status, owner, and links (\`Follow-up Links\` column).
 5. When promotion is complete, mark the status \`promoted\` and keep the row for historical context.
@@ -39,7 +39,7 @@ Statuses must be one of:
 
 export const META_LEARNINGS_TEMPLATE = `# Meta Learnings Ledger
 
-This ledger records session-level observations about agent workflows, coordination patterns, and opportunities to improve instructions. Capture only operational/meta knowledge—domain-specific facts belong in the knowledge graph.
+This ledger records session-level observations about agent workflows, coordination patterns, and opportunities to improve instructions.
 
 ## Entry Template
 Use the following structure for every entry. Replace angle-bracket placeholders and keep the ordering identical so tooling (e.g., \`bin/review-learnings\`) can parse the fields.
@@ -59,11 +59,11 @@ Use the following structure for every entry. Replace angle-bracket placeholders 
 - Follow-up Links: <AGENTS/spec updates, beads issues, etc.>
 \`\`\`
 
-**IDs:** Use \`ML-YYYYMMDD-###\` (e.g., \`ML-20260105-001\`). Each entry must also be referenced from \`learnings/index.md\` once recorded.
+**IDs:** Use \`ML-YYYYMMDD-###\` (e.g., \`ML-20260105-001\`). Each entry must also be referenced from \`.opencode/learnings/index.md\` once recorded.
 
 ## Entries
 
-_No entries recorded yet. Run \`./bin/review-learnings\` after adding entries to keep statuses up to date._
+_No entries recorded yet. Run \`.opencode/skill/self-improve/scripts/review-learnings\` after adding entries to keep statuses up to date._
 `;
 
 export const RECURRING_TASKS_TEMPLATE = `# Recurring Tasks Ledger
@@ -90,11 +90,11 @@ Use the following structure for every entry. Replace angle-bracket placeholders 
 - Follow-up Links: <AGENTS/spec updates, beads issues, etc.>
 \`\`\`
 
-**IDs:** Use \`RT-YYYYMMDD-###\` (e.g., \`RT-20260105-001\`). Each entry must also be referenced from \`learnings/index.md\` once recorded.
+**IDs:** Use \`RT-YYYYMMDD-###\` (e.g., \`RT-20260105-001\`). Each entry must also be referenced from \`.opencode/learnings/index.md\` once recorded.
 
 ## Entries
 
-_No entries recorded yet. Run \`./bin/review-learnings\` after adding entries to keep statuses up to date._
+_No entries recorded yet. Run \`.opencode/skill/self-improve/scripts/review-learnings\` after adding entries to keep statuses up to date._
 `;
 
 export const FAILURES_TEMPLATE = `# Failures and Resolutions Ledger
@@ -122,11 +122,11 @@ Use the following structure for every entry. Replace angle-bracket placeholders 
 - Follow-up Links: <AGENTS/spec updates, beads issues, etc.>
 \`\`\`
 
-**IDs:** Use \`FR-YYYYMMDD-###\` (e.g., \`FR-20260105-001\`). Each entry must also be referenced from \`learnings/index.md\` once recorded.
+**IDs:** Use \`FR-YYYYMMDD-###\` (e.g., \`FR-20260105-001\`). Each entry must also be referenced from \`.opencode/learnings/index.md\` once recorded.
 
 ## Entries
 
-_No entries recorded yet. Run \`./bin/review-learnings\` after adding entries to keep statuses up to date._
+_No entries recorded yet. Run \`.opencode/skill/self-improve/scripts/review-learnings\` after adding entries to keep statuses up to date._
 `;
 
 export const CANDIDATE_AUTOMATIONS_TEMPLATE = `# Candidate Automations Ledger
@@ -154,11 +154,11 @@ Use the following structure for every entry. Replace angle-bracket placeholders 
 - Follow-up Links: <AGENTS/spec updates, beads issues, etc.>
 \`\`\`
 
-**IDs:** Use \`CA-YYYYMMDD-###\` (e.g., \`CA-20260105-001\`). Each entry must also be referenced from \`learnings/index.md\` once recorded.
+**IDs:** Use \`CA-YYYYMMDD-###\` (e.g., \`CA-20260105-001\`). Each entry must also be referenced from \`.opencode/learnings/index.md\` once recorded.
 
 ## Entries
 
-_No entries recorded yet. Run \`./bin/review-learnings\` after adding entries to keep statuses up to date._
+_No entries recorded yet. Run \`.opencode/skill/self-improve/scripts/review-learnings\` after adding entries to keep statuses up to date._
 `;
 
 /**

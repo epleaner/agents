@@ -28,21 +28,30 @@ interface Report {
 }
 
 /**
- * Blueprint files to copy from the source repository
+ * Source to target path mapping for blueprint files
+ * Source paths are relative to the blueprint repo
+ * Target paths are relative to the target repo
  */
-const BLUEPRINT_FILES = [
-  'AGENTS.md',
-  '.opencode/agent/',
-  '.opencode/command/',
-  '.opencode/skill/',
-  '.opencode/templates/',
-  '.opencode/package.json',
-  '.opencode/.gitignore',
-  'openspec/AGENTS.md',
-  'openspec/project.md',
-  'learnings/',
-  'bin/review-learnings',
-];
+const BLUEPRINT_MAP: Record<string, string> = {
+  // AGENTS.md from root goes into .opencode/
+  'AGENTS.md': '.opencode/AGENTS.md',
+  // .opencode contents copy directly
+  '.opencode/agent/': '.opencode/agent/',
+  '.opencode/command/': '.opencode/command/',
+  '.opencode/skill/': '.opencode/skill/',
+  '.opencode/templates/': '.opencode/templates/',
+  '.opencode/package.json': '.opencode/package.json',
+  '.opencode/.gitignore': '.opencode/.gitignore',
+  // openspec and learnings are now inside .opencode
+  '.opencode/openspec/AGENTS.md': '.opencode/openspec/AGENTS.md',
+  '.opencode/openspec/project.md': '.opencode/openspec/project.md',
+  '.opencode/learnings/': '.opencode/learnings/',
+};
+
+/**
+ * Directories that support custom additions (merge, don't replace)
+ */
+const MERGEABLE_DIRS = ['agent', 'skill', 'command'];
 
 export async function init(): Promise<void> {
   console.log('🚀 Initializing yepe blueprint...\n');
@@ -68,7 +77,10 @@ export async function init(): Promise<void> {
   // Step 7: Cleanup
   cleanup();
 
-  // Step 8: Print summary
+  // Step 8: Re-apply learnings via agent
+  await reapplyLearnings();
+
+  // Step 9: Print summary
   printSummary(report, projectInfo);
 }
 
@@ -103,21 +115,38 @@ async function stageFiles(projectInfo: any): Promise<Report> {
   const conflicts: string[] = [];
   const selectedSkills = new Set<string>(projectInfo.selectedSkills);
 
-  for (const blueprintPath of BLUEPRINT_FILES) {
-    const sourcePath = join(STAGING_DIR, blueprintPath);
+  // Check if learnings has existing entries (should be preserved)
+  const hasExistingLearnings = checkExistingLearnings();
+
+  for (const [sourceBlueprintPath, targetPath] of Object.entries(BLUEPRINT_MAP)) {
+    const sourcePath = join(STAGING_DIR, sourceBlueprintPath);
     
     if (!existsSync(sourcePath)) {
+      continue;
+    }
+
+    // Skip learnings if target has existing entries
+    if (hasExistingLearnings && targetPath.includes('.opencode/learnings/')) {
+      changes.push({
+        path: targetPath,
+        status: 'skipped',
+        reason: 'Existing learnings preserved',
+      });
       continue;
     }
 
     const stat = statSync(sourcePath);
     
     if (stat.isDirectory()) {
+      // Check if this is a mergeable directory
+      const dirName = basename(targetPath.replace(/\/$/, ''));
+      const isMergeable = MERGEABLE_DIRS.includes(dirName);
+      
       // Process directory recursively
-      processDirectory(sourcePath, blueprintPath, changes, conflicts, selectedSkills);
+      processDirectory(sourcePath, sourceBlueprintPath, targetPath, changes, conflicts, selectedSkills, isMergeable);
     } else {
       // Process single file
-      processFile(sourcePath, blueprintPath, changes, conflicts);
+      processFile(sourcePath, targetPath, changes, conflicts);
     }
   }
 
@@ -138,7 +167,29 @@ async function stageFiles(projectInfo: any): Promise<Report> {
   return report;
 }
 
-function processDirectory(sourcePath: string, blueprintPath: string, changes: FileChange[], conflicts: string[], selectedSkills?: Set<string>): void {
+/**
+ * Check if target repo has existing learnings with real entries
+ */
+function checkExistingLearnings(): boolean {
+  const indexPath = '.opencode/learnings/index.md';
+  if (!existsSync(indexPath)) return false;
+  
+  const content = readFileSync(indexPath, 'utf-8');
+  // Check if entries table has real entries (not just template placeholder)
+  return !content.includes('_No entries yet_') && 
+         (content.includes('| ML-') || content.includes('| RT-') || 
+          content.includes('| FR-') || content.includes('| CA-'));
+}
+
+function processDirectory(
+  sourcePath: string, 
+  sourceBlueprintPath: string, 
+  targetBasePath: string, 
+  changes: FileChange[], 
+  conflicts: string[], 
+  selectedSkills?: Set<string>,
+  isMergeable?: boolean
+): void {
   const entries = readdirSync(sourcePath);
 
   for (const entry of entries) {
@@ -148,25 +199,52 @@ function processDirectory(sourcePath: string, blueprintPath: string, changes: Fi
     }
 
     // Skip skills that weren't selected
-    if (selectedSkills && blueprintPath.includes('.opencode/skill/')) {
-      const skillName = blueprintPath.split('.opencode/skill/')[1]?.split('/')[0] || entry;
+    if (selectedSkills && sourceBlueprintPath.includes('.opencode/skill/')) {
+      const skillName = sourceBlueprintPath.split('.opencode/skill/')[1]?.split('/')[0] || entry;
       if (!selectedSkills.has(skillName)) {
         continue;
       }
     }
 
     const entrySourcePath = join(sourcePath, entry);
-    const entryBlueprintPath = blueprintPath.endsWith('/') 
-      ? `${blueprintPath}${entry}`
-      : `${blueprintPath}/${entry}`;
+    const entrySourceBlueprintPath = sourceBlueprintPath.endsWith('/') 
+      ? `${sourceBlueprintPath}${entry}`
+      : `${sourceBlueprintPath}/${entry}`;
+    const entryTargetPath = targetBasePath.endsWith('/')
+      ? `${targetBasePath}${entry}`
+      : `${targetBasePath}/${entry}`;
 
     const stat = statSync(entrySourcePath);
 
     if (stat.isDirectory()) {
-      processDirectory(entrySourcePath, entryBlueprintPath, changes, conflicts, selectedSkills);
+      processDirectory(entrySourcePath, entrySourceBlueprintPath, entryTargetPath, changes, conflicts, selectedSkills, isMergeable);
     } else {
-      processFile(entrySourcePath, entryBlueprintPath, changes, conflicts);
+      // For mergeable directories, always update base files (overwrite allowed)
+      if (isMergeable) {
+        processFileWithMerge(entrySourcePath, entryTargetPath, changes);
+      } else {
+        processFile(entrySourcePath, entryTargetPath, changes, conflicts);
+      }
     }
+  }
+}
+
+/**
+ * Process file in a mergeable directory - always update base files
+ */
+function processFileWithMerge(sourcePath: string, targetPath: string, changes: FileChange[]): void {
+  if (existsSync(targetPath)) {
+    // File exists - will be updated (not a conflict for mergeable dirs)
+    changes.push({
+      path: targetPath,
+      status: 'added', // Mark as added so it gets copied/updated
+      reason: 'Base file updated',
+    });
+  } else {
+    changes.push({
+      path: targetPath,
+      status: 'added',
+    });
   }
 }
 
@@ -194,10 +272,30 @@ async function copyFiles(report: Report): Promise<void> {
 
   let copied = 0;
 
+  // Build reverse map for source lookup
+  const targetToSource: Record<string, string> = {};
+  for (const [source, target] of Object.entries(BLUEPRINT_MAP)) {
+    targetToSource[target] = source;
+  }
+
   for (const change of report.changes) {
     if (change.status === 'added') {
-      const sourcePath = join(STAGING_DIR, change.path);
       const targetPath = change.path;
+      
+      // Find the source path by matching against the map
+      let sourcePath = '';
+      for (const [source, target] of Object.entries(BLUEPRINT_MAP)) {
+        if (targetPath.startsWith(target.replace(/\/$/, ''))) {
+          // Calculate the relative part after the mapped prefix
+          const relativePart = targetPath.substring(target.replace(/\/$/, '').length);
+          sourcePath = join(STAGING_DIR, source.replace(/\/$/, '') + relativePart);
+          break;
+        }
+      }
+      
+      if (!sourcePath || !existsSync(sourcePath)) {
+        continue;
+      }
 
       // Create directory if it doesn't exist
       const targetDir = dirname(targetPath);
@@ -206,7 +304,7 @@ async function copyFiles(report: Report): Promise<void> {
       }
 
       // Check if this is a learnings file - use template instead of copying
-      if (targetPath.startsWith('learnings/') && targetPath.endsWith('.md')) {
+      if (targetPath.includes('.opencode/learnings/') && targetPath.endsWith('.md')) {
         const filename = basename(targetPath);
         const template = getLearningsTemplate(filename);
         
@@ -232,8 +330,8 @@ async function customizeFiles(projectInfo: any, report: Report): Promise<void> {
 
   let customized = 0;
 
-  // Customize openspec/project.md if it was added (not conflicted)
-  const projectMdPath = 'openspec/project.md';
+  // Customize .opencode/openspec/project.md if it was added (not conflicted)
+  const projectMdPath = '.opencode/openspec/project.md';
   const projectMdChange = report.changes.find(c => c.path === projectMdPath);
   
   if (projectMdChange && projectMdChange.status === 'added') {
@@ -242,8 +340,8 @@ async function customizeFiles(projectInfo: any, report: Report): Promise<void> {
     customized++;
   }
 
-  // Customize AGENTS.md header if it was added (not conflicted)
-  const agentsMdPath = 'AGENTS.md';
+  // Customize .opencode/AGENTS.md header if it was added (not conflicted)
+  const agentsMdPath = '.opencode/AGENTS.md';
   const agentsMdChange = report.changes.find(c => c.path === agentsMdPath);
   
   if (agentsMdChange && agentsMdChange.status === 'added') {
@@ -288,6 +386,48 @@ function cleanup(): void {
   }
 }
 
+/**
+ * Re-apply promoted learnings to updated base config via agent
+ */
+async function reapplyLearnings(): Promise<void> {
+  const learningsDir = '.opencode/learnings';
+  const indexPath = join(learningsDir, 'index.md');
+  
+  // Check if there are promoted learnings to re-apply
+  if (!existsSync(indexPath)) {
+    return;
+  }
+  
+  const content = readFileSync(indexPath, 'utf-8');
+  const hasPromotedEntries = content.includes('| promoted |');
+  
+  if (!hasPromotedEntries) {
+    return;
+  }
+  
+  console.log('🔄 Re-applying promoted learnings...');
+  
+  const prompt = `Read all entries with "Status: promoted" in .opencode/learnings/.
+For each promoted entry:
+1. Read the "Recommended Action" field
+2. Read the "Follow-up Links" field to identify which files were modified
+3. Re-apply the recommended action to those files
+
+This ensures project-specific customizations survive base config updates.
+Only modify files mentioned in Follow-up Links. Be precise and minimal.`;
+
+  try {
+    execSync(`opencode run "${prompt.replace(/"/g, '\\"')}"`, { 
+      stdio: 'inherit',
+      timeout: 120000 // 2 minute timeout
+    });
+    console.log('✓ Learnings re-applied\n');
+  } catch (error) {
+    console.log('⚠️  Could not re-apply learnings automatically.');
+    console.log('   Run manually: opencode run "Re-apply promoted learnings from .opencode/learnings/"\n');
+  }
+}
+
 function getBlueprintVersion(): string {
   try {
     const packagePath = join(STAGING_DIR, 'package.json');
@@ -318,7 +458,7 @@ function printSummary(report: Report, projectInfo: any): void {
   console.log('\n✨ Next steps:');
   console.log('   1. Review changes: git status');
   console.log('   2. Review conflicts in .yepe-report.json');
-  if (existsSync('openspec')) {
+  if (existsSync('.opencode/openspec')) {
     console.log('   3. Initialize OpenSpec: (already exists)');
   } else {
     console.log('   3. Initialize OpenSpec: openspec init');

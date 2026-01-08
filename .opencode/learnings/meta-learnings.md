@@ -1,6 +1,6 @@
 # Meta Learnings Ledger
 
-This ledger records session-level observations about agent workflows, coordination patterns, and opportunities to improve instructions. Capture only operational/meta knowledge—domain-specific facts belong in the knowledge graph.
+This ledger records session-level observations about agent workflows, coordination patterns, and opportunities to improve instructions.
 
 ## Entry Template
 Use the following structure for every entry. Replace angle-bracket placeholders and keep the ordering identical so tooling (e.g., `bin/review-learnings`) can parse the fields.
@@ -20,7 +20,7 @@ Use the following structure for every entry. Replace angle-bracket placeholders 
 - Follow-up Links: <AGENTS/spec updates, beads issues, etc.>
 ```
 
-**IDs:** Use `ML-YYYYMMDD-###` (e.g., `ML-20260105-001`). Each entry must also be referenced from `learnings/index.md` once recorded.
+**IDs:** Use `ML-YYYYMMDD-###` (e.g., `ML-20260105-001`). Each entry must also be referenced from `.opencode/learnings/index.md` once recorded.
 
 ## Entries
 

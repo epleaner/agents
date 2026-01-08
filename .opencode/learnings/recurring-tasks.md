@@ -1,6 +1,6 @@
 # Recurring Tasks Ledger
 
-Track manual or repetitive tasks that could become commands, scripts, or skills. Only capture operational/process knowledge—domain facts should remain in the knowledge graph.
+Track manual or repetitive tasks that could become commands, scripts, or skills.
 
 ## Entry Template
 ```
@@ -18,7 +18,7 @@ Track manual or repetitive tasks that could become commands, scripts, or skills.
 - Follow-up Links: <AGENTS/spec updates, beads issues, etc.>
 ```
 
-**IDs:** Use `RT-YYYYMMDD-###`. Reference each entry inside `learnings/index.md` for quick discovery.
+**IDs:** Use `RT-YYYYMMDD-###`. Reference each entry inside `.opencode/learnings/index.md` for quick discovery.
 
 ## Entries
 
