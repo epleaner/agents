@@ -80,6 +80,43 @@ git add .
 git commit -m "Add yepe blueprint"
 ```
 
+### Non-Interactive Mode
+
+For CI/CD pipelines or automated testing:
+
+```bash
+# Use defaults (project name from directory, minimal config)
+npx @yepe/init --non-interactive
+
+# Or with a config file
+npx @yepe/init --non-interactive --config yepe.config.json
+```
+
+**Config file format** (`yepe.config.json`):
+
+```json
+{
+  "name": "my-project",
+  "purpose": "A brief description of the project",
+  "techStack": ["TypeScript", "React", "Node.js"],
+  "codeStyle": "Prettier, ESLint",
+  "architecture": "Clean Architecture",
+  "testing": "Jest, Playwright",
+  "gitWorkflow": "trunk-based",
+  "domain": "E-commerce platform",
+  "constraints": "GDPR compliance required",
+  "dependencies": "Stripe API, SendGrid",
+  "beadsPrefix": "app",
+  "selectedSkills": ["research", "qa", "release"]
+}
+```
+
+All fields are optional. Defaults:
+- `name`: Current directory name
+- `purpose`: `"{name} project"`
+- `beadsPrefix`: First 3 characters of directory name
+- `selectedSkills`: Empty (no external skills)
+
 ### Updating Existing Setup
 
 yepe is safe to re-run:

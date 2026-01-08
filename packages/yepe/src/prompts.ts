@@ -1,4 +1,5 @@
 import { createInterface } from 'readline';
+import { basename } from 'path';
 
 export interface ProjectInfo {
   name: string;
@@ -13,6 +14,11 @@ export interface ProjectInfo {
   dependencies: string;
   beadsPrefix: string;
   selectedSkills: string[];
+}
+
+export interface PromptOptions {
+  nonInteractive?: boolean;
+  config?: Partial<ProjectInfo>;
 }
 
 export interface SkillInfo {
@@ -105,9 +111,65 @@ async function promptSkillSelection(skills: SkillInfo[], question: (prompt: stri
 }
 
 /**
+ * Get default project info based on current directory
+ */
+function getDefaultProjectInfo(): ProjectInfo {
+  const cwd = process.cwd();
+  const dirName = basename(cwd);
+  
+  return {
+    name: dirName,
+    purpose: `${dirName} project`,
+    techStack: [],
+    codeStyle: '',
+    architecture: '',
+    testing: '',
+    gitWorkflow: '',
+    domain: '',
+    constraints: '',
+    dependencies: '',
+    beadsPrefix: dirName.substring(0, 3).toLowerCase(),
+    selectedSkills: [],
+  };
+}
+
+/**
  * Prompts the user for project information
  */
-export async function promptProjectInfo(blueprintDir: string): Promise<ProjectInfo> {
+export async function promptProjectInfo(blueprintDir: string, options: PromptOptions = {}): Promise<ProjectInfo> {
+  // Non-interactive mode: use config or defaults
+  if (options.nonInteractive) {
+    const defaults = getDefaultProjectInfo();
+    const config = options.config || {};
+    
+    const projectInfo: ProjectInfo = {
+      name: config.name || defaults.name,
+      purpose: config.purpose || defaults.purpose,
+      techStack: config.techStack || defaults.techStack,
+      codeStyle: config.codeStyle || defaults.codeStyle,
+      architecture: config.architecture || defaults.architecture,
+      testing: config.testing || defaults.testing,
+      gitWorkflow: config.gitWorkflow || defaults.gitWorkflow,
+      domain: config.domain || defaults.domain,
+      constraints: config.constraints || defaults.constraints,
+      dependencies: config.dependencies || defaults.dependencies,
+      beadsPrefix: config.beadsPrefix || defaults.beadsPrefix,
+      selectedSkills: config.selectedSkills || defaults.selectedSkills,
+    };
+    
+    console.log(`Using non-interactive mode with:`);
+    console.log(`  • Name: ${projectInfo.name}`);
+    console.log(`  • Purpose: ${projectInfo.purpose}`);
+    console.log(`  • Beads prefix: ${projectInfo.beadsPrefix}`);
+    if (projectInfo.selectedSkills.length > 0) {
+      console.log(`  • Skills: ${projectInfo.selectedSkills.join(', ')}`);
+    }
+    console.log('');
+    
+    return projectInfo;
+  }
+
+  // Interactive mode
   const rl = createInterface({
     input: process.stdin,
     output: process.stdout,

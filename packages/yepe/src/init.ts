@@ -2,12 +2,17 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync, statSy
 import { join, dirname, relative, basename } from 'path';
 import { execSync } from 'child_process';
 import { ValidationError } from './validate.js';
-import { promptProjectInfo, generateProjectMd, generateAgentsMdHeader } from './prompts.js';
+import { promptProjectInfo, generateProjectMd, generateAgentsMdHeader, ProjectInfo } from './prompts.js';
 import { getLearningsTemplate } from './learnings-templates.js';
 
 const BLUEPRINT_REPO = 'https://github.com/epleaner/agents.git';
 const STAGING_DIR = '.opencode/.yepe-tmp';
 const REPORT_FILE = '.yepe-report.json';
+
+export interface InitOptions {
+  nonInteractive?: boolean;
+  config?: Partial<ProjectInfo>;
+}
 
 interface FileChange {
   path: string;
@@ -53,14 +58,14 @@ const BLUEPRINT_MAP: Record<string, string> = {
  */
 const MERGEABLE_DIRS = ['agent', 'skill', 'command'];
 
-export async function init(): Promise<void> {
+export async function init(options: InitOptions = {}): Promise<void> {
   console.log('🚀 Initializing yepe blueprint...\n');
 
   // Step 1: Clone/download blueprint assets first (needed for skill discovery)
   await downloadBlueprint();
 
   // Step 2: Gather project information (including skill selection)
-  const projectInfo = await promptProjectInfo(STAGING_DIR);
+  const projectInfo = await promptProjectInfo(STAGING_DIR, options);
 
   // Step 3: Detect conflicts and stage files
   const report = await stageFiles(projectInfo);
