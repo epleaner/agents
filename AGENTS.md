@@ -209,6 +209,39 @@ bd doctor              # Check for issues
 git reset HEAD path/to/unrelated/file
 ```
 
+## Ralph Mode (Autonomous Orchestration)
+
+Ralph mode enables autonomous multi-iteration agent execution using the Ralph Wiggum technique.
+
+```bash
+# Run autonomous multi-iteration agent loop
+.opencode/scripts/ralph-orchestrator.sh --prompt task.md --max-iterations 30
+
+# With verbose output
+.opencode/scripts/ralph-orchestrator.sh --prompt task.md --verbose
+
+# Dry run (test without executing)
+.opencode/scripts/ralph-orchestrator.sh --prompt task.md --dry-run
+
+# Resume interrupted session
+.opencode/scripts/ralph-orchestrator.sh --resume ralph-2026-01-08-103045
+
+# Rollback to checkpoint
+.opencode/scripts/ralph-orchestrator.sh --rollback-to 10
+```
+
+**Completion markers** - Include one of these in agent output to signal completion:
+- `- [x] TASK_COMPLETE` (markdown checkbox)
+- `RALPH_COMPLETE` (magic string)
+
+**Configuration** - Copy `.opencode/templates/ralph.yml` to project root and customize.
+
+**Cross-session context**:
+- Local sessions: `.opencode/ralph/sessions.md` (gitignored)
+- Shared learnings: `.opencode/ralph/meta-learnings.md` (committed)
+
+See: `.opencode/openspec/changes/add-ralph-mode/design.md` for full documentation.
+
 ## Landing the Plane (Session Completion)
 
 **When ending a work session**, you MUST complete ALL steps below. Work is NOT complete until `git push` succeeds.
