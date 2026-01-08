@@ -51,10 +51,9 @@ curl -fsSL https://yepe.dev/install.sh | bash
 
 yepe copies the following assets:
 - **AGENTS.md** - AI assistant instructions
-- **.opencode/** - Agent definitions, commands, skills
+- **.opencode/** - Agent definitions, commands, skills (including scripts)
 - **openspec/** - Change proposal framework
 - **learnings/** - Meta-learnings ledgers
-- **bin/** - Helper scripts
 
 For more information, see the [yepe documentation](packages/yepe/README.md).
 
@@ -159,7 +158,10 @@ bd doctor              # Check for issues
 
 - Capture operational/meta insights under `learnings/` using the required template for each ledger. Do **not** store domain facts here; those belong in the knowledge graph.
 - Update `learnings/index.md` whenever you add or modify an entry so other agents can quickly find status, owners, and follow-up links.
-- Before closing a session, run `./bin/review-learnings`:
+- Before closing a session, run the `self-improve` skill's review-learnings script:
+  ```bash
+  .opencode/skill/self-improve/scripts/review-learnings
+  ```
   - Lists entries in `new`, `needs-agents-update`, or `needs-spec-change` states.
   - Prompts you to adjust status/owners/follow-up links and writes the updates back to both the ledger and index.
 - When an entry requires action, immediately promote it by updating the relevant AGENTS section, filing a beads issue, or drafting an OpenSpec change. Always reference the ledger entry ID in those follow-ups and mark the entry as `promoted` once done.

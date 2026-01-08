@@ -13,13 +13,13 @@ To list meetings, run the shell script with date parameters:
 
 ```bash
 # List meetings from the last 7 days
-./bin/fathom-list-meetings
+scripts/fathom-list-meetings
 
 # List meetings in a specific date range
-./bin/fathom-list-meetings --after "2026-01-01T00:00:00Z" --before "2026-01-07T23:59:59Z"
+scripts/fathom-list-meetings --after "2026-01-01T00:00:00Z" --before "2026-01-07T23:59:59Z"
 
 # Include action items in the response
-./bin/fathom-list-meetings --after "2026-01-01T00:00:00Z" --include-action-items
+scripts/fathom-list-meetings --after "2026-01-01T00:00:00Z" --include-action-items
 ```
 
 ## Parameters

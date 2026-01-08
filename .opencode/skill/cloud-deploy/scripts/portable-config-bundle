@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 SOURCE_DIR="$ROOT_DIR/.opencode"
 DIST_DIR="${PORTABLE_BUNDLE_DIST:-$ROOT_DIR/dist}"
 DEFAULT_ARCHIVE="$DIST_DIR/portable-config-bundle.tar.gz"
@@ -27,7 +27,7 @@ require_cmd() {
 
 usage() {
   cat <<'EOF'
-Usage: bin/portable-config-bundle <command> [options]
+Usage: .opencode/skill/cloud-deploy/scripts/portable-config-bundle <command> [options]
 
 Commands:
   package [--output PATH] [--include-node-modules]

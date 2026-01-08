@@ -62,6 +62,20 @@ Scope: <agents | skills | workflows | docs | all>
 - Actions: <what was done>
 ```
 
+## Scripts
+
+The `scripts/review-learnings` script helps review and update meta-learning ledgers:
+
+```bash
+# Interactive review of entries needing attention
+scripts/review-learnings
+
+# List all entries (read-only)
+scripts/review-learnings --all
+```
+
+The script scans `learnings/` for entries in `new`, `needs-agents-update`, or `needs-spec-change` states and prompts for status/owner/follow-up updates.
+
 ## Guidelines
 1. Be specific about friction—vague complaints don't lead to fixes.
 2. Propose concrete, actionable improvements.

@@ -5,7 +5,7 @@ set -euo pipefail
 # Fetches meetings from Fathom within a specified date range
 #
 # Usage:
-#   ./bin/fathom-list-meetings [options]
+#   .opencode/skill/fathom-list-meetings/scripts/fathom-list-meetings [options]
 #
 # Options:
 #   --after <timestamp>       ISO 8601 timestamp for start of range (default: 7 days ago)
@@ -20,7 +20,7 @@ set -euo pipefail
 
 # Load .env file if it exists
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/../../../.." && pwd)"
 if [[ -f "$ROOT_DIR/.env" ]]; then
     set -a
     source "$ROOT_DIR/.env"

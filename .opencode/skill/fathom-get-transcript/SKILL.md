@@ -13,10 +13,10 @@ To fetch a transcript, run the shell script with the recording ID:
 
 ```bash
 # Get transcript for a specific meeting
-./bin/fathom-get-transcript --recording-id 123456789
+scripts/fathom-get-transcript --recording-id 123456789
 
 # Output as plain text instead of JSON
-./bin/fathom-get-transcript --recording-id 123456789 --format text
+scripts/fathom-get-transcript --recording-id 123456789 --format text
 ```
 
 ## Parameters

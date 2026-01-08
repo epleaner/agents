@@ -5,7 +5,7 @@ set -euo pipefail
 # Fetches the full transcript for a specific meeting recording
 #
 # Usage:
-#   ./bin/fathom-get-transcript --recording-id <id> [options]
+#   .opencode/skill/fathom-get-transcript/scripts/fathom-get-transcript --recording-id <id> [options]
 #
 # Options:
 #   --recording-id <id>    Required. The recording ID from Fathom
@@ -17,7 +17,7 @@ set -euo pipefail
 
 # Load .env file if it exists
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/../../../.." && pwd)"
 if [[ -f "$ROOT_DIR/.env" ]]; then
     set -a
     source "$ROOT_DIR/.env"
