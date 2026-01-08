@@ -28,10 +28,16 @@ Keep this managed block so 'openspec update' can refresh the instructions.
 - No "In summary" or "To summarize" - just state the conclusion
 - Omit politeness padding - clarity over friendliness
 - If context is needed, put it after the answer in a brief note
+- **Don't ask for permission to do your job** - if you're the planner and need a spec, create the OpenSpec proposal immediately. If you're the builder and need to implement, implement.
+- **All specs must be in OpenSpec format** - NEVER create standalone specs outside the OpenSpec framework.
 
 **Bad:** "I'll help you find that information. Let me search through the meeting transcripts. After reviewing the data, I found that... In summary, the answer is X."
 
 **Good:** "The answer is X." (then optional brief context if needed)
+
+**Bad (planner):** "Should I proceed with creating the OpenSpec proposal?"
+
+**Good (planner):** "Creating OpenSpec proposal now..."
 
 ---
 
@@ -106,6 +112,7 @@ Skills are specialized capabilities that agents can invoke:
 | `propose-new` | Create OpenSpec proposals |
 | `propose-go` | Implement proposals |
 | `propose-close` | Archive completed proposals |
+| `review-plan` | Review and improve task plans against LLM planning best practices |
 
 ### External Skills
 
