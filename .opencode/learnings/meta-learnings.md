@@ -76,15 +76,28 @@ Use the following structure for every entry. Replace angle-bracket placeholders 
 - Supporting Links: integration test in examples/test-project/
 - Follow-up Links: packages/yepe/src/cli.ts, packages/yepe/src/prompts.ts, packages/yepe/README.md
 
-### [ML-20260107-005] Planner should check for OpenSpec requirements before creating standalone specs
+### [ML-20260107-005] Planner must NEVER create standalone specs - all specs must be OpenSpec proposals
 - Date: 2026-01-07
 - Session: ralph-mode research and proposal
 - Knowledge Type: meta
 - Meta Category: meta-learning
 - Owner: planner
-- Status: needs-agents-update
+- Status: promoted
 - Related IDs: change-add-ralph-mode
-- Summary: Planner agent created detailed standalone spec for Ralph Wiggum mode instead of recognizing it as a new capability requiring OpenSpec proposal. User had to ask "shouldn't this be in openspec?" to trigger the correct workflow.
-- Recommended Action: Update planner agent instructions with clear heuristics for "when to use OpenSpec" - new capabilities, breaking changes, architecture shifts should always go through OpenSpec first.
+- Summary: Planner agent created detailed standalone spec for Ralph Wiggum mode instead of recognizing it as a new capability requiring OpenSpec proposal. User had to ask "shouldn't this be in openspec?" to trigger the correct workflow. Additionally, planner was asking for permission before creating OpenSpec proposals instead of just creating them.
+- Recommended Action: MANDATORY RULES: (1) Planner should NEVER create standalone specs - ALL specs must be OpenSpec proposals. (2) Planner should NOT ask for permission before creating OpenSpec proposals - just create them immediately. (3) New capabilities, breaking changes, architecture shifts, or ambiguous work ALWAYS require OpenSpec - make it the default, not optional.
 - Supporting Links: session transcript
-- Follow-up Links: none
+- Follow-up Links: .opencode/agent/planner.md, AGENTS.md Communication Style section
+
+### [ML-20260107-006] Agents must review staged files before committing
+- Date: 2026-01-07
+- Session: yepe simplification
+- Knowledge Type: meta
+- Meta Category: meta-learning
+- Owner: orchestrator
+- Status: promoted
+- Related IDs: none
+- Summary: Used `git add -A` without reviewing what was being staged, accidentally committing unrelated `add-ralph-mode` change proposal files alongside the yepe simplification changes. This polluted commit history with mixed concerns.
+- Recommended Action: Update AGENTS.md git workflow to: (1) NEVER use `git add -A` or `git add .` blindly. (2) Always review `git status` output before staging. (3) Stage only files related to the current task. (4) Use explicit file paths or patterns when staging.
+- Supporting Links: session transcript
+- Follow-up Links: AGENTS.md "Git Commit Hygiene" section added

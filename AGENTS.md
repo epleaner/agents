@@ -180,6 +180,28 @@ bd doctor              # Check for issues
 
 > Tip: if you are unsure whether a task needs an OpenSpec proposal, leave a beads comment with your reasoning and ask for guidance before continuing.
 
+## Git Commit Hygiene
+
+**NEVER commit unrelated files.** Each commit must contain only changes for the current task.
+
+**MANDATORY before every commit:**
+1. Run `git status` and review ALL modified/untracked files
+2. Identify which files are related to the current task
+3. Stage ONLY task-related files using explicit paths:
+   ```bash
+   git add path/to/file1.ts path/to/file2.ts
+   ```
+4. If unrelated changes exist, leave them unstaged or stash them
+
+**NEVER use:**
+- `git add -A` or `git add .` without first reviewing `git status`
+- These commands stage everything, including unrelated work
+
+**If you accidentally staged unrelated files:**
+```bash
+git reset HEAD path/to/unrelated/file
+```
+
 ## Landing the Plane (Session Completion)
 
 **When ending a work session**, you MUST complete ALL steps below. Work is NOT complete until `git push` succeeds.
