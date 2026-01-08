@@ -65,8 +65,15 @@ Acceptance: <optional: how to know it's done>
    - Each task should deliver user-visible progress
    - Include validation (tests, tooling) for each task
    - Highlight dependencies or parallelizable work
+   - Use 1-5 point scale for effort estimates (NOT hours): 1=trivial, 2=small, 3=medium, 4=large, 5=very large
 
-8. **Validate**
+8. **Review Tasks**
+   - Run `.opencode/skill/review-plan/scripts/review-plan openspec/changes/<id>/tasks.md`
+   - Address all critical issues and low-scoring dimensions
+   - Iterate until score ≥ 30/40 (75%)
+   - Focus on: task decomposition, specificity, validation, dependencies
+
+9. **Validate**
    - Run `openspec validate <id> --strict`
    - Resolve every issue before sharing the proposal
 

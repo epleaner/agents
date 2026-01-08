@@ -63,6 +63,7 @@ Guidelines:
 - Never modify repository files directly—only produce OpenSpec proposals.
 - All plans must be captured as OpenSpec changes with verb-led IDs.
 - Break tasks into steps sized for a single implementation pass (<~100 LOC when possible).
+- Use 1-5 point scale for effort estimates (NOT hours): 1=trivial, 2=small, 3=medium, 4=large, 5=very large.
 - Cite file paths, test commands, and acceptance criteria for each task.
 - If requirements are ambiguous, ask before creating the proposal.
 - Always delegate to `researcher` sub-agent before drafting proposals—use it to:

@@ -32,3 +32,13 @@ Statuses must be one of:
 | FR-20260105-001 | Beads daemon 5+ second startup causing workflow slowdowns | failures-and-resolutions.md | Meta-Agent | promoted | AGENTS.md beads troubleshooting section |
 | ML-20260107-001 | Orchestrator should delegate meeting queries to fathom subagent | meta-learnings.md | orchestrator | promoted | .opencode/agent/orchestrator.md |
 | ML-20260107-002 | Agent responses need direct communication style | meta-learnings.md | all agents | promoted | AGENTS.md, .opencode/agent/orchestrator.md |
+| ML-20260107-003 | Proposal process needs assumption clarification step | meta-learnings.md | planner | promoted | .opencode/skill/propose-new/skill.md |
+| ML-20260107-004 | yepe needs non-interactive mode for testing | meta-learnings.md | builder | promoted | packages/yepe/src/cli.ts, packages/yepe/src/prompts.ts, packages/yepe/README.md |
+| ML-20260107-005 | Planner should check for OpenSpec requirements before creating standalone specs | meta-learnings.md | planner | promoted | .opencode/agent/planner.md |
+| CA-20260107-001 | GitHub source fetcher skill | candidate-automations.md | builder | new | none |
+| ML-20260107-007 | Planner must distinguish "research requirements" from "explore codebase" | meta-learnings.md | planner | promoted | .opencode/agent/planner.md |
+| ML-20260107-008 | Planner must research best practices before answering questions | meta-learnings.md | planner | promoted | .opencode/agent/planner.md |
+| ML-20260107-009 | Self-improve skill needs focus parameter and tool requirements documentation | meta-learnings.md | builder | promoted | .opencode/skill/self-improve/skill.md |
+| ML-20260107-010 | Planner must only create OpenSpec proposals, never implement | meta-learnings.md | planner | promoted | .opencode/agent/planner.md |
+| ML-20260107-011 | Orchestrator must auto-delegate when lacking tools, not ask permission | meta-learnings.md | orchestrator | promoted | .opencode/agent/orchestrator.md |
+| ML-20260107-012 | Planner must use 1-5 point scale for effort estimates, not hours | meta-learnings.md | planner | promoted | .opencode/agent/planner.md, .opencode/skill/propose-new/SKILL.md |
