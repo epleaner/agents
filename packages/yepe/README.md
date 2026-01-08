@@ -29,6 +29,7 @@ yepe copies the following from the [agents blueprint repository](https://github.
 
 **Key features:**
 - **Single folder footprint**: Everything lives in `.opencode/`
+- **Smart project detection**: Auto-detects name, description, and tech stack
 - **Learnings preservation**: Existing learnings are never overwritten
 - **Custom config preserved**: Your custom agents/skills survive updates
 - **Agent re-application**: After update, an agent re-applies promoted learnings
@@ -42,9 +43,23 @@ Before running yepe, ensure:
 2. Your working tree is clean: `git status` (commit or stash changes first)
 3. You have git installed and configured
 
+## Commands
+
+yepe has two commands:
+
+| Command | Description |
+|---------|-------------|
+| `init`  | Initialize a new project with the blueprint (default) |
+| `pull`  | Update existing setup without onboarding prompts |
+
+### When to use each
+
+- **Use `init`** for new projects or first-time setup
+- **Use `pull`** to update an existing setup with latest blueprint changes
+
 ## Usage
 
-### Fresh Installation
+### Fresh Installation (init)
 
 In a new repository:
 
@@ -56,8 +71,8 @@ git init
 npx @yepe/init
 
 # You'll be prompted for:
-# - Project name
-# - Project description (include tech stack, architecture, constraints, etc.)
+# - Project name [auto-detected from package.json, etc.]
+# - Project description [auto-detected]
 # - Beads prefix (2-4 characters for issue IDs)
 # - Skill selection (which external integrations to include)
 
@@ -74,7 +89,7 @@ git commit -m "Add yepe blueprint"
 For CI/CD pipelines or automated testing:
 
 ```bash
-# Use defaults (project name from directory, minimal config)
+# Use detected values and defaults
 npx @yepe/init --non-interactive
 
 # Or with a config file
@@ -92,27 +107,67 @@ npx @yepe/init --non-interactive --config yepe.config.json
 }
 ```
 
-All fields are optional. Defaults:
-- `name`: Current directory name
-- `description`: `"{name} project"`
-- `beadsPrefix`: First 3 characters of directory name
-- `selectedSkills`: Empty (no external skills)
+All fields are optional. When not provided:
+1. Detection is attempted (see below)
+2. Falls back to sensible defaults
 
-### Updating Existing Setup
+### Updating Existing Setup (pull)
 
-yepe is safe to re-run:
+Use `pull` to update without re-answering setup questions:
 
 ```bash
-npx @yepe/init
+npx @yepe/init pull
 ```
 
-**What happens on update:**
-- Base files (from blueprint) are updated
-- Custom agents/skills you added are preserved
-- Learnings with entries are never overwritten
-- After update, an agent re-applies your promoted learnings to restore customizations
+**What `pull` does:**
+- Downloads latest blueprint files
+- Updates base agents/skills/commands
+- Preserves your `project.md` configuration
+- Preserves custom agents/skills you've added
+- Preserves learnings with existing entries
+- Re-applies promoted learnings to restore customizations
+
+**What `pull` requires:**
+- Project must be initialized (`.opencode/openspec/project.md` must exist)
+- If not initialized, you'll get an error with instructions to run `init` first
 
 Files that conflict are listed in `.yepe-report.json`.
+
+## Project Detection
+
+yepe automatically detects project metadata from common project files:
+
+### Detection Sources (in priority order)
+
+**Project name:**
+1. `package.json` → `name` field
+2. `Cargo.toml` → `[package] name`
+3. `pyproject.toml` → `[project] name` or `[tool.poetry] name`
+4. Current directory name (fallback)
+
+**Project description:**
+1. `package.json` → `description` field
+2. `Cargo.toml` → `[package] description`
+3. `pyproject.toml` → `[project] description` or `[tool.poetry] description`
+4. `README.md` → First non-heading paragraph
+
+**Tech stack:**
+- `package.json` dependencies → React, Vue, Express, TypeScript, etc.
+- `Cargo.toml` dependencies → Tokio, Axum, Actix, etc.
+- `pyproject.toml` dependencies → FastAPI, Django, Flask, etc.
+
+### Detection Behavior
+
+**Interactive mode:**
+- Detected values shown as defaults in brackets: `Project name [detected-name]:`
+- Press Enter to accept, or type to override
+
+**Non-interactive mode:**
+- Config file values take priority
+- Then detected values
+- Then hardcoded defaults
+
+Detection is best-effort and never crashes on missing/malformed files.
 
 ## Output
 
@@ -195,6 +250,31 @@ Learnings are the persistence layer for project-specific customizations:
 4. **On yepe update**, an agent reads promoted learnings and re-applies them
 
 This means your customizations survive base config updates without complex merge logic.
+
+## CLI Reference
+
+```
+yepe - AI agent blueprint scaffolding tool
+
+Usage:
+  npx @yepe/init [command] [options]
+
+Commands:
+  init     Initialize a new project with the blueprint (default)
+  pull     Update existing setup without onboarding prompts
+
+Options:
+  -n, --non-interactive    Run without prompts (uses detected values or config)
+  -c, --config <path>      Path to JSON config file
+  -h, --help               Show help message
+
+Examples:
+  npx @yepe/init                           # Initialize (interactive)
+  npx @yepe/init -n                        # Initialize with detection
+  npx @yepe/init -n -c yepe.config.json    # Initialize with config
+  npx @yepe/init pull                      # Update existing setup
+  npx @yepe/init pull -n                   # Update in CI/CD
+```
 
 ## Learn More
 

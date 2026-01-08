@@ -1,6 +1,7 @@
 import { createInterface } from 'readline';
 import { readdirSync, existsSync, readFileSync, statSync } from 'fs';
 import { basename, join } from 'path';
+import { detectProject, DetectedProject } from './detect.js';
 
 export interface ProjectInfo {
   name: string;
@@ -102,16 +103,25 @@ async function promptSkillSelection(skills: SkillInfo[], question: (prompt: stri
 }
 
 /**
- * Get default project info based on current directory
+ * Get default project info using detection functions
  */
-function getDefaultProjectInfo(): ProjectInfo {
+function getDefaultProjectInfo(detected?: DetectedProject): ProjectInfo {
   const cwd = process.cwd();
   const dirName = basename(cwd);
   
+  const name = detected?.name || dirName;
+  const description = detected?.description || `${name} project`;
+  
+  // Generate beads prefix from name (first 3 alphanumeric chars, lowercase)
+  const beadsPrefix = name
+    .replace(/[^a-zA-Z0-9]/g, '')
+    .substring(0, 3)
+    .toLowerCase() || 'app';
+  
   return {
-    name: dirName,
-    description: `${dirName} project`,
-    beadsPrefix: dirName.substring(0, 3).toLowerCase(),
+    name,
+    description,
+    beadsPrefix,
     selectedSkills: [],
   };
 }
@@ -120,9 +130,12 @@ function getDefaultProjectInfo(): ProjectInfo {
  * Prompts the user for project information
  */
 export async function promptProjectInfo(blueprintDir: string, options: PromptOptions = {}): Promise<ProjectInfo> {
-  // Non-interactive mode: use config or defaults
+  // Detect project metadata
+  const detected = detectProject();
+  
+  // Non-interactive mode: use config, then detection, then defaults
   if (options.nonInteractive) {
-    const defaults = getDefaultProjectInfo();
+    const defaults = getDefaultProjectInfo(detected);
     const config = options.config || {};
     
     const projectInfo: ProjectInfo = {
@@ -133,9 +146,12 @@ export async function promptProjectInfo(blueprintDir: string, options: PromptOpt
     };
     
     console.log(`Using non-interactive mode with:`);
-    console.log(`  • Name: ${projectInfo.name}`);
-    console.log(`  • Description: ${projectInfo.description}`);
+    console.log(`  • Name: ${projectInfo.name}${detected.name && !config.name ? ' (detected)' : ''}`);
+    console.log(`  • Description: ${projectInfo.description}${detected.description && !config.description ? ' (detected)' : ''}`);
     console.log(`  • Beads prefix: ${projectInfo.beadsPrefix}`);
+    if (detected.techStack && detected.techStack.length > 0) {
+      console.log(`  • Tech stack: ${detected.techStack.join(', ')} (detected)`);
+    }
     if (projectInfo.selectedSkills.length > 0) {
       console.log(`  • Skills: ${projectInfo.selectedSkills.join(', ')}`);
     }
@@ -144,7 +160,9 @@ export async function promptProjectInfo(blueprintDir: string, options: PromptOpt
     return projectInfo;
   }
 
-  // Interactive mode
+  // Interactive mode with detected defaults
+  const defaults = getDefaultProjectInfo(detected);
+  
   const rl = createInterface({
     input: process.stdin,
     output: process.stdout,
@@ -159,33 +177,44 @@ export async function promptProjectInfo(blueprintDir: string, options: PromptOpt
   };
 
   console.log('\nProject configuration:\n');
+  
+  // Show detected tech stack if available
+  if (detected.techStack && detected.techStack.length > 0) {
+    console.log(`Detected tech stack: ${detected.techStack.join(', ')}\n`);
+  }
 
   try {
-    // Required: Project name
+    // Required: Project name (with detected default)
     let name = '';
     while (!name) {
-      name = await question('Project name: ');
+      const defaultHint = defaults.name ? ` [${defaults.name}]` : '';
+      const input = await question(`Project name${defaultHint}: `);
+      name = input || defaults.name;
       if (!name) {
         console.log('  ❌ Project name is required\n');
       }
     }
 
-    // Required: Description
+    // Required: Description (with detected default)
     let description = '';
     console.log('\nProject description (include relevant details like tech stack, architecture,');
     console.log('testing strategy, domain context, constraints, or external dependencies):');
     while (!description) {
-      description = await question('> ');
+      const defaultHint = defaults.description ? ` [${defaults.description}]` : '';
+      const input = await question(`>${defaultHint} `);
+      description = input || defaults.description;
       if (!description) {
         console.log('  ❌ Project description is required\n');
       }
     }
 
-    // Required: Beads prefix
+    // Required: Beads prefix (with detected default)
     let beadsPrefix = '';
     while (!beadsPrefix) {
+      const defaultHint = defaults.beadsPrefix ? ` [${defaults.beadsPrefix}]` : '';
       console.log('\nBeads prefix (2-4 characters for issue IDs, e.g., "app", "api", "web"):');
-      beadsPrefix = await question('> ');
+      const input = await question(`>${defaultHint} `);
+      beadsPrefix = input || defaults.beadsPrefix;
       if (!beadsPrefix) {
         console.log('  ❌ Beads prefix is required\n');
       } else if (beadsPrefix.length < 2 || beadsPrefix.length > 4) {

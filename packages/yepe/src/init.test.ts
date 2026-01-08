@@ -63,6 +63,21 @@ describe('init integration', () => {
       assert.ok(typeof init.init === 'function');
     });
 
+    it('should import detect module without errors', async () => {
+      const detect = await import('./detect.js');
+      
+      assert.ok(typeof detect.detectProject === 'function');
+      assert.ok(typeof detect.detectProjectName === 'function');
+      assert.ok(typeof detect.detectProjectDescription === 'function');
+      assert.ok(typeof detect.detectTechStack === 'function');
+    });
+
+    it('should import pull module without errors', async () => {
+      const pull = await import('./pull.js');
+      
+      assert.ok(typeof pull.pull === 'function');
+    });
+
     it('should import cli module without errors', async () => {
       // CLI module has side effects, so we just verify it can be parsed
       // by checking the file exists and is valid TypeScript/JavaScript
@@ -79,7 +94,7 @@ describe('init integration', () => {
   });
 
   describe('no CommonJS in ESM modules', () => {
-    const srcFiles = ['prompts.ts', 'validate.ts', 'init.ts', 'cli.ts', 'learnings-templates.ts'];
+    const srcFiles = ['prompts.ts', 'validate.ts', 'init.ts', 'cli.ts', 'learnings-templates.ts', 'detect.ts', 'pull.ts'];
 
     for (const file of srcFiles) {
       it(`should not use require() in ${file}`, () => {
