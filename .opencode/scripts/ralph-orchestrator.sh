@@ -25,7 +25,12 @@ readonly BLUE='\033[0;34m'
 readonly MAGENTA='\033[0;35m'
 readonly CYAN='\033[0;36m'
 readonly BOLD='\033[1m'
+readonly DIM='\033[2m'
 readonly NC='\033[0m' # No Color
+
+# Agent output styling
+readonly AGENT_PREFIX="${DIM}│${NC} "
+readonly AGENT_SEPARATOR_CHAR="─"
 
 # =============================================================================
 # DEFAULT CONFIGURATION
@@ -135,6 +140,40 @@ log_progress() {
   fi
   
   echo -e "${CYAN}[Ralph]${NC} Iteration ${BOLD}${iteration}/${max}${NC} (${percentage}%) | ${elapsed_min}m${elapsed_sec}s elapsed | ETA: ${eta}${task:+ | Task: $task}"
+}
+
+# =============================================================================
+# AGENT OUTPUT DISPLAY
+# =============================================================================
+
+log_agent_separator() {
+  local label="${1:-Agent Output}"
+  local width=50
+  local label_len=${#label}
+  local pad_left=$(( (width - label_len - 2) / 2 ))
+  local pad_right=$(( width - label_len - 2 - pad_left ))
+  
+  local line_left=""
+  local line_right=""
+  for ((i=0; i<pad_left; i++)); do line_left+="$AGENT_SEPARATOR_CHAR"; done
+  for ((i=0; i<pad_right; i++)); do line_right+="$AGENT_SEPARATOR_CHAR"; done
+  
+  # Output to stderr so it displays even when stdout is captured
+  echo -e "${CYAN}[Ralph]${NC} ${DIM}${line_left}${NC} ${label} ${DIM}${line_right}${NC}" >&2
+}
+
+log_agent_end_separator() {
+  local width=50
+  local line=""
+  for ((i=0; i<width; i++)); do line+="$AGENT_SEPARATOR_CHAR"; done
+  # Output to stderr so it displays even when stdout is captured
+  echo -e "${CYAN}[Ralph]${NC} ${DIM}${line}${NC}" >&2
+}
+
+stream_agent_line() {
+  local line="$1"
+  # Output to stderr so it displays even when stdout is captured
+  echo -e "${AGENT_PREFIX}${DIM}${line}${NC}" >&2
 }
 
 # =============================================================================
@@ -874,6 +913,9 @@ invoke_agent() {
   
   if [[ "$DRY_RUN" == "true" ]]; then
     log_info "[DRY RUN] Would invoke: opencode run --agent $AGENT_NAME --format json < $prompt_file"
+    log_agent_separator "Simulated Output"
+    stream_agent_line "[DRY RUN] Simulated agent output for iteration $ITERATION"
+    log_agent_end_separator
     output="[DRY RUN] Simulated agent output for iteration $ITERATION"
     echo "$output"
     return 0
@@ -885,10 +927,54 @@ invoke_agent() {
   local prompt_content
   prompt_content=$(cat "$prompt_file")
   
+  # Create temp file for capturing output while streaming
+  local output_file="/tmp/ralph-output-$SESSION_ID-$ITERATION.txt"
+  local exitcode_file="/tmp/ralph-exitcode-$SESSION_ID-$ITERATION"
+  
   # Retry loop for rate limiting
   local attempt=0
   while [[ $attempt -lt $MAX_RETRIES ]]; do
-    output=$(opencode run --agent "$AGENT_NAME" "$prompt_content" 2>&1) || exit_code=$?
+    exit_code=0
+    
+    # Show agent output separator
+    log_agent_separator "Agent Output"
+    
+    # Clear output file
+    > "$output_file"
+    
+    # Stream output in real-time while capturing to file
+    # Use a FIFO to properly handle the streaming
+    local fifo="/tmp/ralph-fifo-$SESSION_ID-$ITERATION"
+    rm -f "$fifo"
+    mkfifo "$fifo"
+    
+    # Start background process to read from FIFO and display
+    (
+      while IFS= read -r line || [[ -n "$line" ]]; do
+        stream_agent_line "$line"
+        printf '%s\n' "$line" >> "$output_file"
+      done < "$fifo"
+    ) &
+    local reader_pid=$!
+    
+    # Run agent and write to FIFO, capture exit code
+    opencode run --agent "$AGENT_NAME" "$prompt_content" > "$fifo" 2>&1
+    exit_code=$?
+    
+    # Close the FIFO write end to signal EOF to reader
+    exec 3>"$fifo" 2>/dev/null || true
+    exec 3>&- 2>/dev/null || true
+    
+    # Wait for reader to finish processing
+    wait $reader_pid 2>/dev/null || true
+    
+    # Clean up FIFO
+    rm -f "$fifo"
+    
+    log_agent_end_separator
+    
+    # Read captured output
+    output=$(cat "$output_file" 2>/dev/null || echo "")
     
     if [[ $exit_code -eq 0 ]]; then
       # Reset retry count on success
@@ -906,6 +992,9 @@ invoke_agent() {
     # Not a rate limit error, break out
     break
   done
+  
+  # Clean up temp files
+  rm -f "$output_file" "$exitcode_file"
   
   if [[ $exit_code -ne 0 ]]; then
     log_warning "Agent returned non-zero exit code: $exit_code"
