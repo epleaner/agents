@@ -4,12 +4,14 @@ description: Manage isolated Linux sandboxes (Sprites) for code execution, testi
 ---
 
 ## What I do
-- Create, list, and destroy Sprite instances (isolated Linux sandboxes)
+- Create, list, and destroy Sprite instances (isolated Linux sandboxes with ~8GB RAM, 8 CPUs)
 - Execute commands inside Sprites with stdin/stdout streaming or interactive console
-- Manage checkpoints (snapshots) for state preservation and rollback
-- Proxy local ports through remote Sprite environments
+- Manage checkpoints (snapshots) for state preservation and rollback (~300ms checkpoint time)
+- Proxy local ports through remote Sprite environments (automatic localhost forwarding)
 - Manage sprite URLs and authentication settings
 - Set active sprite context for directory-based workflows
+- Leverage pre-installed tools (Claude Code, Python 3.13, Node.js 22.20, etc.)
+- Access built-in Claude Skills in `/.sprite/` for sprite-specific guidance
 
 ## Usage Template
 ```
@@ -20,6 +22,60 @@ Command: <optional: command to execute inside sprite>
 Options: <optional: additional flags like -o, -s, --debug>
 ```
 
+## Key Concepts
+
+### Sprites are Computers, Not Containers
+Sprites are **persistent computers** with real filesystems, not ephemeral containers. This means:
+- State persists between sessions (no need to rebuild environments)
+- Filesystem survives sprite sleep/wake cycles
+- Coding agents don't have to rebuild development environments every time
+- You get a real Linux computer (~8GB RAM, 8 CPUs) that you can treat like a remote server
+
+### Fast Checkpoints, Not Slow Creates
+Sprites optimize for "slow create, fast start/stop" with checkpoint/restore:
+- Creating a sprite takes longer (full environment setup)
+- Checkpoints are fast (~300ms) and efficient (copy-on-write)
+- Restoring from checkpoint is faster than creating new sprite
+- Last 5 checkpoints mounted at `/.sprite/checkpoints` for direct file access
+
+### Scale-to-Zero Architecture
+Sprites automatically sleep and wake:
+- Sleep after 30 seconds of inactivity
+- Wake quickly when needed
+- Pay only for active usage (CPU hours, RAM hours, storage GB-hours)
+- Filesystem persists during sleep
+
+## Sprite Environment Features
+
+Each sprite includes:
+
+### Pre-installed Tools
+- **Claude Code** - AI coding assistant (auto-signs in on first run)
+- **Python 3.13** - Latest Python runtime
+- **Node.js 22.20** - Latest Node.js LTS
+- **Codex CLI** - GitHub Copilot CLI
+- **Gemini CLI** - Google's AI assistant
+- Additional development tools and utilities
+
+### Built-in Documentation & Skills
+- **`/.sprite/docs/agent-context.md`** - Agent-specific documentation
+- **`/.sprite/skills/`** - Claude Skills that teach Claude how Sprites work
+- **`sprite-env` command** - Internal sprite management tool
+- Run `cat /.sprite/docs/agent-context.md` to learn about sprite internals
+
+### Storage Architecture
+- **Fast NVMe storage** - Directly attached for performance
+- **Durable object storage** - Automatic background sync
+- **TRIM-friendly billing** - Pay only for blocks written, bill decreases when you delete
+- **Persistent filesystem** - Survives sprite sleep/wake cycles
+- **Copy-on-write checkpoints** - Efficient snapshots of writable overlay
+
+### Auto-scaling & Billing
+- **Scale-to-zero** - Sprites sleep after 30 seconds of inactivity
+- **Fast wake** - Quick resume when needed
+- **Usage-based billing** - Pay for CPU hours, RAM hours, and GB-hours of storage
+- **Estimated costs**: ~$0.46 for 4-hour intensive coding session, ~$4/month for low-traffic web app
+
 ## Process
 
 ### 1. Identify Action and Validate Context
@@ -27,6 +83,7 @@ Options: <optional: additional flags like -o, -s, --debug>
 - Check authentication status (user should run `sprite login` first)
 - Verify sprite context: either specified via `-s <name>` flag or set via `sprite use <name>`
 - Checkpoint: If not authenticated, instruct user to run `sprite login`
+- Note: Sprites are persistent computers with filesystems, not ephemeral containers
 - Decision: Route to appropriate workflow based on action type
 
 ### 2. Execute Sprite Operation
@@ -50,12 +107,14 @@ Options: <optional: additional flags like -o, -s, --debug>
 - Decision: If command fails (exit code ≠ 0), report stderr and suggest fixes
 
 #### Managing Checkpoints
-- **Create**: `sprite checkpoint create` (uses active sprite)
+- **Create**: `sprite checkpoint create` (uses active sprite, takes ~300ms)
 - **List**: `sprite checkpoint list` or `sprite checkpoint ls`
 - **Info**: `sprite checkpoint info <id>` for details
-- **Restore**: `sprite restore <id>` to restore from checkpoint
+- **Restore**: `sprite restore <id>` to restore from checkpoint (async, restarts environment)
+- **Access**: Last 5 checkpoints mounted at `/.sprite/checkpoints` for direct file access
 - Checkpoint: Verify checkpoint creation before considering it available for restore
 - Decision: If restoring, warn that current state will be lost
+- Note: Checkpoints use copy-on-write for storage efficiency, capturing only writable overlay
 
 #### Port Proxying
 - **Forward ports**: `sprite proxy <port1> [port2...]` to forward local ports through remote proxy
@@ -233,43 +292,73 @@ Fix: Validate sprite name format before attempting creation
 
 1. **Authenticate first** - Users must run `sprite login` before any operations. Check authentication status and provide clear instructions if not logged in.
 
-2. **Use sprite context** - Prefer `sprite use <name>` to set active sprite for directory, then use commands without `-s` flag for cleaner workflows.
+2. **Sprites are persistent computers** - Unlike ephemeral containers, sprites maintain state between sessions. Don't rebuild environments unnecessarily.
 
-3. **Separate stdout and stderr** - When executing commands, always capture and display both streams separately for debugging.
+3. **Use sprite context** - Prefer `sprite use <name>` to set active sprite for directory, then use commands without `-s` flag for cleaner workflows.
 
-4. **Provide exit codes** - Include command exit codes in exec output so users can script conditional logic.
+4. **Leverage pre-installed tools** - Claude Code, Python 3.13, Node.js 22.20, and other tools are already installed. No need to install them.
 
-5. **Checkpoint before risky operations** - Suggest creating checkpoints before destructive commands or major state changes.
+5. **Explore `/.sprite/` directory** - Contains built-in documentation, skills, and sprite internals. Use `cat /.sprite/docs/agent-context.md` for guidance.
 
-6. **Interactive vs non-interactive** - Use `sprite exec` for single commands, `sprite console` for interactive debugging sessions.
+6. **Checkpoint liberally** - Checkpoints are fast (~300ms) and efficient (copy-on-write). Create them before risky operations or after successful setups.
 
-7. **Organization context** - When working with multiple orgs, use `-o <org>` flag or `sprite org auth` to manage tokens.
+7. **Access checkpoint files directly** - Last 5 checkpoints are mounted at `/.sprite/checkpoints` for direct file access without full restore.
 
-8. **Clean up resources** - Remind users to `sprite destroy` when done to avoid unnecessary costs.
+8. **Interactive vs non-interactive** - Use `sprite exec` for single commands, `sprite console` for interactive debugging sessions.
 
-9. **Port forwarding for services** - Use `sprite proxy <port>` to access web services running inside sprites from local machine.
+9. **Port forwarding is automatic** - `sprite console` automatically forwards ports. Use `sprite proxy <port>` for additional ports.
 
-10. **Debug mode** - Use `--debug` flag for troubleshooting: `sprite --debug exec <command>` or `sprite --debug=/tmp/debug.log exec <command>`.
+10. **Public URLs for sharing** - Use `sprite url update --auth public` to make sprite accessible via public URL for demos/testing.
 
-11. **Cross-reference with qa skill** - When running tests inside sprites, coordinate with `qa` skill for test result parsing.
+11. **Scale-to-zero awareness** - Sprites sleep after 30 seconds of inactivity. First command after sleep may take slightly longer.
+
+12. **Storage billing optimization** - Delete unused files to reduce storage costs (TRIM-friendly billing).
+
+13. **Organization context** - When working with multiple orgs, use `-o <org>` flag or `sprite org auth` to manage tokens.
+
+14. **Debug mode** - Use `--debug` flag for troubleshooting: `sprite --debug exec <command>` or `sprite --debug=/tmp/debug.log exec <command>`.
+
+15. **Safe YOLO mode for coding agents** - Sprites provide a safe sandbox for running coding agents in `--dangerously-skip-permissions` mode.
+
+16. **Cross-reference with qa skill** - When running tests inside sprites, coordinate with `qa` skill for test result parsing.
+
+## Use Cases
+
+### 1. Safe Coding Agent Sandbox
+Run AI coding agents (Claude Code, Codex, Gemini CLI) in YOLO mode (`--dangerously-skip-permissions`) without risking your local system. The worst that can happen is the sprite gets messed up and you restore from checkpoint or destroy it.
+
+### 2. Persistent Development Environment
+Unlike ephemeral containers, sprites maintain state between sessions. Set up your dev environment once, checkpoint it, and return to it later without rebuilding.
+
+### 3. Untrusted Code Execution API
+Use the Sprites API to run user-submitted code or LLM-generated code in a secure sandbox with configurable network policies and checkpoint/rollback capabilities.
+
+### 4. Reproducible Testing Environment
+Create a sprite, install dependencies, checkpoint the clean state, run tests, then restore to clean state for next test run. No test pollution between runs.
+
+### 5. Collaborative Development
+Share sprite URLs with team members for pair programming, debugging, or demos. Public URLs allow anyone to access your sprite.
+
+### 6. Multi-Environment Workflows
+Create separate sprites for development, staging, and testing. Use `sprite use` to switch between them in different project directories.
 
 ## Common Workflows
 
-### Development Environment Setup
+### Development Environment Setup (Persistent)
 ```bash
 # Authenticate
 sprite login
 
-# Create sprite
+# Create sprite (Python 3.13, Node.js 22.20 already installed!)
 sprite create dev-env
 
 # Set as active sprite for this directory
 sprite use dev-env
 
-# Install dependencies
+# Install project dependencies
 sprite exec npm install
 
-# Create checkpoint after setup
+# Create checkpoint after setup (takes ~300ms)
 sprite checkpoint create
 
 # Run tests
@@ -278,24 +367,31 @@ sprite exec npm test
 # If tests fail, restore to checkpoint
 sprite checkpoint list
 sprite restore <checkpoint-id>
+
+# Next session: just reconnect, environment is still there!
+sprite console
 ```
 
-### Interactive Debugging Session
+### Safe Coding Agent Workflow
 ```bash
-# Create and activate sprite
-sprite create debug-env
-sprite use debug-env
+# Create sprite for AI agent work
+sprite create claude-sandbox
+sprite use claude-sandbox
 
-# Open interactive shell
+# Open console (Claude Code auto-signs in on first run)
 sprite console
 
-# (Inside console, run commands interactively)
-# npm install
-# node --inspect app.js
-# exit
+# Inside sprite, run Claude in YOLO mode safely
+claude --dangerously-skip-permissions "Build a web scraper"
 
-# Create checkpoint of working state
-sprite checkpoint create
+# If something goes wrong, restore from checkpoint
+# (Outside sprite)
+sprite checkpoint list
+sprite restore v0
+
+# Or just destroy and recreate
+sprite destroy
+sprite create claude-sandbox
 ```
 
 ### Port Forwarding for Web Services
@@ -303,15 +399,18 @@ sprite checkpoint create
 # Create sprite and start web server
 sprite create web-env
 sprite use web-env
-sprite exec npm start &
 
-# Forward port 3000 to local machine
-sprite proxy 3000
+# Console automatically forwards ports!
+sprite console
+# (Inside sprite)
+npm start  # Access at http://localhost:8080 on your machine
 
-# Access at http://localhost:3000
-# Make sprite URL public
+# Or use proxy for specific ports
+sprite proxy 3000 8080
+
+# Make sprite URL public for sharing
 sprite url update --auth public
-sprite url
+sprite url  # Share this URL with team
 ```
 
 ### Multi-Organization Workflow
@@ -328,6 +427,30 @@ sprite -o myorg -s prod-env exec npm test
 # Or set context and use
 sprite use -o myorg prod-env
 sprite exec npm test
+```
+
+### Exploring Sprite Internals
+```bash
+# Connect to sprite
+sprite console
+
+# Inside sprite, explore built-in documentation
+cat /.sprite/docs/agent-context.md
+
+# Check available Claude Skills
+ls /.sprite/skills/
+
+# View checkpoint management help
+sprite-env checkpoints --help
+
+# Access checkpoint files directly (last 5 checkpoints)
+ls /.sprite/checkpoints/
+
+# Check what tools are pre-installed
+which claude python node npm
+
+# View sprite environment variables
+env | grep SPRITE
 ```
 
 ## CLI Command Reference
@@ -385,6 +508,17 @@ sprite exec npm test
 | `sprite upgrade` | Upgrade CLI to latest version | `sprite upgrade` |
 | `sprite upgrade --check` | Check for updates | `sprite upgrade --check` |
 
+### Internal Sprite Commands (run inside sprite via console)
+| Command | Description | Example |
+|---------|-------------|---------|
+| `sprite-env checkpoints list` | List checkpoints from inside sprite | `sprite-env checkpoints list` |
+| `sprite-env checkpoints create` | Create checkpoint from inside | `sprite-env checkpoints create` |
+| `sprite-env checkpoints get <id>` | Get checkpoint details | `sprite-env checkpoints get v2` |
+| `sprite-env checkpoints restore <id>` | Restore from checkpoint | `sprite-env checkpoints restore v1` |
+| `cat /.sprite/docs/agent-context.md` | View agent documentation | `cat /.sprite/docs/agent-context.md` |
+| `ls /.sprite/skills/` | List Claude Skills | `ls /.sprite/skills/` |
+| `ls /.sprite/checkpoints/` | Access checkpoint files directly | `ls /.sprite/checkpoints/` |
+
 ### Global Flags
 | Flag | Description | Example |
 |------|-------------|---------|
@@ -393,12 +527,75 @@ sprite exec npm test
 | `--debug[=<file>]` | Enable debug logging | `sprite --debug exec npm test` |
 | `-h, --help` | Show help | `sprite --help` |
 
+## Provisioning the Agents Repository
+
+Use the provision script to quickly set up a sprite with the OpenCode agents repo:
+
+```bash
+# From the agents repo directory
+.opencode/scripts/provision-sprite.sh
+
+# With custom sprite name
+.opencode/scripts/provision-sprite.sh --name my-dev-env
+
+# With specific organization
+.opencode/scripts/provision-sprite.sh --name my-dev-env --org myorg
+
+# With a specific branch
+.opencode/scripts/provision-sprite.sh --branch feature-xyz
+```
+
+The provision script will:
+1. Create a new sprite (or use existing one)
+2. Clone the agents repository from GitHub
+3. Install npm dependencies in `.opencode/`
+4. Configure environment variables (`OPENCODE_DATA_DIR`, `NODE_ENV`)
+5. Create a checkpoint for easy restore
+
+After provisioning, set your API keys:
+```bash
+sprite -s opencode-dev console
+
+# Inside the sprite:
+export OPENROUTER_API_KEY=sk-or-...
+export ANTHROPIC_API_KEY=...
+export EXA_API_KEY=...
+
+# Or add to ~/.bashrc for persistence
+echo 'export OPENROUTER_API_KEY=sk-or-...' >> ~/.bashrc
+```
+
+### Re-provisioning or Updating
+
+To update an existing sprite with latest changes:
+```bash
+# Run inside the sprite
+sprite -s opencode-dev exec ".opencode/scripts/provision-sprite.sh --inside"
+
+# Or connect and pull manually
+sprite -s opencode-dev console
+cd ~/workspace/agents
+git pull
+cd .opencode && npm install
+```
+
+### Restoring from Checkpoint
+
+If something breaks, restore to the provisioned state:
+```bash
+sprite -s opencode-dev checkpoint list
+sprite -s opencode-dev restore <checkpoint-id>
+```
+
 ## Integration Notes
 
-- **With `qa` skill**: Use sprites for isolated test execution, then parse results with qa skill
-- **With `debugger` skill**: Create sprite, reproduce bug in isolation, checkpoint failing state
+- **With `qa` skill**: Use sprites for isolated test execution with checkpoint/restore for clean test runs
+- **With `debugger` skill**: Create sprite, reproduce bug in isolation, checkpoint failing state for analysis
 - **With `release` skill**: Test deployment scripts in sprite before running in production
 - **With `research` skill**: Fetch documentation inside sprite to test API examples in isolation
+- **With coding agents**: Run Claude Code, Codex, or Gemini CLI in YOLO mode safely within sprite sandbox
+- **With `/.sprite/skills/`**: Leverage built-in Claude Skills that teach Claude how to use sprite features
+- **With API integrations**: Use Sprites API (Go, TypeScript, Python, Elixir SDKs) for programmatic sandbox management
 
 ## Security Considerations
 

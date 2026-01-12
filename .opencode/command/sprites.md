@@ -1,8 +1,11 @@
 ---
-description: Manage Sprite instances (isolated Linux sandboxes) for code execution and testing.
+description: Manage Sprite instances (persistent Linux computers) for safe coding agent execution and sandboxed development.
 ---
 
-Use the `sprites` skill to create, manage, and execute commands in isolated Linux sandboxes.
+Use the `sprites` skill to create, manage, and execute commands in persistent Linux sandboxes.
+
+**What are Sprites?**
+Sprites are persistent computers (~8GB RAM, 8 CPUs), not ephemeral containers. They include pre-installed tools (Claude Code, Python 3.13, Node.js 22.20) and support fast checkpoints (~300ms) for state management. Perfect for running coding agents in YOLO mode safely.
 
 <UserRequest>
   $ARGUMENTS
@@ -55,7 +58,16 @@ Use the `sprites` skill to create, manage, and execute commands in isolated Linu
 /sprites destroy
 ```
 
+**Key Features**
+- **Persistent environments**: State survives between sessions (no rebuilding)
+- **Pre-installed tools**: Claude Code, Python 3.13, Node.js 22.20, and more
+- **Fast checkpoints**: ~300ms snapshots with copy-on-write efficiency
+- **Auto port forwarding**: `sprite console` automatically forwards localhost
+- **Built-in docs**: Explore `/.sprite/docs/` and `/.sprite/skills/` inside sprite
+- **Scale-to-zero**: Sleep after 30s inactivity, pay only for usage
+
 **Integration**
-- Use with `/qa` for isolated test execution
+- Use with `/qa` for isolated test execution with checkpoint/restore
 - Use with `/debugger` for bug reproduction in clean environments
 - Use with `/research` to test API examples in isolation
+- Run coding agents (Claude Code, Codex, Gemini) safely in YOLO mode
