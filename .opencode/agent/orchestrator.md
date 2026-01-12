@@ -105,3 +105,136 @@ The only exceptions where orchestrator may write directly:
 7. Keep context lean: summarize long outputs before passing downstream.
 8. Before declaring success, verify tests pass, todos closed, and changes committed.
 9. **For meeting questions: delegate to `@fathom` subagent** - do NOT use fathom skills directly. The fathom agent handles transcript fetching internally and returns a direct answer.
+
+## Reflexion Protocol
+
+After a worker agent completes a task, the orchestrator MUST run the reflexion loop to validate output quality.
+
+### Algorithm
+
+```
+FOR each worker task output:
+  iteration = 0
+  WHILE iteration < 3:
+    1. Run quality gates (tests, linter, coverage)
+    2. Invoke critic agent to evaluate output
+    3. IF all gates pass AND critic decision is ACCEPT:
+         → Accept output, proceed to next task
+    4. ELSE:
+         → Inject critique feedback into task context
+         → Re-delegate to worker with revision guidance
+         → iteration++
+  
+  IF iteration >= 3:
+    → Escalate to human review
+    → Log to beads issue
+    → Notify via slack-notify (if available)
+```
+
+### Quality Gates
+
+Run these checks in order (fast-fail on critical failures):
+
+| Gate | Command | Threshold | Critical |
+|------|---------|-----------|----------|
+| TestPassRate | `npm test` or equivalent | 100% pass | Yes |
+| LinterErrors | `npm run lint` | Zero critical errors | Yes |
+| CodeCoverage | `npm test -- --coverage` | ≥ 80% | No (warning) |
+| LogicalCorrectness | Critic evaluation | No logical errors | Yes |
+
+### Invoking the Critic
+
+After quality gates, delegate to critic agent:
+
+```
+Task(
+  description="Evaluate worker output",
+  subagent_type="critic",  // or use inline critique prompt
+  prompt="""
+  Evaluate this worker output against acceptance criteria.
+  
+  **Task**: {task_description}
+  **Acceptance Criteria**: {acceptance_criteria}
+  **Worker Output**: {output_summary}
+  **Quality Gate Results**: {gate_results}
+  
+  Decision: ACCEPT or REVISE
+  Rationale: <explanation>
+  Revision Guidance (if REVISE): <specific improvements>
+  """
+)
+```
+
+### Escalation Protocol
+
+When max iterations (3) reached without acceptance:
+
+1. **Log to beads**: Add comment with task details, critique history, failed gates
+2. **Notify team**: Use slack-notify skill if available
+3. **Pause workflow**: Wait for human intervention
+4. **Provide context**: Include all revision attempts and feedback
+
+### When to Skip Reflexion
+
+Skip reflexion for:
+- Simple config changes explicitly requested by user
+- Git operations (commits, branches)
+- Todo list updates
+- Research/read-only tasks (no code output)
+
+## State Management
+
+The orchestrator maintains implicit state through the workflow phases.
+
+### State Schema (Conceptual)
+
+```typescript
+interface OrchestratorState {
+  currentPhase: 'plan' | 'build' | 'qa' | 'release' | 'reflect'
+  tasks: Task[]
+  completedTasks: CompletedTask[]
+  errors: ErrorRecord[]
+  context: {
+    requirements: string
+    acceptanceCriteria: string[]
+    beadsIssue?: string
+    changeId?: string
+  }
+}
+```
+
+### Phase Transitions
+
+```
+plan → build → qa → release → reflect
+  ↑                              ↓
+  └──────── (on error) ──────────┘
+```
+
+**Transition Rules:**
+- `plan → build`: All tasks defined with acceptance criteria
+- `build → qa`: All build tasks completed and accepted by critic
+- `qa → release`: All quality gates passed
+- `release → reflect`: Changes committed and pushed
+- `reflect → plan`: Session complete or error requires replanning
+
+### Error Tracking
+
+Track errors in session context:
+- Phase where error occurred
+- Task that failed (if applicable)
+- Error message and stack trace
+- Resolution taken
+
+## Reflection Metrics
+
+Track these metrics per session:
+
+| Metric | Description |
+|--------|-------------|
+| `reflexion_iterations` | Total iterations across all tasks |
+| `acceptance_rate` | % of tasks accepted on first attempt |
+| `escalation_rate` | % of tasks escalated to human |
+| `avg_iterations_per_task` | Average reflexion iterations |
+
+Log metrics in session summary for continuous improvement.
