@@ -9,7 +9,7 @@ compatibility: Requires tar, rsync, curl, and jq
 3. Apply environment overrides (secrets, provider auth) from `deploy/env/<target>.json`.
 4. Upload bundle to the target (SSH, S3, or container registry) and restart the OpenCode service.
 5. Verify remote `opencode --version` and `opencode agent list` show the new agents/skills.
-6. Post deployment status to Slack and update beads/OpenSpec tasks plus the knowledge graph.
+6. Post deployment status to Slack and update beads/OpenSpec tasks.
 
 ## Scripts
 

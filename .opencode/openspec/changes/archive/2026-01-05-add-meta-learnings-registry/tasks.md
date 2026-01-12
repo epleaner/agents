@@ -11,7 +11,7 @@
 - [x] 3.2 Document the lifecycle for promoting entries into AGENTS/specs/config (who is responsible, how to link back to ledger IDs, how to close out entries once promoted).
 
 ## 4. Spec & Guidance Updates
-- [x] 4.1 Extend `codex-multi-agent-suite` spec to cover the ledger/index structure, review workflow, and the rule that meta learnings live outside the knowledge graph.
+- [x] 4.1 Extend `codex-multi-agent-suite` spec to cover the ledger/index structure and review workflow.
 - [x] 4.2 Update AGENTS/OpenSpec guidance so Orchestrator/Meta-Agent run the review command during session wrap-up and ensure promotions are filed when criteria are met.
 
 ## 5. Validation

@@ -12,7 +12,7 @@ We need a durable plan for configuring OpenCode across multiple machines and pro
 - Establish guidance for research tooling (Exa, Context7, Playwright) and documentation (AGENTS instructions, skills, commands).
 - Reference oh-my-opencode patterns as inspiration, noting how each concept is reimplemented or adapted inside the bespoke configuration.
 - Detail agent orchestration mechanics, including subagent escalation rules and the shared skills library strategy.
-- Define the unified knowledge graph, Slack EOD digest automation, persistent todo/action-item management, and cloud deployment workflow that keep the setup operational across environments.
+- Define the Slack EOD digest automation, persistent todo/action-item management, and cloud deployment workflow that keep the setup operational across environments.
 
 ## Impact
 - Affected specs: `opencode-setup`

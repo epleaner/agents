@@ -14,5 +14,4 @@ Links: PR #12, beads agents-zr8, change plan-opencode-setup
 I apply the updates and echo the result.
 
 ## Notes
-- Mention action items or blockers so the knowledge graph stays consistent.
 - Use after verifying Planner/Builder/QA status to avoid stale data.

@@ -5,7 +5,6 @@ description: Post structured updates to designated Slack channels with beads/Ope
 ## What I do
 - Send formatted messages to `#eng-ai`, `#shipping`, or other configured channels.
 - Include status context (phase, owner, blockers) plus links to beads issues, OpenSpec changes, PRs, and action items.
-- Append messages to the knowledge graph so later queries can replay decisions.
 
 ## Usage Template
 ```

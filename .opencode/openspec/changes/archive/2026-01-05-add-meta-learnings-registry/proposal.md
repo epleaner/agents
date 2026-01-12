@@ -7,7 +7,7 @@ Ongoing sessions surface recurring process issues, automation ideas, and failure
 - Create a `learnings/` directory containing category-specific ledgers plus a centralized `index.md` that summarizes recent entries, status, and promotion targets so agents can quickly locate relevant meta knowledge.
 - Define a custom "review learnings" command/workflow the Meta-Agent runs at session close to list new ledger entries, prompt owners for promotion decisions, and mark outcomes (e.g., promote to AGENTS, propose new spec delta, or close as informational).
 - Document the lifecycle for promoting ledger entries into canonical references: when an entry becomes actionable, the Meta-Agent (or delegate) must update the appropriate AGENTS section or draft an OpenSpec change, linking back to the ledger entry ID for traceability.
-- Extend the `codex-multi-agent-suite` spec to codify the ledger structure, index expectations, review command, and explicitly state that the knowledge graph remains domain-only while meta learnings stay in ledgers/specs/AGENTS.
+- Extend the `codex-multi-agent-suite` spec to codify the ledger structure, index expectations, and review command.
 
 ## Impact
 - Affected specs: `codex-multi-agent-suite`

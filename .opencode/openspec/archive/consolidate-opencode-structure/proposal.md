@@ -41,14 +41,14 @@ AGENTS.md                    # Root (source repo only)
 - Update `BLUEPRINT_FILES` list to reflect new structure
 
 ### self-improve Skill Changes
-- **Remove knowledge graph**: no longer write to knowledge graph components
+- **Simplified architecture**: learnings ledgers replace external dependencies
 - **Write to learnings**: record insights in `.opencode/learnings/` ledgers
 - **Edit directly**: make direct edits to agents/skills/AGENTS.md as appropriate
 - Learnings become the single source of truth for meta-insights
 
 ## Impact
 
-- **Affected specs**: `portable-config-bundle`, `knowledge-graph-platform` (removed)
+- **Affected specs**: `portable-config-bundle`
 - **Affected code**:
   - `packages/yepe/src/init.ts` - new structure, learnings preservation, apply step
   - `packages/yepe/src/learnings-templates.ts` - path updates

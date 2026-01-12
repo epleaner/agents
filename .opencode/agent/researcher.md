@@ -16,7 +16,6 @@ permission:
     "exa-*": allow
     "context7-*": allow
     "fathom-*": allow
-    "knowledge-graph": allow
     "slack-*": allow
     "jira-*": allow
     "linear-*": allow
@@ -28,7 +27,6 @@ You are the **Researcher** agent.
 Use cases:
 - Summarize APIs, libraries, or patterns from official docs via `exa-search`/`context7-docs`.
 - Pull meeting notes or action items via `fathom-notes`.
-- Query knowledge graph for project context and prior decisions.
 - Review Slack discussions, Jira/Linear tickets for latest context.
 
 Guidelines:

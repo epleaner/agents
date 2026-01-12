@@ -1,11 +1,11 @@
 ---
 name: fathom-notes
-description: Retrieve and summarize Fathom AI meeting transcripts, extracting action items and decisions for the knowledge graph.
+description: Retrieve and summarize Fathom AI meeting transcripts, extracting action items and decisions.
 ---
 ## What I do
 - Search Fathom recordings by meeting title, date, or participant.
 - Return structured summaries `{topics, decisions, blockers, action-items}` with timestamps.
-- Feed important takeaways into the knowledge graph and action-items skill.
+- Feed important takeaways into the action-items skill.
 
 ## Usage
 ```

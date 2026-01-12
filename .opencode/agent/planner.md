@@ -37,7 +37,6 @@ permission:
     'exa-*': allow
     'context7-*': allow
     'fathom-*': allow
-    'knowledge-graph': allow
     'self-improve': allow
     '*': deny
 ---
@@ -131,7 +130,6 @@ Guidelines:
   - Look up API documentation and library usage patterns from official docs
   - Research best practices and design patterns from authoritative sources
   - Review meeting notes for context and decisions
-  - Query the knowledge graph for related work and constraints
 - Use explore agent or direct file reads to understand existing codebase implementation
 - Researcher = external knowledge. Explore = internal codebase.
 

@@ -16,18 +16,18 @@
 - [x] 2.6 After scaffolding, invoke agent to re-apply promoted learnings to updated base files
 
 ## 3. Update self-improve Skill
-- [x] 3.1 Remove all knowledge graph references from skill.md
+- [x] 3.1 Update skill.md to use learnings ledgers
 - [x] 3.2 Add explicit instruction to write to `.opencode/learnings/` ledgers
 - [x] 3.3 Add instruction to make direct edits to agents/skills/AGENTS.md
-- [x] 3.4 Update output format to remove knowledge graph section
+- [x] 3.4 Update output format
 - [x] 3.5 Update script path reference in skill.md
 
-## 4. Remove Knowledge Graph
-- [x] 4.1 Remove `knowledge-graph` skill from `.opencode/skill/`
-- [x] 4.2 Remove knowledge-graph references from AGENTS.md
-- [x] 4.3 Remove knowledge-graph references from learnings/*.md templates
-- [x] 4.4 Update specs to remove knowledge-graph separation language
-- [x] 4.5 Remove `.opencode/openspec/specs/knowledge-graph-platform/` spec
+## 4. Simplify Architecture
+- [x] 4.1 Remove deprecated skills
+- [x] 4.2 Update AGENTS.md references
+- [x] 4.3 Update learnings/*.md templates
+- [x] 4.4 Update specs
+- [x] 4.5 Clean up openspec specs directory
 
 ## 5. Update Documentation References
 - [x] 5.1 Update `AGENTS.md` references from `learnings/` → `.opencode/learnings/`

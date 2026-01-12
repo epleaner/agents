@@ -79,7 +79,6 @@ The self-improve skill SHALL write session insights to `.opencode/learnings/` le
 - **THEN** an entry is created in `.opencode/learnings/failures-and-resolutions.md`
 - **AND** direct edits are made to prevent recurrence
 
-#### Scenario: No knowledge graph
+#### Scenario: Learnings as source of truth
 - **WHEN** self-improve runs
-- **THEN** it does NOT write to any knowledge graph components
-- **AND** learnings are the single source of truth for meta-insights
+- **THEN** learnings are the single source of truth for meta-insights

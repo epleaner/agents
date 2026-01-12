@@ -44,7 +44,7 @@ You'll be prompted for project information (required fields marked with *):
 - Important constraints (technical, business, regulatory)
 - Key external dependencies (APIs, services)
 - **Skill selection** (choose which external integration skills to include)
-  - Options: slack-notify, jira-lookup, jira-update, linear-sync, fathom-notes, action-items, knowledge-graph, cloud-deploy
+  - Options: slack-notify, jira-lookup, jira-update, linear-sync, fathom-notes, action-items, cloud-deploy
   - You can select individual skills (e.g., "1,3,5"), all ("a"), or none ("0")
 
 **Error handling:**

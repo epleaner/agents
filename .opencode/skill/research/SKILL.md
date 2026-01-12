@@ -5,13 +5,12 @@ description: Look up documentation, APIs, meeting notes, or project context usin
 ## What I do
 - Search APIs and library documentation via `exa-search` and `context7-docs`.
 - Pull meeting notes and action items via `fathom-notes`.
-- Query project context and prior decisions via `knowledge-graph`.
 - Review Slack discussions, Jira/Linear tickets for latest context.
 
 ## Usage Template
 ```
 Topic: <what to research>
-Sources: <optional: specific sources to check - exa, context7, fathom, knowledge-graph, slack, jira, linear>
+Sources: <optional: specific sources to check - exa, context7, fathom, slack, jira, linear>
 Context: <optional: why this is needed, what decision it informs>
 ```
 

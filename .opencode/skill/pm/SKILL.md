@@ -1,18 +1,17 @@
 ---
 name: pm
-description: Sync beads, OpenSpec, Jira/Linear, Slack, and knowledge graph status.
+description: Sync beads, OpenSpec, Jira/Linear, and Slack status.
 ---
 ## What I do
 - Maintain single source of truth across tracking systems.
 - Sync beads issues with Jira/Linear tickets.
 - Post status updates to Slack channels.
-- Keep knowledge graph updated with decisions and progress.
 - Capture action items with owners and due dates.
 
 ## Usage Template
 ```
 Action: <sync | update | notify | capture>
-Systems: <beads, jira, linear, slack, knowledge-graph>
+Systems: <beads, jira, linear, slack>
 Context: <what changed, what needs syncing>
 ```
 

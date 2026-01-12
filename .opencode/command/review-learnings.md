@@ -1,5 +1,6 @@
 ---
 description: Run the ledger review workflow and promote actionable meta learnings.
+agent: orchestrator
 ---
 Use this command whenever a session produces new entries under `learnings/` or before wrapping up a worklog. It keeps the ledgers, `learnings/index.md`, and downstream AGENTS/spec updates in sync so meta knowledge never gets lost.
 
@@ -9,4 +10,4 @@ Use this command whenever a session produces new entries under `learnings/` or b
    - Update the status/owner/follow-up links directly in the prompt (the script writes changes back to the ledger and updates `index.md`).
    - If the entry requires an AGENTS edit, configuration tweak, beads issue, or new OpenSpec change, create the follow-up immediately and record its link in the `Follow-up Links` field.
 4. Continue until the script reports "All entries are outside the attention set". If entries remain, rerun the command after addressing the outstanding work.
-5. After promotion, double-check that `learnings/index.md` reflects the final status and that every follow-up artifact references the originating ledger ID. Remember that meta learnings stay in ledgers/AGENTS/specs; the knowledge graph remains domain-only context for agents.
+5. After promotion, double-check that `learnings/index.md` reflects the final status and that every follow-up artifact references the originating ledger ID.

@@ -34,7 +34,6 @@ permission:
     'propose-close': allow
     'exa-*': allow
     'context7-*': allow
-    'knowledge-graph': allow
     'slack-notify': allow
     'fathom-notes': allow
     'action-items': allow

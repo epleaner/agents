@@ -1,12 +1,12 @@
 ## ADDED Requirements
 
 ### Requirement: Meta-Learnings Registry
-The Codex multi-agent suite SHALL maintain a `learnings/` directory at the repo root that contains separate markdown ledgers for (a) session meta learnings, (b) recurring manual tasks that might become commands or skills, (c) failures and their resolutions, and (d) candidate automations/skills, plus a shared `index.md`. Each ledger SHALL document a uniform entry template (date/session, bead/change IDs, knowledge type, subcategory, owner, summary, recommended action, status, and supporting links) so the Meta-Agent and Orchestrator can append structured rows without inventing new formats. The index SHALL summarize recent entries, their status, and any linked follow-up artifacts so agents can quickly locate relevant context. These ledgers and the index SHALL store only operational/meta knowledge; the knowledge graph remains domain-only context for agents.
+The Codex multi-agent suite SHALL maintain a `learnings/` directory at the repo root that contains separate markdown ledgers for (a) session meta learnings, (b) recurring manual tasks that might become commands or skills, (c) failures and their resolutions, and (d) candidate automations/skills, plus a shared `index.md`. Each ledger SHALL document a uniform entry template (date/session, bead/change IDs, knowledge type, subcategory, owner, summary, recommended action, status, and supporting links) so the Meta-Agent and Orchestrator can append structured rows without inventing new formats. The index SHALL summarize recent entries, their status, and any linked follow-up artifacts so agents can quickly locate relevant context.
 
 #### Scenario: Ledger and index scaffolding exist
 - **WHEN** a new repository clone is prepared or CI verifies project structure
 - **THEN** the `learnings/` directory contains the four mandated ledgers plus `index.md`
-- **AND** each file includes the required entry template and guidance reminding contributors to keep domain knowledge in the knowledge graph
+- **AND** each file includes the required entry template
 
 #### Scenario: Sessions append structured entries
 - **WHEN** a session uncovers a new meta learning, recurring task, failure pattern, or candidate command/skill
@@ -23,4 +23,4 @@ The Codex multi-agent suite SHALL maintain a `learnings/` directory at the repo 
 - **WHEN** a ledger entry meets promotion criteria (e.g., repeated twice, blocks delivery, or requires new automation/skill)
 - **THEN** the Meta-Agent files or updates the appropriate AGENTS section, configuration, beads issue, or OpenSpec change referencing the ledger entry ID
 - **AND** the ledger entry and `index.md` are updated with links to those follow-up artifacts and marked as "Promoted"
-- **AND** the knowledge graph continues to exclude meta learnings, ensuring agents query it only for domain context while consulting ledgers/AGENTS/specs for operational improvements.
+

@@ -31,7 +31,6 @@ permission:
     "jira-*": allow
     "linear-*": allow
     "fathom-*": allow
-    "knowledge-graph": allow
     "action-items": allow
     "*": allow
 ---
