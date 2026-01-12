@@ -92,9 +92,11 @@ This project uses 5 agents:
 | Command | Description |
 | --- | --- |
 | `/research` | Look up documentation, APIs, or context |
+| `/sota-research` | Research SOTA multi-agent LLM best practices and generate improvement proposals |
 | `/plan` | Break down work into actionable steps (creates OpenSpec proposals) |
 | `/dev` | Run the full development workflow |
 | `/fathom` | Work with Fathom meeting recordings, transcripts, and action items |
+| `/new-skill` | Create a new skill with SOTA prompt engineering best practices |
 
 ## Skills
 
@@ -103,6 +105,7 @@ Skills are specialized capabilities that agents can invoke:
 | Skill | Purpose |
 | --- | --- |
 | `research` | Documentation, API, and context lookups |
+| `sota-research` | Research SOTA multi-agent LLM architecture best practices |
 | `debugger` | Reproduce failures and propose fixes |
 | `qa` | Run linters, tests, and formatters |
 | `release` | Git hygiene, commits, and PRs |
@@ -113,6 +116,7 @@ Skills are specialized capabilities that agents can invoke:
 | `propose-go` | Implement proposals |
 | `propose-close` | Archive completed proposals |
 | `review-plan` | Review and improve task plans against LLM planning best practices |
+| `new-skill` | Create new skills with SOTA prompt engineering patterns |
 
 ### External Skills
 
@@ -215,22 +219,19 @@ Ralph mode enables autonomous multi-iteration agent execution using the Ralph Wi
 
 ```bash
 # Inline prompt (simplest)
-.opencode/scripts/ralph-orchestrator.sh "Implement user authentication with JWT"
+.opencode/scripts/ralph.ts "Implement user authentication with JWT"
 
 # From file
-.opencode/scripts/ralph-orchestrator.sh --prompt task.md --max-iterations 30
+.opencode/scripts/ralph.ts --prompt task.md --max-iterations 30
 
 # Inline with options
-.opencode/scripts/ralph-orchestrator.sh "Fix the login bug" --max-iterations 10 --verbose
+.opencode/scripts/ralph.ts "Fix the login bug" --max-iterations 10
 
 # Dry run (test without executing)
-.opencode/scripts/ralph-orchestrator.sh "Test task" --dry-run
+.opencode/scripts/ralph.ts "Test task" --dry-run
 
 # Resume interrupted session
-.opencode/scripts/ralph-orchestrator.sh --resume ralph-2026-01-08-103045
-
-# Rollback to checkpoint
-.opencode/scripts/ralph-orchestrator.sh --rollback-to 10
+.opencode/scripts/ralph.ts --resume ralph-2026-01-08-103045
 ```
 
 **Completion markers** - Include one of these in agent output to signal completion:
@@ -244,6 +245,41 @@ Ralph mode enables autonomous multi-iteration agent execution using the Ralph Wi
 - Shared learnings: `.opencode/ralph/meta-learnings.md` (committed)
 
 See: `.opencode/openspec/changes/add-ralph-mode/design.md` for full documentation.
+
+## Quality Gates and Acceptance Criteria
+
+**All worker task outputs should be validated against quality gates before acceptance.**
+
+### Quality Gates (in execution order)
+
+| Gate | Check | Threshold | Critical |
+|------|-------|-----------|----------|
+| **TestPassRate** | `npm test` or equivalent | 100% pass | Yes |
+| **LinterErrors** | `npm run lint` | Zero critical errors | Yes |
+| **CodeCoverage** | `npm test -- --coverage` | ≥ 80% | No (warning) |
+| **LogicalCorrectness** | Critic/self-evaluation | No logical errors | Yes |
+
+### Acceptance Criteria
+
+For a task output to be accepted:
+1. All critical quality gates must pass
+2. No logical errors detected by self-critique
+3. Output meets stated acceptance criteria from task definition
+
+### Reflexion Loop (SOTA Pattern)
+
+When quality gates fail or logical errors are detected:
+1. **Generate**: Worker produces output
+2. **Critique**: Evaluate against acceptance criteria and quality gates
+3. **Revise**: If REVISE decision, re-delegate with critique feedback
+4. **Iterate**: Repeat up to 3 times, then escalate to human review
+
+**Escalation triggers:**
+- Max iterations (3) reached without acceptance
+- Critical errors that worker cannot resolve
+- External dependency failures
+
+See: `.opencode/openspec/changes/enhance-orchestrator-reflection/` for full specification.
 
 ## Landing the Plane (Session Completion)
 
