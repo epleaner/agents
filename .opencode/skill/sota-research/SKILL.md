@@ -29,13 +29,14 @@ Before any research, establish the temporal context:
    - `{current_date}` - Today's date (e.g., "2026-01-11")
    - `{current_year}` - Current year (e.g., "2026")
    - `{previous_year}` - Previous year (e.g., "2025")
-   - `{six_month_cutoff}` - Date 6 months ago (e.g., "2025-07-11")
-   - `{twelve_month_cutoff}` - Date 12 months ago (e.g., "2025-01-11")
+   - `{one_week_cutoff}` - Date 7 days ago (e.g., "2026-01-04") - for "breaking" content
+   - `{one_month_cutoff}` - Date 30 days ago (e.g., "2025-12-11") - for "fresh" content
+   - `{three_month_cutoff}` - Date 90 days ago (e.g., "2025-10-11") - for "recent" content
 
 3. **Store these variables** for use in:
    - Search queries (use `{current_year} {previous_year}` instead of hardcoded years)
-   - Recency scoring (compare source dates against `{six_month_cutoff}`)
-   - Classification of "recent" sources (within `{twelve_month_cutoff}`)
+   - Recency scoring (compare source dates against cutoffs)
+   - Classification: breaking (1 week) > fresh (1 month) > recent (3 months) > older
 
 - Checkpoint: If date cannot be extracted, use fallback of current execution context
 - Reasoning: Dynamic dates ensure searches remain relevant as time passes
@@ -116,9 +117,10 @@ For each query:
   - Production patterns
 - Deduplicate by URL
 - Score relevance using date context from Step 0:
-  - **High recency**: Published after `{six_month_cutoff}` (within last 6 months)
-  - **Medium recency**: Published after `{twelve_month_cutoff}` (within last 12 months)
-  - **Low recency**: Published before `{twelve_month_cutoff}` (older than 12 months)
+  - **Breaking**: Published after `{one_week_cutoff}` (within last 7 days) - highest priority
+  - **Fresh**: Published after `{one_month_cutoff}` (within last 30 days) - high priority
+  - **Recent**: Published after `{three_month_cutoff}` (within last 90 days) - medium priority
+  - **Older**: Published before `{three_month_cutoff}` - lower priority, flag as potentially stale
   - Also prioritize: from tracked sources, with code examples
 - Reasoning: Prefer actionable insights over theoretical discussions
 
@@ -188,8 +190,9 @@ Write updated sources.md with:
 ## Date Context
 - **Research Date**: {current_date}
 - **Year Range for Queries**: {previous_year}-{current_year}
-- **High Recency Cutoff**: {six_month_cutoff} (sources after this date prioritized)
-- **Recent Classification**: {twelve_month_cutoff} (sources within last 12 months)
+- **Breaking Cutoff**: {one_week_cutoff} (last 7 days - highest priority)
+- **Fresh Cutoff**: {one_month_cutoff} (last 30 days - high priority)
+- **Recent Cutoff**: {three_month_cutoff} (last 90 days - medium priority)
 
 ## Executive Summary
 - <Key finding 1>
@@ -388,7 +391,7 @@ If searches return < 5 relevant results:
 
 2. **Establish date context first** - Always complete Step 0 before any searches. Use `{current_year}`, `{previous_year}`, and date cutoffs throughout the process to ensure temporal accuracy.
 
-3. **Prioritize recency using calculated dates** - AI/LLM best practices evolve rapidly. Prefer sources published after `{six_month_cutoff}`. Flag sources older than `{twelve_month_cutoff}` as potentially outdated.
+3. **Prioritize recency using calculated dates** - AI/LLM best practices evolve rapidly. For daily/weekly runs: prioritize breaking (7 days) and fresh (30 days) content. Flag sources older than `{three_month_cutoff}` as potentially stale.
 
 4. **Extract specifics, not generalities** - "Use chain-of-thought" is not useful. "Prefix each step with reasoning tags like `<thinking>`" is actionable.
 
