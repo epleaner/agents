@@ -18,7 +18,6 @@ Currently, `npx @yepe/init` runs the full onboarding flow every time, prompting 
   - Config file support (`--config`) works with both commands
 
 ## Impact
-- **Affected specs:** `portable-config-bundle` gains requirements for command separation and project detection
 - **Affected code:**
   - `packages/yepe/src/cli.ts` - Add command routing (init vs pull)
   - `packages/yepe/src/init.ts` - Extract onboarding logic, add detection

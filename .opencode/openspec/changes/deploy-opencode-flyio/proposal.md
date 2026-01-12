@@ -18,7 +18,6 @@ Currently, OpenCode runs exclusively locally, creating friction for users who wo
 - Define persistent volume strategy for `.opencode/` data preservation across deploys
 
 ## Impact
-- **Affected specs:** `cloud-deployment-workflow` gains Fly.io-specific requirements
 - **Affected code:**
   - New file: `Dockerfile` (~50 lines)
   - New file: `fly.toml` (~40 lines)

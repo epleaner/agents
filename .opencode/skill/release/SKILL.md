@@ -6,7 +6,6 @@ description: Handle git hygiene, PR prep, commits, and deployment.
 - Prepare clean git state (no untracked files, clean working tree).
 - Summarize diffs and propose commit messages.
 - Create/update PRs with proper descriptions.
-- Run cloud deployment workflows when needed.
 - Post deployment status updates.
 
 ## Usage Template
@@ -33,13 +32,6 @@ Create or update a pull request:
    - Beads/OpenSpec IDs
    - Test evidence
    - Deployment notes
-
-### deploy
-Run cloud deployment:
-1. Verify QA sign-off
-2. Package deployment artifacts
-3. Execute deployment workflow
-4. Capture and report logs
 
 ### status
 Report current release state:

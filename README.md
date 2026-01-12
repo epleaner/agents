@@ -99,7 +99,6 @@ Skills are specialized capabilities that agents invoke for specific tasks.
 | `slack-notify` | Broadcast status updates | TODO |
 | `jira-lookup`, `jira-update` | Jira issue sync | TODO |
 | `linear-sync` | Linear issue sync | TODO |
-| `cloud-deploy` | Package and deploy bundles | TODO |
 
 ## Self-Improve Workflow
 

@@ -228,24 +228,6 @@
 
 ---
 
-## 7. Spec Deltas
-
-**Purpose:** Update OpenSpec with Fly.io deployment requirements
-**Dependencies:** Sections 1-6 complete
-**Estimated effort:** 1 hour
-
-- [ ] 7.1 Create cloud-deployment-workflow spec delta
-      File: `.opencode/openspec/changes/deploy-opencode-flyio/specs/cloud-deployment-workflow/spec.md`
-      Add ADDED requirements:
-      - Fly.io Deployment
-      - Container Configuration
-      - Persistent Storage
-      - Secure Access
-      Validation: `openspec validate deploy-opencode-flyio --strict`
-      Success: OpenSpec validation passes
-
----
-
 ## Summary
 
 | Section | Tasks | Estimated Hours |
@@ -256,8 +238,7 @@
 | 4. Deployment Testing | 5 | 2-3 |
 | 5. Documentation | 3 | 2 |
 | 6. Cost Optimization | 2 | 1 |
-| 7. Spec Deltas | 1 | 1 |
-| **Total** | **18** | **10-12 hours** |
+| **Total** | **17** | **9-11 hours** |
 
 ---
 
@@ -270,14 +251,12 @@
 5. **Data persists** - Files in `/app/.opencode` survive redeploys
 6. **OpenCode runs** - Agents execute successfully via SSH
 7. **Documentation complete** - README, AGENTS.md, and troubleshooting guide updated
-8. **OpenSpec valid** - `openspec validate deploy-opencode-flyio --strict` passes
 
 ---
 
 ## Next Steps After Implementation
 
-1. Run `openspec validate deploy-opencode-flyio --strict`
-2. Create beads issue: `bd create --title "Implement Fly.io deployment"`
-3. Begin implementation with Section 1
-4. Test each section before proceeding
-5. Update this tasks.md as items complete
+1. Create beads issue: `bd create --title "Implement Fly.io deployment"`
+2. Begin implementation with Section 1
+3. Test each section before proceeding
+4. Update this tasks.md as items complete

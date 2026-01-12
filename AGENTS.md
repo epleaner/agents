@@ -129,7 +129,6 @@ Skills are specialized capabilities that agents can invoke:
 | `slack-notify` | Broadcast status updates |
 | `jira-lookup`, `jira-update`, `linear-sync` | Sync external trackers |
 | `action-items` | Create/escalate todos with owners |
-| `cloud-deploy` | Package + deploy bundles |
 
 ## Beads Performance Troubleshooting
 

@@ -12,7 +12,6 @@ Setting up a fresh repository with the full agentic workflow currently requires 
 - Document validation hooks so the command verifies prerequisites (git repo, beads hooks) and reports actionable errors instead of silently failing.
 
 ## Impact
-- **Affected specs:** `portable-config-bundle` gains explicit requirements for a turnkey blueprint CLI and update workflow.
 - **Related beads:** agents-pzm (this change) and agents-7ok (Proposal agent) should cross-reference so the Proposal agent can rely on the scaffolded OpenSpec assets.
 - **Affected tooling:** 
   - Publication process for the npm package and shell script
