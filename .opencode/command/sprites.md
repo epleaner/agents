@@ -16,30 +16,43 @@ Use the `sprites` skill to create, manage, and execute commands in isolated Linu
 5. For network policy, specify allow/deny rules
 
 **Common Operations**
+- Authenticate: `/sprites login`
 - Create sprite: `/sprites create <name>`
-- Execute command: `/sprites exec <name> -- <command>`
-- Create checkpoint: `/sprites checkpoint create <name> --name <checkpoint-name>`
-- Restore checkpoint: `/sprites checkpoint restore <name> --checkpoint <id>`
-- Set network policy: `/sprites policy set <name> --allow <domain>`
+- Set active sprite: `/sprites use <name>`
+- Execute command: `/sprites exec <command>`
+- Open interactive shell: `/sprites console`
+- Create checkpoint: `/sprites checkpoint create`
+- Restore checkpoint: `/sprites restore <id>`
+- Forward ports: `/sprites proxy <port>`
 - List sprites: `/sprites list`
-- Destroy sprite: `/sprites destroy <name>`
+- Destroy sprite: `/sprites destroy`
 
 **Examples**
 ```bash
-# Create a development environment
+# Authenticate and create environment
+/sprites login
 /sprites create dev-env
+/sprites use dev-env
 
-# Run Python code
-/sprites exec dev-env -- python -c "print('Hello from Sprite')"
+# Run commands
+/sprites exec python -c "print('Hello from Sprite')"
+
+# Open interactive shell for debugging
+/sprites console
 
 # Create checkpoint before risky operation
-/sprites checkpoint create dev-env --name before-upgrade
+/sprites checkpoint create
 
 # Restore if something goes wrong
-/sprites checkpoint restore dev-env --checkpoint <checkpoint-id>
+/sprites checkpoint list
+/sprites restore <checkpoint-id>
+
+# Forward port for web service
+/sprites exec npm start &
+/sprites proxy 3000
 
 # Clean up
-/sprites destroy dev-env
+/sprites destroy
 ```
 
 **Integration**
