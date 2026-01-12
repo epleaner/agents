@@ -1,5 +1,6 @@
 ---
 description: Invoke the planner agent to break down work into actionable steps.
+agent: planner
 ---
 Plan the following work by breaking it into clear, actionable steps with validation criteria.
 

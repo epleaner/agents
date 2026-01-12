@@ -1,5 +1,6 @@
 ---
 description: Start a new stream of work in a separate git worktree.
+agent: builder
 ---
 Create a new git worktree and immediately begin work on the given task.
 

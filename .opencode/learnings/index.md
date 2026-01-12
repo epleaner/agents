@@ -43,3 +43,4 @@ Statuses must be one of:
 | ML-20260107-011 | Orchestrator must auto-delegate when lacking tools, not ask permission | meta-learnings.md | orchestrator | promoted | .opencode/agent/orchestrator.md |
 | ML-20260107-012 | Planner must use 1-5 point scale for effort estimates, not hours | meta-learnings.md | planner | promoted | .opencode/agent/planner.md, .opencode/skill/propose-new/SKILL.md |
 | ML-20260108-001 | Orchestrator must never implement directly, even with write tools available | meta-learnings.md | orchestrator | promoted | .opencode/agent/orchestrator.md |
+| ML-20260111-001 | Orchestrator lacks SOTA self-critique and reflexion capabilities | meta-learnings.md | orchestrator | promoted | agents-77a, .opencode/openspec/changes/enhance-orchestrator-reflection/, AGENTS.md |

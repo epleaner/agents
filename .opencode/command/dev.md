@@ -1,5 +1,6 @@
 ---
 description: Run the feature development workflow from planning through implementation.
+agent: orchestrator
 ---
 Run the feature development workflow for the specified work. This chains planning, building, QA, and release steps.
 

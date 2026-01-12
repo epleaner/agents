@@ -1,5 +1,6 @@
 ---
 description: Ask questions about your meetings - silently fetches context and answers directly.
+agent: fathom
 ---
 Answer questions about meetings using Fathom recordings. The agent will silently fetch relevant meetings and transcripts, then directly answer your question.
 

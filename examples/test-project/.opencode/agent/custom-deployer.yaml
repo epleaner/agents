@@ -1,7 +1,0 @@
-name: custom-deployer
-description: Custom deployment agent for test project
-model: gpt-4
-temperature: 0.2
-instructions: |
-  You are a custom deployment agent for the test project.
-  Handle all deployment-related tasks.

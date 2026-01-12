@@ -192,3 +192,16 @@ Use the following structure for every entry. Replace angle-bracket placeholders 
 - Recommended Action: Add explicit rule to orchestrator.md: "Orchestrator MUST NOT write code or create files directly. Even with write/edit tools available, delegate implementation to general agent. Only exceptions: git operations, todo updates, quick config changes."
 - Supporting Links: session transcript
 - Follow-up Links: .opencode/agent/orchestrator.md updated with "CRITICAL: No Direct Implementation" section
+
+### [ML-20260111-001] Orchestrator lacks SOTA self-critique and reflexion capabilities
+- Date: 2026-01-11
+- Session: orchestrator SOTA research
+- Knowledge Type: meta
+- Meta Category: meta-learning
+- Owner: orchestrator
+- Status: promoted
+- Related IDs: agents-77a, change-enhance-orchestrator-reflection
+- Summary: Research on state-of-the-art multi-agent orchestration patterns (Jan 2026) identified that our orchestrator is missing critical capabilities: (1) Reflexion Loop - self-critique → revise → iterate cycle for task outputs, (2) Bidirectional Reflection Protocol (BRP) - monitor agent watching orchestrator decisions, (3) Structured State Management - explicit state schema for agent coordination. The existing `self-improve` skill captures session-level friction but does NOT provide real-time, task-specific self-correction that SOTA reflexion loops offer.
+- Recommended Action: Implement Reflexion pattern with quality gates (tests, linter, coverage, logical correctness), max 3 iterations, and escalation to human review. Add critic agent for self-evaluation. Define explicit OrchestratorState schema.
+- Supporting Links: AWS Strands Agents (Reflexion), COCO Framework (BRP), Agent-R (Self-Training), LangGraph Multi-Agent Patterns
+- Follow-up Links: agents-77a (beads issue), .opencode/openspec/changes/enhance-orchestrator-reflection/ (OpenSpec proposal), AGENTS.md "Quality Gates and Acceptance Criteria" section

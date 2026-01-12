@@ -611,3 +611,9 @@ Success rate: N/A
 **Started**: 2026-01-11 15:38:38
 **Objective**: run 5 iterations
 
+
+### Outcome (2026-01-11 15:38:44)
+**Status**: - shutdown
+**Duration**: 0m
+**Iterations**: 1/50
+

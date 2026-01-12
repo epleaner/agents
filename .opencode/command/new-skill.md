@@ -1,5 +1,6 @@
 ---
 description: Create a new skill for the agent setup with SOTA prompt engineering.
+agent: builder
 ---
 Create a new skill following SOTA prompt engineering best practices (role definition, chain-of-thought, few-shot examples).
 
