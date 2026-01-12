@@ -97,6 +97,7 @@ This project uses 5 agents:
 | `/dev` | Run the full development workflow |
 | `/fathom` | Work with Fathom meeting recordings, transcripts, and action items |
 | `/new-skill` | Create a new skill with SOTA prompt engineering best practices |
+| `/ralph-prompt` | Generate Ralph mode prompts with beads integration and iteration guidance |
 
 ## Skills
 
@@ -117,6 +118,8 @@ Skills are specialized capabilities that agents can invoke:
 | `propose-close` | Archive completed proposals |
 | `review-plan` | Review and improve task plans against LLM planning best practices |
 | `new-skill` | Create new skills with SOTA prompt engineering patterns |
+| `ralph-prompt` | Generate Ralph mode prompts with beads integration and iteration guidance |
+| `sprites` | Manage isolated Linux sandboxes for code execution and testing |
 
 ### External Skills
 
