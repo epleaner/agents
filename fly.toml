@@ -1,0 +1,25 @@
+# Fly.io configuration for OpenCode Agents
+# Customize app name before first deployment
+
+app = "opencode-agents"
+primary_region = "sjc"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  NODE_ENV = "production"
+  OPENCODE_DATA_DIR = "/app/.opencode-data"
+
+# No HTTP service - SSH access only for security
+
+[mounts]
+  source = "opencode_data"
+  destination = "/app/.opencode-data"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"
+
+[experimental]
+  auto_rollback = true

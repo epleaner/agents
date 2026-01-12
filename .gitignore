@@ -12,3 +12,6 @@ opencode.json
 .ralph-metrics-*.json
 
 *.DS_Store
+
+# Fly.io
+.fly/

@@ -321,6 +321,57 @@ Config file format:
 }
 ```
 
+## Fly.io Deployment
+
+Deploy this agent framework to Fly.io for remote access via SSH.
+
+### Prerequisites
+
+- [flyctl](https://fly.io/docs/flyctl/install/) installed
+- Fly.io account (free tier works)
+- API keys for OpenRouter and Exa
+
+### Quick Start
+
+```bash
+# First-time setup
+flyctl auth login
+.opencode/scripts/deploy-flyio.sh
+
+# Set required secrets
+flyctl secrets set OPENROUTER_API_KEY=sk-or-... -a opencode-agents
+flyctl secrets set EXA_API_KEY=... -a opencode-agents
+
+# Connect via SSH
+flyctl ssh console -a opencode-agents
+```
+
+### Management Commands
+
+```bash
+.opencode/scripts/deploy-flyio.sh --status   # Check status
+.opencode/scripts/deploy-flyio.sh --stop     # Stop (pause billing)
+.opencode/scripts/deploy-flyio.sh --start    # Resume
+.opencode/scripts/deploy-flyio.sh --ssh      # Connect via SSH
+.opencode/scripts/deploy-flyio.sh --logs     # View logs
+```
+
+### Configuration
+
+The deployment uses:
+- **Region:** San Jose (sjc) by default, override with `FLYIO_REGION`
+- **App name:** `opencode-agents` by default, override with `FLYIO_APP_NAME`
+- **VM:** shared-cpu-1x with 512MB RAM
+- **Storage:** 1GB persistent volume at `/app/.opencode-data`
+
+Customize `fly.toml` for different VM sizes or regions.
+
+### Cost
+
+- **Running:** ~$2-5/month (shared-cpu-1x)
+- **Stopped:** Free (use `--stop` when not in use)
+- **Storage:** $0.15/GB/month
+
 ## Communication Style
 
 All agents follow a direct communication style:
