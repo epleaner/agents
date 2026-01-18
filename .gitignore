@@ -1,9 +1,6 @@
 dist/
 examples/sample-service/.opencode/shared/
-# OpenCode config with API keys
-opencode.json
 # Environment variables with secrets
-.env
 
 # Ralph mode - local session history (do not commit)
 .opencode/ralph/sessions.md
