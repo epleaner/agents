@@ -17,3 +17,5 @@ opencode.json
 .fly/
 
 workspace/
+.fly/.envrc.local
+.envrc.local

@@ -66,7 +66,7 @@ Secrets: <optional: key=value pairs for secrets set action>
 #### Set Secrets
 - Run: `flyctl secrets set <KEY>=<value> -a <app-name>`
 - Required secrets: `OPENROUTER_API_KEY`, `EXA_API_KEY`
-- Optional secrets: `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`
+- Optional secrets: `CONTEXT7_API_KEY`
 - Checkpoint: Verify secrets set with `flyctl secrets list -a <app-name>`
 - Note: Setting secrets triggers a redeploy
 
@@ -281,8 +281,7 @@ Fix: Always validate flyctl installation and auth status first
 ### Optional Secrets
 | Secret | Description |
 |--------|-------------|
-| `ANTHROPIC_API_KEY` | Direct Anthropic API access |
-| `OPENAI_API_KEY` | OpenAI API access |
+| `CONTEXT7_API_KEY` | Context7 API key for documentation lookup |
 
 ### Files
 | File | Purpose |
