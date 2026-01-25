@@ -197,6 +197,29 @@ If multiple capabilities are affected, create multiple delta files under `change
 
 4. **Create tasks.md:**
 ```markdown
+## Prerequisites
+
+Complete before starting implementation:
+- [ ] [External dependency or setup step]
+- [ ] [API keys, accounts, or access needed]
+
+## Execution Phases
+
+[Show parallel work opportunities]
+```
+Phase 1: [Setup]
+  └── Section 1
+
+Phase 2: [Core work - parallel tracks]
+  ├── Track A: Section 2 → Section 3
+  └── Track B: Section 4 → Section 5
+
+Phase 3: [Validation]
+  └── Section 6
+```
+
+---
+
 ## 1. Implementation
 - [ ] 1.1 Create database schema
 - [ ] 1.2 Implement API endpoint
@@ -233,6 +256,24 @@ Minimal `design.md` skeleton:
 ## Open Questions
 - [...]
 ```
+
+### Keep Proposals Lean
+
+**Maximum 4 core files per proposal:**
+1. `proposal.md` - Why and what (required)
+2. `tasks.md` - Implementation checklist (required)
+3. `design.md` - Technical decisions (only if needed per criteria above)
+4. `specs/[capability]/spec.md` - Delta requirements (required)
+
+**Do NOT create:**
+- Separate files for security considerations → put in design.md
+- Separate files for alternative approaches → put in design.md "Alternatives considered"
+- README.md in proposal directories → proposal.md IS the readme
+- Multiple docs covering the same topic with different detail levels
+
+**Consolidation rule:** If you created exploration docs during planning, merge insights into core files and delete the extras before implementation begins.
+
+**Acceptance criteria must align with design decisions.** If design.md says "skip rate limiting", tasks.md acceptance criteria cannot require rate limiting.
 
 ## Spec File Format
 

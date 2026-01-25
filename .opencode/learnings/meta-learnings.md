@@ -205,3 +205,16 @@ Use the following structure for every entry. Replace angle-bracket placeholders 
 - Recommended Action: Implement Reflexion pattern with quality gates (tests, linter, coverage, logical correctness), max 3 iterations, and escalation to human review. Add critic agent for self-evaluation. Define explicit OrchestratorState schema.
 - Supporting Links: AWS Strands Agents (Reflexion), COCO Framework (BRP), Agent-R (Self-Training), LangGraph Multi-Agent Patterns
 - Follow-up Links: agents-77a (beads issue), .opencode/openspec/changes/enhance-orchestrator-reflection/ (OpenSpec proposal), AGENTS.md "Quality Gates and Acceptance Criteria" section
+
+### [ML-20260119-001] OpenSpec proposals should have max 4 core files, not 9
+- Date: 2026-01-19
+- Session: Railway deployment plan audit
+- Knowledge Type: meta
+- Meta Category: meta-learning
+- Owner: planner
+- Status: promoted
+- Related IDs: change-deploy-opencode-web-railway
+- Summary: Railway deployment proposal had 9 markdown files with contradictory guidance (SIMPLE.md said "skip rate limiting", tasks.md acceptance criteria required it). Multiple docs covered same topics at different detail levels (MCP-SIMPLIFIED.md duplicated README.md). Exploration docs created during planning were never consolidated before implementation.
+- Recommended Action: (1) Enforce max 4 core files per proposal: proposal.md, tasks.md, design.md (optional), spec.md. (2) Add consolidation step to planning workflow - merge exploration docs into core files before implementation. (3) Acceptance criteria must align with design decisions. (4) tasks.md must have Prerequisites section at top and Execution Phases diagram showing parallel work.
+- Supporting Links: session transcript, deploy-opencode-web-railway audit
+- Follow-up Links: .opencode/openspec/AGENTS.md updated with "Keep Proposals Lean" section and enhanced tasks.md template
