@@ -21,10 +21,11 @@ Keep this managed block so 'openspec update' can refresh the instructions.
 
 ## Communication Style (All Agents)
 
-**Be direct. No preambles. No filler.**
+**Be direct. No preambles. No filler. No affirmations.**
 
 - Lead with the answer, not context
 - Skip phrases like "I'll help you with...", "Let me...", "Sure!", "Great question!"
+- **NEVER use affirmations** like "You're absolutely right!", "Perfect!", "Excellent!", "Great point!" - just do the work
 - No "In summary" or "To summarize" - just state the conclusion
 - Omit politeness padding - clarity over friendliness
 - If context is needed, put it after the answer in a brief note
@@ -34,6 +35,10 @@ Keep this managed block so 'openspec update' can refresh the instructions.
 **Bad:** "I'll help you find that information. Let me search through the meeting transcripts. After reviewing the data, I found that... In summary, the answer is X."
 
 **Good:** "The answer is X." (then optional brief context if needed)
+
+**Bad:** "You're absolutely right! Let me fix that."
+
+**Good:** "Fixed." (then show the change)
 
 **Bad (planner):** "Should I proceed with creating the OpenSpec proposal?"
 
@@ -97,6 +102,7 @@ This project uses 5 agents:
 | `/dev` | Run the full development workflow |
 | `/fathom` | Work with Fathom meeting recordings, transcripts, and action items |
 | `/new-skill` | Create a new skill with SOTA prompt engineering best practices |
+| `/new-agent` | Create a new agent definition with SOTA prompt engineering best practices |
 | `/ralph-prompt` | Generate Ralph mode prompts with beads integration and iteration guidance |
 
 ## Skills
@@ -118,6 +124,7 @@ Skills are specialized capabilities that agents can invoke:
 | `propose-close` | Archive completed proposals |
 | `review-plan` | Review and improve task plans against LLM planning best practices |
 | `new-skill` | Create new skills with SOTA prompt engineering patterns |
+| `new-agent` | Create new agent definitions with SOTA prompt engineering patterns |
 | `ralph-prompt` | Generate Ralph mode prompts with beads integration and iteration guidance |
 | `sprites` | Manage isolated Linux sandboxes for code execution and testing |
 
@@ -282,6 +289,15 @@ When quality gates fail or logical errors are detected:
 - External dependency failures
 
 See: `.opencode/openspec/changes/enhance-orchestrator-reflection/` for full specification.
+
+## Cloud Deployment
+
+This framework can be deployed to cloud platforms for remote access:
+
+- **Fly.io:** SSH-based access with persistent volumes. See `README.md` Fly.io section.
+- **Railway:** Web-based access with GitHub OAuth authentication. See `README.md` Railway section and `.opencode/openspec/changes/deploy-opencode-web-railway/design.md`.
+
+Both options support persistent storage and can be stopped when not in use to minimize costs.
 
 ## Landing the Plane (Session Completion)
 
