@@ -16,3 +16,5 @@ examples/sample-service/.opencode/shared/
 workspace/
 .fly/.envrc.local
 .envrc.local
+
+projects
