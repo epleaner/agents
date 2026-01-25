@@ -1,0 +1,19 @@
+{
+  "name": "opencode-railway",
+  "version": "1.0.0",
+  "description": "OpenCode Web deployment for Railway with GitHub OAuth authentication",
+  "private": true,
+  "scripts": {
+    "start": "bash .opencode/scripts/start-railway.sh"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "passport": "^0.7.0",
+    "passport-github2": "^0.1.12",
+    "express-session": "^1.17.3",
+    "http-proxy-middleware": "^2.0.6"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "server": {
+    "port": 4096,
+    "hostname": "0.0.0.0",
+    "cors": ["http://localhost:3000"]
+  },
+  "session": {
+    "maxIdleTimeout": 3600000,
+    "cleanupInterval": 300000
+  },
+  "logging": {
+    "level": "info",
+    "format": "json"
+  },
+  "security": {
+    "trustProxy": true,
+    "rateLimit": {
+      "enabled": true,
+      "maxRequests": 100,
+      "windowMs": 60000
+    }
+  }
+}

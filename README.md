@@ -372,6 +372,54 @@ Customize `fly.toml` for different VM sizes or regions.
 - **Stopped:** Free (use `--stop` when not in use)
 - **Storage:** $0.15/GB/month
 
+## Railway Deployment
+
+Deploy OpenCode Web to Railway with GitHub OAuth authentication for secure browser-based access.
+
+### Prerequisites
+
+- [Railway CLI](https://docs.railway.app/develop/cli) installed
+- GitHub OAuth App (create at GitHub Settings → Developer settings → OAuth Apps)
+- API keys for Anthropic (required) and OpenAI (optional)
+
+### Quick Start
+
+```bash
+# Install Railway CLI
+npm install -g @railway/cli
+
+# Authenticate
+railway login
+
+# Create project and deploy
+railway init
+railway volume create  # Name: opencode-data, Mount: /app/data
+railway up
+
+# Set required secrets
+railway variables set GITHUB_CLIENT_ID=your_client_id
+railway variables set GITHUB_CLIENT_SECRET=your_client_secret
+railway variables set ALLOWED_GITHUB_USERNAME=your_github_username
+railway variables set SESSION_SECRET=$(openssl rand -hex 32)
+railway variables set ANTHROPIC_API_KEY=sk-ant-...
+
+# Get deployment URL
+railway domain
+```
+
+### Access Methods
+
+- **Web UI:** Visit the Railway domain URL
+- **Shell:** `railway run bash`
+- **Git sync:** `railway run bash /app/.opencode/scripts/git-sync.sh`
+
+### Cost
+
+- **Railway Pro:** ~$10/month (1GB RAM, 5GB disk)
+- **LLM APIs:** Variable based on usage
+
+See `.opencode/openspec/changes/deploy-opencode-web-railway/design.md` for full documentation.
+
 ## Communication Style
 
 All agents follow a direct communication style:
