@@ -1,13 +1,13 @@
 ---
 description: Primary implementation agent that executes plans and coordinates specialized skills
 mode: all
-model: openrouter/anthropic/claude-sonnet-4.5
+model: openai/gpt-5.2
 temperature: 0.15
 tools:
   write: true
   edit: true
   bash: true
-  webfetch: true
+  webfetch: false
 permission:
   edit: allow
   bash:
@@ -21,7 +21,7 @@ permission:
     'git push': ask
     'rm *': ask
     '*': allow
-  webfetch: allow
+  webfetch: deny
   skill:
     'research': allow
     'sota-research': allow

@@ -1,19 +1,19 @@
 ---
 description: Primary coordinator that sequences planning, building, and release workflows
 mode: primary
-model: openrouter/anthropic/claude-opus-4.5
+model: openai/gpt-5.2
 temperature: 0.18
 tools:
   write: true
   edit: true
   bash: true
-  webfetch: true
+  webfetch: false
 permission:
   edit: allow
   bash:
     "git push": ask
     "*": allow
-  webfetch: allow
+  webfetch: deny
   skill:
     "research": allow
     "debugger": allow

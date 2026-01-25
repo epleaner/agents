@@ -1,17 +1,25 @@
 ---
 description: Read-only research agent for documentation, APIs, and context lookups
-mode: all
-model: openrouter/google/gemini-2.5-flash
+mode: primary
+model: openai/gpt-5.2
 temperature: 0.35
 tools:
+  read: false
+  glob: false
+  grep: false
   write: false
   edit: false
   bash: false
-  webfetch: true
+  webfetch: false
+  task: false
 permission:
+  read: deny
+  glob: deny
+  grep: deny
   edit: deny
   bash: deny
-  webfetch: allow
+  webfetch: deny
+  task: deny
   skill:
     "exa-*": allow
     "context7-*": allow

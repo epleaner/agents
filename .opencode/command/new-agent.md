@@ -10,7 +10,7 @@ Create a new agent following state-of-the-art prompt engineering best practices 
 
 **Guidelines**
 1. Provide agent name, purpose, and capabilities
-2. Specify which tools the agent needs (write, edit, bash, webfetch, task)
+2. Specify which tools the agent needs (write, edit, bash, task; and read/glob/grep for review-only agents)
 3. Define what the agent should NOT do (boundaries)
 4. Include example scenarios if the agent's role is complex
 5. The skill will research SOTA patterns and create a well-structured agent definition

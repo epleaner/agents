@@ -16,22 +16,18 @@
       "type": "remote",
       "url": "https://mcp.context7.com/mcp",
       "headers": {
-        "CONTEXT7_API_KEY": "$env:CONTEXT7_API_KEY}",
+        "CONTEXT7_API_KEY": "$env:CONTEXT7_API_KEY",
         "Accept": "application/json, text/event-stream"
       },
       "enabled": true
     },
     "exa": {
-      "type": "local",
-      "command": [
-        "npx",
-        "-y",
-        "exa-mcp-server"
-      ],
-      "timeout": 60000,
-      "environment": {
-        "EXA_API_KEY": "{env:EXA_API_KEY}"
-      }
+      "type": "remote",
+      "url": "https://mcp.exa.ai/mcp",
+      "headers": {
+        "exaApiKey": "$env:EXA_API_KEY"
+      },
+      "enabled": true
     },
     "railway": {
       "type": "local",

@@ -1,13 +1,13 @@
 ---
 description: Planner that creates OpenSpec proposals with tasks, spec deltas, and validation criteria
 mode: all
-model: openrouter/anthropic/claude-sonnet-4.5
+model: openai/gpt-5.2
 temperature: 0.22
 tools:
   write: true
   edit: true
   bash: true
-  webfetch: true
+  webfetch: false
   task: true
 permission:
   write:
@@ -22,7 +22,7 @@ permission:
     'bd list*': allow
     'git status': allow
     '*': deny
-  webfetch: allow
+  webfetch: deny
   task:
     'researcher': allow
     'explore': allow

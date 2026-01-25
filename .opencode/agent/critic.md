@@ -1,7 +1,7 @@
 ---
 description: Evaluates worker outputs against acceptance criteria and quality gates
 mode: subagent
-model: claude-sonnet-4-20250514
+model: openai/gpt-5.2
 temperature: 0.2
 tools:
   read: true

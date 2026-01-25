@@ -1,7 +1,7 @@
 ---
 description: Fathom meeting assistant for fetching transcripts, extracting action items, and answering questions about meetings
 mode: subagent
-model: openrouter/anthropic/claude-sonnet-4
+model: openai/gpt-5.2
 temperature: 0.3
 tools:
   write: false

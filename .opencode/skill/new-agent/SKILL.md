@@ -247,7 +247,6 @@ tools:
   write: true
   edit: true
   bash: true
-  webfetch: true
   task: true
 permission:
   write:
@@ -262,6 +261,8 @@ permission:
     '*': deny
 ---
 ```
+
+Note: `webfetch` is disabled project-wide; use Exa/Context7 tools for web/docs research.
 
 **Permission patterns:**
 - Use allowlists for sensitive operations (write, bash)
@@ -357,7 +358,6 @@ tools:
   write: <true | false>
   edit: <true | false>
   bash: <true | false>
-  webfetch: <true | false>
   task: <true | false>
 permission:
   write:
@@ -366,7 +366,6 @@ permission:
     '<pattern>': <allow | deny | ask>
   bash:
     '<command>': <allow | deny | ask>
-  webfetch: <allow | deny | ask>
   skill:
     '<skill-name>': <allow | deny | ask>
 ---
@@ -639,12 +638,10 @@ tools:
   write: true
   edit: true
   bash: true
-  webfetch: true
 permission:
   write: allow
   edit: allow
   bash: allow
-  webfetch: allow
 ---
 
 You are a helpful assistant.

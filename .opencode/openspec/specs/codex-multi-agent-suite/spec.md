@@ -17,7 +17,7 @@ The OpenCode setup SHALL define a GPT-5.1 Codex-centric lineup of six primary ag
 - **AND** it files or updates todos, beads issues, or OpenSpec change proposals before Orchestrator/PM can declare the session complete.
 
 #### Primary Agent Specifications
-- **Orchestrator**: GPT-5.1 Codex (temperature <=0.2) with full `write/edit/bash/webfetch`, skills `exa-search`, `context7-docs`, `slack-notify`, Jira/Linear read-only. Owns beads todos, sequences workflows, launches async subagents, enforces completion.
+- **Orchestrator**: GPT-5.1 Codex (temperature <=0.2) with full `write/edit/bash`, skills `exa-search`, `context7-docs`, `slack-notify`, Jira/Linear read-only. Owns beads todos, sequences workflows, launches async subagents, enforces completion.
 - **Planner**: GPT-5.1 Codex or Claude Sonnet (temperature <=0.3) with read-only permissions (`write/edit/bash`: deny, OpenSpec commands allowed), skills `exa-search`, `context7-docs`, `fathom-notes`. Focuses on clarifying questions, spec alignment, and beads/OpenSpec cross references before build starts.
 - **Proposal Agent**: GPT-5.1 Codex (temperature <=0.25) with repository read access, `write/edit` limited to `openspec/`, `bash` limited to OpenSpec tooling, and skills `exa-search`, `context7-docs`. Specializes in drafting OpenSpec artifacts, asking clarifying questions, and citing research sources before handing work to Planner/Builder.
 - **PM**: GPT-5.1 Codex (temperature <=0.25) with limited `write` (docs/AGENTS) and `bash` (bd, openspec, jira) permissions, skills `jira-lookup`, `jira-update`, `linear-sync`, `slack-notify`, `fathom-notes`. Maintains beads/OpenSpec linkage and external comms (Slack/Jira/Linear) referencing change IDs.
@@ -93,4 +93,3 @@ The Codex multi-agent suite SHALL route every new or ambiguous change request th
 - **WHEN** the Proposal agent needs to persist work
 - **THEN** it writes only within `openspec/` (proposal/tasks/design/spec) and runs `openspec validate <change-id> --strict`
 - **AND** it hands the validated change plus outstanding assumptions to Planner and Orchestrator before Builder can begin implementation.
-
