@@ -4,17 +4,14 @@ A blueprint repository for AI-assisted development workflows. Scaffold this into
 
 ## Quick Start
 
-Scaffold this blueprint into your repository using yepe. Currently requires building locally (npx publishing is TODO):
+Scaffold this blueprint into your repository using yepe.
 
 ```bash
-# Clone and build yepe
-git clone https://github.com/epleaner/agents.git
-cd agents/packages/yepe
-npm install && npm run build && npm link
+# In your target repository
+npx @yepe/init
 
-# Run in your target repository
-cd /path/to/your/project
-yepe init
+# Or without Node.js
+curl -fsSL https://yepe.dev/install.sh | bash
 ```
 
 yepe copies the complete agent framework into `.opencode/` and prompts for project customization (name, tech stack, conventions).
@@ -114,7 +111,7 @@ The `self-improve` skill is central to how this system learns and evolves. Run i
 ### What It Does
 
 1. Reviews the current session for friction points and insights
-2. Records findings in the appropriate ledger (`.opencode/learnings/`)
+2. Records findings in the appropriate ledger (`learnings/` here; `.opencode/learnings/` when scaffolded)
 3. Proposes updates to AGENTS.md, agent definitions, or skills
 4. Creates beads issues or OpenSpec proposals for larger changes
 
@@ -203,20 +200,19 @@ openspec archive <id>      # Archive completed work
 Ralph mode enables autonomous multi-iteration agent execution for complex tasks that require many steps.
 
 ```bash
-# Inline prompt
-.opencode/scripts/ralph-orchestrator.sh "Implement user authentication"
+# Inline prompt (simplest)
+scripts/ralph.ts "Implement user authentication"
 
-# From file with iteration limit
-.opencode/scripts/ralph-orchestrator.sh --prompt task.md --max-iterations 30
+# From file
+scripts/ralph.ts --prompt task.md --max-iterations 30
 
-# Dry run
-.opencode/scripts/ralph-orchestrator.sh "Test task" --dry-run
+# Dry run (test without executing)
+scripts/ralph.ts "Test task" --dry-run
 
 # Resume interrupted session
-.opencode/scripts/ralph-orchestrator.sh --resume ralph-2026-01-08-103045
+scripts/ralph.ts --resume ralph-2026-01-08-103045
 
-# Rollback to checkpoint
-.opencode/scripts/ralph-orchestrator.sh --rollback-to 10
+# Rollback is not currently supported by scripts/ralph.ts
 ```
 
 ### Key Features
@@ -230,7 +226,7 @@ Ralph mode enables autonomous multi-iteration agent execution for complex tasks 
 
 ### Configuration
 
-Copy `.opencode/templates/ralph.yml` to your project root and customize:
+Copy `templates/ralph.yml` (or `.opencode/templates/ralph.yml` when scaffolded) to your project root and customize:
 
 ```yaml
 ralph:
@@ -260,7 +256,7 @@ The learnings system captures operational insights and promotes them into action
 
 ### Workflow
 
-1. **Capture**: Record insights during sessions in `.opencode/learnings/`
+1. **Capture**: Record insights during sessions in `learnings/` (or `.opencode/learnings/` when scaffolded)
 2. **Review**: Run `self-improve` skill before closing sessions
 3. **Promote**: Update AGENTS.md, file beads issues, or create OpenSpec changes
 4. **Track**: Mark entries as `promoted` with links to follow-up artifacts
@@ -269,23 +265,20 @@ Entry statuses: `new`, `needs-agents-update`, `needs-spec-change`, `in-progress`
 
 ## yepe (Blueprint Scaffolding)
 
-yepe scaffolds this blueprint into any repository. Currently requires building locally (npx publishing is TODO):
+yepe scaffolds this blueprint into any repository:
 
 ```bash
-# Clone and build (one-time setup)
-git clone https://github.com/epleaner/agents.git
-cd agents/packages/yepe
-npm install && npm run build && npm link
+# In your target repository
+npx @yepe/init
 
-# Run in your target repository
-cd /path/to/your/project
-yepe init
+# Or without Node.js
+curl -fsSL https://yepe.dev/install.sh | bash
 ```
 
 ### What It Copies
 
 - **AGENTS.md** - AI assistant instructions
-- **agent/** - Agent definitions
+- **agents/** - Agent definitions
 - **command/** - Slash commands
 - **skill/** - Specialized capabilities
 - **openspec/** - Change proposal framework
@@ -304,10 +297,10 @@ yepe init
 For CI/CD pipelines or automated testing:
 
 ```bash
-yepe init --non-interactive
+npx @yepe/init --non-interactive
 
 # With config file
-yepe init --non-interactive --config yepe.config.json
+npx @yepe/init --non-interactive --config yepe.config.json
 ```
 
 Config file format:
@@ -336,7 +329,7 @@ Deploy this agent framework to Fly.io for remote access via SSH.
 ```bash
 # First-time setup
 flyctl auth login
-.opencode/scripts/deploy-flyio.sh
+scripts/deploy-flyio.sh
 
 # Set required secrets
 flyctl secrets set OPENROUTER_API_KEY=sk-or-... -a opencode-agents
@@ -349,11 +342,11 @@ flyctl ssh console -a opencode-agents
 ### Management Commands
 
 ```bash
-.opencode/scripts/deploy-flyio.sh --status   # Check status
-.opencode/scripts/deploy-flyio.sh --stop     # Stop (pause billing)
-.opencode/scripts/deploy-flyio.sh --start    # Resume
-.opencode/scripts/deploy-flyio.sh --ssh      # Connect via SSH
-.opencode/scripts/deploy-flyio.sh --logs     # View logs
+scripts/deploy-flyio.sh --status   # Check status
+scripts/deploy-flyio.sh --stop     # Stop (pause billing)
+scripts/deploy-flyio.sh --start    # Resume
+scripts/deploy-flyio.sh --ssh      # Connect via SSH
+scripts/deploy-flyio.sh --logs     # View logs
 ```
 
 ### Configuration
@@ -411,14 +404,14 @@ railway domain
 
 - **Web UI:** Visit the Railway domain URL
 - **Shell:** `railway run bash`
-- **Git sync:** `railway run bash /app/.opencode/scripts/git-sync.sh`
+- **Git sync:** `railway run bash /app/scripts/git-sync.sh` (or `/app/.opencode/scripts/git-sync.sh` when scaffolded)
 
 ### Cost
 
 - **Railway Pro:** ~$10/month (1GB RAM, 5GB disk)
 - **LLM APIs:** Variable based on usage
 
-See `.opencode/openspec/changes/deploy-opencode-web-railway/design.md` for full documentation.
+See `openspec/changes/deploy-opencode-web-railway/design.md` (or `.opencode/openspec/changes/deploy-opencode-web-railway/design.md` when scaffolded) for full documentation.
 
 ## Communication Style
 

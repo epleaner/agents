@@ -1,20 +1,29 @@
+# Dependencies / builds
+node_modules/
 dist/
-examples/sample-service/.opencode/shared/
-# Environment variables with secrets
+bun.lock
 
-# Ralph mode - local session history (do not commit)
-.opencode/ralph/sessions.md
-.opencode/ralph/archive/
-.ralph-state/
-.ralph-metrics-*.json
+# Environment / secrets
+.env
+.env.*
+!.env.example
 
-*.DS_Store
+# OS / editor
+.DS_Store
 
 # Fly.io
 .fly/
 
-workspace/
-.fly/.envrc.local
-.envrc.local
+# Ralph mode - local session history (do not commit)
+ralph/sessions.md
+ralph/archive/
+.ralph-state/
+.ralph-metrics-*.json
 
-projects
+# Same paths when scaffolded into a repo under .opencode/
+.opencode/ralph/sessions.md
+.opencode/ralph/archive/
+
+# Local workspace / generated
+workspace/
+projects/
