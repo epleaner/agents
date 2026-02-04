@@ -1,0 +1,402 @@
+#!/usr/bin/env python3
+
+import argparse
+import json
+import os
+import shutil
+import subprocess
+import sys
+from typing import Any, Dict, List, Optional, Tuple
+
+
+def _emit(payload: Dict[str, Any]) -> None:
+    sys.stdout.write(json.dumps(payload, sort_keys=True, separators=(",", ":")))
+    sys.stdout.write("\n")
+
+
+def _ok(action: str, request: Dict[str, Any], result: Any) -> None:
+    _emit({"ok": True, "action": action, "request": request, "result": result})
+
+
+def _err(
+    action: str,
+    request: Dict[str, Any],
+    err_type: str,
+    message: str,
+    remediation: Optional[str] = None,
+    details: Any = None,
+) -> None:
+    error: Dict[str, Any] = {"type": err_type, "message": message}
+    if remediation:
+        error["remediation"] = remediation
+    if details is not None:
+        error["details"] = details
+    _emit({"ok": False, "action": action, "request": request, "error": error})
+
+
+def _run(cmd: List[str]) -> Tuple[int, str, str]:
+    proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    return proc.returncode, proc.stdout, proc.stderr
+
+
+def _require_acli(action: str, request: Dict[str, Any]) -> Optional[str]:
+    path = shutil.which("acli")
+    if not path:
+        _err(
+            action,
+            request,
+            "missing_dependency",
+            "Required command 'acli' not found in PATH",
+            remediation="Install Atlassian CLI and ensure 'acli' is on PATH (then run: acli --version)",
+        )
+        return None
+    return path
+
+
+def _parse_auth_status(text: str) -> bool:
+    t = (text or "").strip().lower()
+    if not t:
+        return False
+    unauth_markers = [
+        "not logged in",
+        "not authenticated",
+        "no valid authentication",
+        "login required",
+        "unauthorized",
+    ]
+    if any(m in t for m in unauth_markers):
+        return False
+    auth_markers = [
+        "logged in",
+        "authenticated",
+        "you are logged in",
+        "active session",
+    ]
+    if any(m in t for m in auth_markers):
+        return True
+    # Fall back to optimistic: some versions are verbose but still indicate success.
+    return True
+
+
+def _get_version() -> Optional[str]:
+    rc, out, _ = _run(["acli", "--version"])
+    if rc != 0:
+        return None
+    return out.strip() or None
+
+
+def _auth_status() -> Dict[str, Any]:
+    rc, out, err = _run(["acli", "jira", "auth", "status"])
+    text = (out or "") + (err or "")
+    ok = (rc == 0) and _parse_auth_status(text)
+    return {"ok": ok, "exitCode": rc, "text": text.strip()}
+
+
+def _preflight(action: str, request: Dict[str, Any], require_auth: bool) -> Optional[Dict[str, Any]]:
+    if not _require_acli(action, request):
+        return None
+    version = _get_version()
+    auth = _auth_status()
+    if require_auth and not auth.get("ok"):
+        _err(
+            action,
+            request,
+            "not_authenticated",
+            "Not authenticated to Jira via acli",
+            remediation="Run: acli jira auth login --web",
+            details={"auth": auth, "version": version},
+        )
+        return None
+    return {"version": version, "auth": auth}
+
+
+def _run_acli_json(action: str, request: Dict[str, Any], cmd: List[str]) -> None:
+    # Ensure deterministic, non-interactive output.
+    if "--json" not in cmd:
+        cmd = cmd + ["--json"]
+    rc, out, err = _run(cmd)
+    if rc != 0:
+        _err(
+            action,
+            request,
+            "acli_failed",
+            "acli command failed",
+            remediation="Re-run with the same arguments in a shell to inspect output",
+            details={"exitCode": rc, "cmd": cmd, "stdout": out.strip(), "stderr": err.strip()},
+        )
+        return
+    raw = out.strip()
+    try:
+        parsed = json.loads(raw)
+    except Exception as e:
+        # Some CLI versions may print warnings before JSON. Try a best-effort extraction.
+        extracted = None
+        for start in (raw.find("{"), raw.find("[")):
+            if start == -1:
+                continue
+            try:
+                extracted = json.loads(raw[start:])
+                break
+            except Exception:
+                extracted = None
+        if extracted is None:
+            _err(
+                action,
+                request,
+                "invalid_json",
+                "acli did not return valid JSON",
+                remediation="Ensure your acli version supports --json for this command",
+                details={"cmd": cmd, "stdout": raw, "stderr": err.strip(), "parseError": str(e)},
+            )
+            return
+        parsed = extracted
+    _ok(action, request, parsed)
+
+
+def _needs_confirm(action: str, request: Dict[str, Any]) -> None:
+    _err(
+        action,
+        request,
+        "needs_confirmation",
+        "Mutating Jira action requires explicit confirmation",
+        remediation="Re-run with --yes (or --confirm) to proceed",
+    )
+
+
+def main(argv: List[str]) -> int:
+    parser = argparse.ArgumentParser(prog="jira", add_help=True)
+    parser.add_argument("--yes", action="store_true", help="Confirm mutating actions")
+    parser.add_argument("--confirm", action="store_true", help="Alias for --yes")
+
+    sub = parser.add_subparsers(dest="cmd")
+
+    sub.add_parser("preflight")
+
+    auth_p = sub.add_parser("auth")
+    auth_sub = auth_p.add_subparsers(dest="auth_cmd")
+    auth_sub.add_parser("status")
+    auth_sub.add_parser("login-hints")
+
+    project_p = sub.add_parser("project")
+    project_sub = project_p.add_subparsers(dest="project_cmd")
+    pv = project_sub.add_parser("view")
+    pv.add_argument("--key", required=True)
+    pl = project_sub.add_parser("list")
+    pl.add_argument("--limit", type=int, default=50)
+    pl.add_argument("--paginate", action="store_true")
+    pl.add_argument("--recent", action="store_true")
+
+    wi_p = sub.add_parser("workitem")
+    wi_sub = wi_p.add_subparsers(dest="workitem_cmd")
+    wv = wi_sub.add_parser("view")
+    wv.add_argument("--key", required=True)
+    ws = wi_sub.add_parser("search")
+    ws.add_argument("--jql", required=True)
+    ws.add_argument("--limit", type=int, default=50)
+    ws.add_argument("--paginate", action="store_true")
+
+    wic = wi_sub.add_parser("comment")
+    wic_sub = wic.add_subparsers(dest="comment_cmd")
+    wic_create = wic_sub.add_parser("create")
+    wic_create.add_argument("--key", required=True)
+    wic_create.add_argument("--body", required=True)
+
+    wit = wi_sub.add_parser("transition")
+    wit.add_argument("--key", required=True)
+    wit.add_argument("--status", required=True)
+
+    wie = wi_sub.add_parser("edit")
+    wie.add_argument("--key", required=True)
+    wie.add_argument("--summary")
+    wie.add_argument("--description")
+    wie.add_argument("--from-json")
+    wie.add_argument("--generate-json", action="store_true")
+
+    args = parser.parse_args(argv)
+
+    confirmed = bool(args.yes or args.confirm)
+
+    if args.cmd is None:
+        _err("usage", {}, "invalid_usage", "No command provided", remediation="Run: jira preflight")
+        return 2
+
+    if args.cmd == "preflight":
+        req: Dict[str, Any] = {}
+        if not _require_acli("preflight", req):
+            return 1
+        version = _get_version()
+        auth = _auth_status()
+        _ok("preflight", req, {"version": version, "auth": auth})
+        return 0
+
+    if args.cmd == "auth":
+        if args.auth_cmd == "login-hints":
+            if not _require_acli("auth.login-hints", {}):
+                return 1
+            _ok(
+                "auth.login-hints",
+                {},
+                {
+                    "install": "Ensure Atlassian CLI 'acli' is installed and on PATH",
+                    "login": "Run: acli jira auth login --web",
+                    "status": "Run: acli jira auth status",
+                },
+            )
+            return 0
+        if args.auth_cmd == "status":
+            if not _require_acli("auth.status", {}):
+                return 1
+            version = _get_version()
+            auth = _auth_status()
+            if not auth.get("ok"):
+                _err(
+                    "auth.status",
+                    {},
+                    "not_authenticated",
+                    "Not authenticated to Jira via acli",
+                    remediation="Run: acli jira auth login --web",
+                    details={"auth": auth, "version": version},
+                )
+                return 1
+            _ok("auth.status", {}, {"version": version, "auth": auth})
+            return 0
+        _err("auth", {}, "invalid_usage", "Unknown auth subcommand", remediation="Use: jira auth status")
+        return 2
+
+    if args.cmd == "project":
+        if args.project_cmd == "view":
+            req = {"key": args.key}
+            if _preflight("project.view", req, require_auth=True) is None:
+                return 1
+            _run_acli_json("project.view", req, ["acli", "jira", "project", "view", "--key", args.key])
+            return 0
+        if args.project_cmd == "list":
+            req = {"limit": args.limit, "paginate": bool(args.paginate), "recent": bool(args.recent)}
+            if _preflight("project.list", req, require_auth=True) is None:
+                return 1
+            cmd = ["acli", "jira", "project", "list", "--limit", str(args.limit)]
+            if args.paginate:
+                cmd.append("--paginate")
+            if args.recent:
+                cmd.append("--recent")
+            _run_acli_json("project.list", req, cmd)
+            return 0
+        _err("project", {}, "invalid_usage", "Unknown project subcommand", remediation="Use: jira project list")
+        return 2
+
+    if args.cmd == "workitem":
+        if args.workitem_cmd == "view":
+            req = {"key": args.key}
+            if _preflight("workitem.view", req, require_auth=True) is None:
+                return 1
+            _run_acli_json("workitem.view", req, ["acli", "jira", "workitem", "view", args.key])
+            return 0
+
+        if args.workitem_cmd == "search":
+            req = {"jql": args.jql, "limit": args.limit, "paginate": bool(args.paginate)}
+            if _preflight("workitem.search", req, require_auth=True) is None:
+                return 1
+            cmd = ["acli", "jira", "workitem", "search", "--jql", args.jql, "--limit", str(args.limit)]
+            if args.paginate:
+                cmd.append("--paginate")
+            _run_acli_json("workitem.search", req, cmd)
+            return 0
+
+        if args.workitem_cmd == "comment" and args.comment_cmd == "create":
+            req = {"key": args.key, "body": args.body}
+            if not confirmed:
+                _needs_confirm("workitem.comment.create", req)
+                return 1
+            if _preflight("workitem.comment.create", req, require_auth=True) is None:
+                return 1
+            cmd = [
+                "acli",
+                "jira",
+                "workitem",
+                "comment",
+                "create",
+                "--key",
+                args.key,
+                "--body",
+                args.body,
+                "--yes",
+            ]
+            _run_acli_json("workitem.comment.create", req, cmd)
+            return 0
+
+        if args.workitem_cmd == "transition":
+            req = {"key": args.key, "status": args.status}
+            if not confirmed:
+                _needs_confirm("workitem.transition", req)
+                return 1
+            if _preflight("workitem.transition", req, require_auth=True) is None:
+                return 1
+            cmd = [
+                "acli",
+                "jira",
+                "workitem",
+                "transition",
+                "--key",
+                args.key,
+                "--status",
+                args.status,
+                "--yes",
+            ]
+            _run_acli_json("workitem.transition", req, cmd)
+            return 0
+
+        if args.workitem_cmd == "edit":
+            req = {
+                "key": args.key,
+                "summary": args.summary,
+                "description": args.description,
+                "from_json": args.from_json,
+                "generate_json": bool(args.generate_json),
+            }
+            if args.generate_json:
+                # This is non-mutating (it generates JSON locally).
+                if _preflight("workitem.edit.generate-json", {"key": args.key}, require_auth=True) is None:
+                    return 1
+                _run_acli_json(
+                    "workitem.edit.generate-json",
+                    {"key": args.key},
+                    ["acli", "jira", "workitem", "edit", "--key", args.key, "--generate-json"],
+                )
+                return 0
+
+            if not confirmed:
+                _needs_confirm("workitem.edit", req)
+                return 1
+            if _preflight("workitem.edit", req, require_auth=True) is None:
+                return 1
+
+            cmd = ["acli", "jira", "workitem", "edit", "--key", args.key, "--yes"]
+            if args.summary:
+                cmd += ["--summary", args.summary]
+            if args.description:
+                cmd += ["--description", args.description]
+            if args.from_json:
+                cmd += ["--from-json", args.from_json]
+
+            # Ensure at least one mutating field was provided.
+            if not (args.summary or args.description or args.from_json):
+                _err(
+                    "workitem.edit",
+                    req,
+                    "invalid_usage",
+                    "No edit fields provided",
+                    remediation="Provide at least one of: --summary, --description, --from-json",
+                )
+                return 2
+            _run_acli_json("workitem.edit", req, cmd)
+            return 0
+
+        _err("workitem", {}, "invalid_usage", "Unknown workitem subcommand", remediation="Use: jira workitem view")
+        return 2
+
+    _err(args.cmd, {}, "invalid_usage", "Unknown command", remediation="Run: jira preflight")
+    return 2
+
+
+if __name__ == "__main__":
+    raise SystemExit(main(sys.argv[1:]))

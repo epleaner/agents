@@ -94,7 +94,7 @@ Skills are specialized capabilities that agents invoke for specific tasks.
 | `fathom-notes` | Pull meeting transcripts and action items | Available |
 | `action-items` | Create/escalate todos with owners | Available |
 | `slack-notify` | Broadcast status updates | TODO |
-| `jira-lookup`, `jira-update` | Jira issue sync | TODO |
+| `jira` | Jira issue sync (deterministic JSON via `acli`) | Available |
 | `linear-sync` | Linear issue sync | TODO |
 
 ## Self-Improve Workflow

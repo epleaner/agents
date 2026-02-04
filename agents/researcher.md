@@ -25,6 +25,7 @@ permission:
     "context7-*": allow
     "fathom-*": allow
     "slack-*": allow
+    "jira": allow
     "jira-*": allow
     "linear-*": allow
     "self-improve": allow

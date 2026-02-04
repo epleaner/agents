@@ -2,15 +2,21 @@
 name: jira-lookup
 description: Fetch Jira issue summaries, comments, and status to align beads/OpenSpec work with external tracking.
 ---
-## Usage
-Provide Jira keys or search terms plus the context you need.
-```
-Issue: ENG-2041
-Fields: summary, status, assignee, latest-comment
-Need: blockers related to plan-opencode-setup
-```
-I will return a concise summary with status, owners, due dates, and recent comments.
+## Deprecated
+This skill is deprecated. Use the `jira` skill instead:
 
-## Notes
-- Use this before making updates so PM can see current state.
-- For bulk queries, provide a JQL snippet.
+`./skill/jira/scripts/jira workitem view --key "KEY-123"`
+
+If you are an agent invoking this skill, return a deterministic error (no prose):
+```json
+{
+  "ok": false,
+  "action": "deprecated",
+  "request": {"skill": "jira-lookup"},
+  "error": {
+    "type": "deprecated_skill",
+    "message": "Skill 'jira-lookup' is deprecated; use 'jira' wrapper",
+    "remediation": "Use: ./skill/jira/scripts/jira workitem view --key KEY-123"
+  }
+}
+```

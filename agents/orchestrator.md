@@ -28,6 +28,7 @@ permission:
     "exa-*": allow
     "context7-*": allow
     "slack-*": allow
+    "jira": allow
     "jira-*": allow
     "linear-*": allow
     "fathom-*": allow

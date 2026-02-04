@@ -139,7 +139,7 @@ Skills are specialized capabilities that agents can invoke:
 | `fathom-get-transcript` | Fetch transcript for a specific meeting |
 | `fathom-notes` | Pull meeting transcripts + action items |
 | `slack-notify` | Broadcast status updates |
-| `jira-lookup`, `jira-update`, `linear-sync` | Sync external trackers |
+| `jira`, `linear-sync` | Sync external trackers |
 | `action-items` | Create/escalate todos with owners |
 
 ## Beads Performance Troubleshooting
