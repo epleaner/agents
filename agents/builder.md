@@ -30,9 +30,6 @@ permission:
     'release': allow
     'writer': allow
     'pm': allow
-    'propose-new': allow
-    'propose-go': allow
-    'propose-close': allow
     'new-skill': allow
     'new-agent': allow
     'exa-*': allow

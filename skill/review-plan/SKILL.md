@@ -138,22 +138,18 @@ description: Review and improve task plans using LLM planning best practices
 
 ### As an Agent
 ```bash
-# Review a proposal's task breakdown
-openspec show <change-id> --format json > /tmp/plan.json
-skill/review-plan/scripts/review-plan /tmp/plan.json
+# Review a task plan
+skill/review-plan/scripts/review-plan path/to/tasks.md
 
-# (If running inside a scaffolded project, use `.opencode/skill/...` instead of `skill/...`.)
-
-# Review tasks.md directly
-skill/review-plan/scripts/review-plan openspec/changes/<id>/tasks.md
+# In a scaffolded project, use `.opencode/skill/...` instead of `skill/...`.
 ```
 
 ### As a Planner
-Before finalizing any OpenSpec proposal:
-1. Run the review-plan script on your tasks.md
-2. Address all red flags and low scores
-3. Iterate until all dimensions score ≥ 4/5
-4. Document review findings in proposal.md
+Before handing off a plan:
+1. Run the review-plan script on the plan file.
+2. Address all red flags and low scores.
+3. Iterate until all dimensions score ≥ 4/5.
+4. Record review findings alongside the plan.
 
 ## Output Format
 
@@ -191,7 +187,7 @@ Before finalizing any OpenSpec proposal:
 ## Next Steps
 - [ ] Address critical issues
 - [ ] Re-run review after fixes
-- [ ] Validate with `openspec validate <id> --strict`
+- [ ] Confirm acceptance criteria and verification commands are actionable
 ```
 
 ## Example: Before/After Review
@@ -271,20 +267,9 @@ Before finalizing any OpenSpec proposal:
 - ✅ Clear success criteria
 - ✅ Concrete, actionable language
 
-## Integration with Propose-New Skill
+## Integration with Planning
 
-The `propose-new` skill should automatically invoke `review-plan` before step 8 (Validate):
-
-```
-7. Draft Tasks
-   - Create tasks.md with ordered work items
-   - Run review-plan to validate task quality
-   - Iterate on tasks until review score ≥ 4/5 on all dimensions
-
-8. Validate
-   - Run openspec validate <id> --strict
-   - Resolve issues
-```
+Run `review-plan` after drafting tasks and before handing the plan to the builder. Address critical issues and re-review the revised plan.
 
 ## Guidelines
 1. Be strict in reviews - better to catch issues now than during implementation

@@ -150,7 +150,6 @@ Read and analyze:
 .opencode/agents/*.md         # Individual agent configurations (when scaffolded)
 .opencode/skill/*/SKILL.md    # Skill definitions (when scaffolded)
 .opencode/command/*.md        # Command definitions
-openspec/                     # Change proposal framework (or `.opencode/openspec/` when scaffolded)
 ```
 
 For each insight, evaluate:

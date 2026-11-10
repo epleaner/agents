@@ -59,9 +59,9 @@ Use the following structure for every entry. Replace angle-bracket placeholders 
 - Status: promoted
 - Related IDs: none
 - Summary: During the consolidate-opencode-structure proposal, there were ~4 exchanges to clarify how learnings re-application works (agent-driven vs programmatic). The proposal was drafted before fully understanding the user's intent.
-- Recommended Action: Update propose-new skill to include explicit "clarify assumptions" step before drafting design.md. Ask 1-2 targeted questions when the mechanism is ambiguous.
+- Recommended Action: Clarify assumptions before drafting a design. Ask 1–2 targeted questions when the mechanism cannot be inferred from context.
 - Supporting Links: session transcript
-- Follow-up Links: .opencode/skill/propose-new/skill.md updated with step 2 "Clarify Assumptions"
+- Follow-up Links: agents/planner.md
 
 ### [ML-20260107-004] yepe needs non-interactive mode for testing
 - Date: 2026-01-07
@@ -76,7 +76,7 @@ Use the following structure for every entry. Replace angle-bracket placeholders 
 - Supporting Links: integration test in examples/test-project/
 - Follow-up Links: https://github.com/epleaner/yepe (src/cli.ts, src/prompts.ts, README.md)
 
-### [ML-20260107-005] Planner must NEVER create standalone specs - all specs must be OpenSpec proposals
+### [ML-20260107-005] Planner should recognize substantial work and plan proactively
 - Date: 2026-01-07
 - Session: ralph-mode research and proposal
 - Knowledge Type: meta
@@ -84,8 +84,8 @@ Use the following structure for every entry. Replace angle-bracket placeholders 
 - Owner: planner
 - Status: promoted
 - Related IDs: change-add-ralph-mode
-- Summary: Planner agent created detailed standalone spec for Ralph Wiggum mode instead of recognizing it as a new capability requiring OpenSpec proposal. User had to ask "shouldn't this be in openspec?" to trigger the correct workflow. Additionally, planner was asking for permission before creating OpenSpec proposals instead of just creating them.
-- Recommended Action: MANDATORY RULES: (1) Planner should NEVER create standalone specs - ALL specs must be OpenSpec proposals. (2) Planner should NOT ask for permission before creating OpenSpec proposals - just create them immediately. (3) New capabilities, breaking changes, architecture shifts, or ambiguous work ALWAYS require OpenSpec - make it the default, not optional.
+- Summary: Planner drafted a detailed standalone implementation outline for Ralph mode without aligning it with the project's planning workflow. The user had to prompt a formal plan, and the planner then asked for permission rather than doing the requested planning.
+- Recommended Action: For new capabilities, breaking changes, architecture shifts, or ambiguous work, define scope, tasks, and acceptance criteria proactively. Ask only for missing requirements, not permission to plan.
 - Supporting Links: session transcript
 - Follow-up Links: .opencode/agent/planner.md, AGENTS.md Communication Style section
 
@@ -141,7 +141,7 @@ Use the following structure for every entry. Replace angle-bracket placeholders 
 - Supporting Links: session transcript
 - Follow-up Links: .opencode/skill/self-improve/skill.md updated with Required Tools section, Focus Parameter section, and updated guidelines
 
-### [ML-20260107-010] Planner must only create OpenSpec proposals, never implement
+### [ML-20260107-010] Planner must plan, not implement
 - Date: 2026-01-07
 - Session: backpropagation workflow planning
 - Knowledge Type: meta
@@ -149,8 +149,8 @@ Use the following structure for every entry. Replace angle-bracket placeholders 
 - Owner: planner
 - Status: promoted
 - Related IDs: none
-- Summary: Planner attempted to create actual project files (README.md, directory structures) and output detailed inline implementation specs instead of creating an OpenSpec proposal and handing off to builder. Planner confused "planning" with "building". Planner should ONLY output via OpenSpec artifacts and NEVER attempt implementation.
-- Recommended Action: Update planner.md with explicit boundaries: (1) ONLY create OpenSpec proposals, (2) NEVER create project files, (3) NEVER output inline specs - use propose-new skill, (4) Hand off to builder for all implementation.
+- Summary: Planner attempted to create project files during planning and output implementation details rather than handing an actionable plan to the builder. Planning and building have distinct ownership.
+- Recommended Action: Keep planner output focused on scope, tasks, acceptance criteria, and handoff; leave implementation to the builder.
 - Supporting Links: session transcript
 - Follow-up Links: .opencode/agent/planner.md updated with Boundaries section
 
@@ -176,9 +176,9 @@ Use the following structure for every entry. Replace angle-bracket placeholders 
 - Status: promoted
 - Related IDs: none
 - Summary: Planner was using "Estimated effort: 2-3 hours" format in tasks.md files, but team standard is 1-5 point scale (1=trivial, 2=small, 3=medium, 4=large, 5=very large). Hours are imprecise and vary by implementer; points provide consistent relative sizing.
-- Recommended Action: Update planner.md and propose-new skill to mandate 1-5 point scale for effort estimates.
-- Supporting Links: session transcript, .opencode/openspec/changes/add-ralph-mode/tasks.md
-- Follow-up Links: .opencode/agent/planner.md updated, .opencode/skill/propose-new/SKILL.md updated
+- Recommended Action: Update planner guidance to use 1–5 points for effort estimates.
+- Supporting Links: session transcript
+- Follow-up Links: agents/planner.md
 
 ### [ML-20260108-001] Orchestrator must never implement directly, even with write tools available
 - Date: 2026-01-08
@@ -204,9 +204,9 @@ Use the following structure for every entry. Replace angle-bracket placeholders 
 - Summary: Research on state-of-the-art multi-agent orchestration patterns (Jan 2026) identified that our orchestrator is missing critical capabilities: (1) Reflexion Loop - self-critique → revise → iterate cycle for task outputs, (2) Bidirectional Reflection Protocol (BRP) - monitor agent watching orchestrator decisions, (3) Structured State Management - explicit state schema for agent coordination. The existing `self-improve` skill captures session-level friction but does NOT provide real-time, task-specific self-correction that SOTA reflexion loops offer.
 - Recommended Action: Implement Reflexion pattern with quality gates (tests, linter, coverage, logical correctness), max 3 iterations, and escalation to human review. Add critic agent for self-evaluation. Define explicit OrchestratorState schema.
 - Supporting Links: AWS Strands Agents (Reflexion), COCO Framework (BRP), Agent-R (Self-Training), LangGraph Multi-Agent Patterns
-- Follow-up Links: agents-77a (beads issue), .opencode/openspec/changes/enhance-orchestrator-reflection/ (OpenSpec proposal), AGENTS.md "Quality Gates and Acceptance Criteria" section
+- Follow-up Links: agents-77a (beads issue), AGENTS.md "Quality Gates and Acceptance Criteria" section
 
-### [ML-20260119-001] OpenSpec proposals should have max 4 core files, not 9
+### [ML-20260119-001] Plans should have a small number of core files
 - Date: 2026-01-19
 - Session: Railway deployment plan audit
 - Knowledge Type: meta
@@ -217,4 +217,4 @@ Use the following structure for every entry. Replace angle-bracket placeholders 
 - Summary: Railway deployment proposal had 9 markdown files with contradictory guidance (SIMPLE.md said "skip rate limiting", tasks.md acceptance criteria required it). Multiple docs covered same topics at different detail levels (MCP-SIMPLIFIED.md duplicated README.md). Exploration docs created during planning were never consolidated before implementation.
 - Recommended Action: (1) Enforce max 4 core files per proposal: proposal.md, tasks.md, design.md (optional), spec.md. (2) Add consolidation step to planning workflow - merge exploration docs into core files before implementation. (3) Acceptance criteria must align with design decisions. (4) tasks.md must have Prerequisites section at top and Execution Phases diagram showing parallel work.
 - Supporting Links: session transcript, deploy-opencode-web-railway audit
-- Follow-up Links: .opencode/openspec/AGENTS.md updated with "Keep Proposals Lean" section and enhanced tasks.md template
+- Follow-up Links: agents/planner.md planning guidance

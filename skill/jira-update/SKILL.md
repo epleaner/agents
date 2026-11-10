@@ -1,6 +1,6 @@
 ---
 name: jira-update
-description: Synchronize beads/OpenSpec progress back to Jira issues (status, labels, comments).
+description: Synchronize beads progress back to Jira issues (status, labels, comments).
 ---
 ## Deprecated
 This skill is deprecated. Use the `jira` skill instead:

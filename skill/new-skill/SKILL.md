@@ -43,7 +43,7 @@ cat skill/<name>/SKILL.md              # Review similar skills
 
 Ensure the new skill:
 - Doesn't duplicate existing functionality
-- Follows naming conventions (verb-noun: `review-plan`, `propose-new`)
+- Follows naming conventions (verb-noun: `review-plan`, `slack-notify`)
 - Fills a genuine gap in the agent toolkit
 
 ### 3. Define Role and Identity

@@ -22,9 +22,6 @@ permission:
     "release": allow
     "writer": allow
     "self-improve": allow
-    "propose-new": allow
-    "propose-go": allow
-    "propose-close": allow
     "exa-*": allow
     "context7-*": allow
     "slack-*": allow
@@ -102,7 +99,7 @@ The only exceptions where orchestrator may write directly:
 ## Guidance
 
 1. For new work, use `/plan` or the `planner` agent to break down tasks.
-2. For proposals/specs, use `/propose-new`, `/propose-go`, `/propose-close` commands.
+2. For substantial work, review the task plan and its acceptance criteria before implementation.
 3. Use `research` skill for documentation lookups before implementation.
 4. Use `qa` skill to validate work before release.
 5. Use `release` skill for git hygiene, commits, and PRs.

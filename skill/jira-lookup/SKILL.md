@@ -1,6 +1,6 @@
 ---
 name: jira-lookup
-description: Fetch Jira issue summaries, comments, and status to align beads/OpenSpec work with external tracking.
+description: Fetch Jira issue summaries, comments, and status to align beads work with external tracking.
 ---
 ## Deprecated
 This skill is deprecated. Use the `jira` skill instead:

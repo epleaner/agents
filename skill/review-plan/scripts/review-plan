@@ -26,12 +26,6 @@ fi
 
 echo -e "${BLUE}=== Plan Review: $PLAN_FILE ===${NC}\n"
 
-# Extract change ID if it's in openspec structure
-CHANGE_ID=""
-if [[ "$PLAN_FILE" =~ openspec/changes/([^/]+)/ ]]; then
-    CHANGE_ID="${BASH_REMATCH[1]}"
-    echo -e "${GREEN}Change ID:${NC} $CHANGE_ID"
-fi
 
 # Read file content
 CONTENT=$(cat "$PLAN_FILE")
@@ -136,7 +130,7 @@ else
     CONTEXT_SCORE=2
 fi
 
-if echo "$CONTENT" | grep -qE 'openspec/(specs|changes)'; then
+if [ "$FILE_PATH_COUNT" -gt 0 ]; then
     CONTEXT_SCORE=$((CONTEXT_SCORE + 1))
 fi
 
@@ -306,14 +300,11 @@ echo -e "${BLUE}=== NEXT STEPS ===${NC}\n"
 
 if [ $PERCENTAGE -lt 75 ]; then
     echo "1. Address critical issues listed above"
-    echo "2. Iterate on tasks.md based on recommendations"
-    echo "3. Re-run: .opencode/skill/review-plan/scripts/review-plan $PLAN_FILE"
+    echo "2. Revise $PLAN_FILE based on recommendations"
+    printf '3. Re-run: %q %q\n' "$0" "$PLAN_FILE"
     echo "4. Target: ≥30/40 (75%) before proceeding"
 else
-    echo -e "${GREEN}✓ Plan is ready for validation${NC}"
-    if [ -n "$CHANGE_ID" ]; then
-        echo "  Run: openspec validate $CHANGE_ID --strict"
-    fi
+    echo -e "${GREEN}✓ Plan is ready for handoff${NC}"
 fi
 
 echo ""

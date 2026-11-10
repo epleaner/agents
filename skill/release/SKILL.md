@@ -29,7 +29,7 @@ Create or update a pull request:
 1. Ensure branch is pushed to remote
 2. Generate PR description with:
    - Summary of changes
-   - Beads/OpenSpec IDs
+   - Beads issue IDs
    - Test evidence
    - Deployment notes
 
@@ -41,6 +41,6 @@ Report current release state:
 
 ## Guidelines
 1. Never proceed without QA sign-off.
-2. Always include beads/OpenSpec IDs in PR descriptions.
+2. Include relevant issue IDs in PR descriptions.
 3. Refuse to release if action items remain open.
 4. Post deployment status to Slack.
