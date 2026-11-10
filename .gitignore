@@ -11,8 +11,7 @@ bun.lock
 # OS / editor
 .DS_Store
 
-# Fly.io
-.fly/
+.envrc.local
 
 # Ralph mode - local session history (do not commit)
 ralph/sessions.md
@@ -27,3 +26,6 @@ ralph/archive/
 # Local workspace / generated
 workspace/
 projects/
+
+# Local Docker persistent OpenCode data (may contain secrets)
+.opencode-local/

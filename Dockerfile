@@ -1,5 +1,4 @@
-# OpenCode Agents - Cloud Deployment (Railway/Fly.io)
-# Optimized for AI-assisted development workflows
+# OpenCode Agents - local Docker runtime
 
 FROM node:20-alpine
 
@@ -16,23 +15,14 @@ RUN apk add --no-cache \
 RUN curl -fsSL https://opencode.ai/install | bash \
     && ln -sf /root/.opencode/bin/opencode /usr/local/bin/opencode
 
-# Set up working directory
-WORKDIR /app
-
-# Copy repository files
-COPY . .
-
-# Install Node.js dependencies for .opencode
-RUN cd .opencode && npm install --production && cd ..
-
-# Create volume mount points
-RUN mkdir -p /app/.opencode-data /app/data
-
-# Set environment defaults
-ENV NODE_ENV=production
-ENV OPENCODE_DATA_DIR=/app/.opencode-data
+# OpenCode stores its data under the host-mounted directory.
+RUN mkdir -p /app/workspace /app/.opencode-data
+ENV XDG_DATA_HOME=/app/.opencode-data/share
+ENV XDG_CONFIG_HOME=/app/.opencode-data/config
+ENV XDG_STATE_HOME=/app/.opencode-data/state
+ENV XDG_CACHE_HOME=/app/.opencode-data/cache
 ENV PATH="/root/.opencode/bin:$PATH"
 
-# Default command - Railway uses startCommand from railway.json
-# Fly.io uses sleep infinity for SSH access
-CMD ["bash", ".opencode/scripts/start-railway.sh"]
+WORKDIR /app/workspace
+EXPOSE 4096
+CMD ["opencode", "web", "--hostname", "0.0.0.0", "--port", "4096"]

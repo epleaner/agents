@@ -28,14 +28,6 @@
         "exaApiKey": "$env:EXA_API_KEY"
       },
       "enabled": true
-    },
-    "railway": {
-      "type": "local",
-      "command": [
-        "npx",
-        "-y",
-        "@railway/mcp-server"
-      ]
     }
   },
   "agent": {

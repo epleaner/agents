@@ -128,7 +128,6 @@ Skills are specialized capabilities that agents can invoke:
 | `new-skill` | Create new skills with SOTA prompt engineering patterns |
 | `new-agent` | Create new agent definitions with SOTA prompt engineering patterns |
 | `ralph-prompt` | Generate Ralph mode prompts with beads integration and iteration guidance |
-| `sprites` | Manage isolated Linux sandboxes for code execution and testing |
 
 ### External Skills
 
@@ -292,14 +291,12 @@ When quality gates fail or logical errors are detected:
 
 See: `openspec/changes/enhance-orchestrator-reflection/` (or `.opencode/openspec/changes/enhance-orchestrator-reflection/` when scaffolded) for full specification.
 
-## Cloud Deployment
+## Local Docker
 
-This framework can be deployed to cloud platforms for remote access:
-
-- **Fly.io:** SSH-based access with persistent volumes. See `README.md` Fly.io section.
-- **Railway:** Web-based access with GitHub OAuth authentication. See `README.md` Railway section and `openspec/changes/deploy-opencode-web-railway/design.md` (or `.opencode/openspec/changes/deploy-opencode-web-railway/design.md` when scaffolded).
-
-Both options support persistent storage and can be stopped when not in use to minimize costs.
+Use the Dockerfile and the local-only `docker build` / `docker run` workflow
+in `README.md`. Bind the checkout to `/app/workspace` and persistent host data
+to `/app/.opencode-data`; expose port 4096 on loopback only. Remote deployment
+and its OAuth proxy are not part of the supported runtime.
 
 ## Landing the Plane (Session Completion)
 
