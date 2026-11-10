@@ -1,0 +1,7 @@
+.git
+.gitignore
+.worktrees
+.beads
+.opencode-local
+.env
+.env.*

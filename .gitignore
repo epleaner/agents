@@ -10,11 +10,10 @@ examples/sample-service/.opencode/shared/
 
 *.DS_Store
 
-# Fly.io
-.fly/
-
 workspace/
-.fly/.envrc.local
 .envrc.local
 
 projects
+
+# Local Docker persistent OpenCode data (may contain secrets)
+.opencode-local/
