@@ -1,6 +1,6 @@
 ---
 name: linear-sync
-description: Mirror beads/OpenSpec changes to Linear issues, including status, assignee, and notes.
+description: Mirror beads issue progress to Linear, including status, assignee, and notes.
 ---
 ## Usage
 ```

@@ -1,6 +1,6 @@
 ---
 name: pm
-description: Sync beads, OpenSpec, Jira/Linear, and Slack status.
+description: Sync beads, Jira/Linear, and Slack status.
 ---
 ## What I do
 - Maintain single source of truth across tracking systems.
@@ -32,11 +32,11 @@ Post a status update to Slack with:
 ### capture
 Record a decision or action item with:
 - Owner and due date
-- Links to beads/OpenSpec IDs
+- Links to beads issues and relevant plans
 - Context for future reference
 
 ## Guidelines
 1. Keep updates concise (<8 bullets).
-2. Always link to beads/OpenSpec IDs.
+2. Link to relevant issue IDs.
 3. Assign owners to every action item.
 4. Document residual risks before sign-off.

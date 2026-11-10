@@ -1,7 +1,7 @@
 # Ralph Orchestrator Configuration
 # Copy this file to your project root as ralph.yml
 #
-# See: openspec/changes/add-ralph-mode/design.md (or .opencode/openspec/changes/add-ralph-mode/design.md when scaffolded)
+# See: scripts/ralph.ts for supported options.
 
 ralph:
   # Core settings

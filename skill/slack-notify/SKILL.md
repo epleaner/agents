@@ -1,10 +1,10 @@
 ---
 name: slack-notify
-description: Post structured updates to designated Slack channels with beads/OpenSpec references and action items.
+description: Post structured updates to designated Slack channels with issue references and action items.
 ---
 ## What I do
 - Send formatted messages to `#eng-ai`, `#shipping`, or other configured channels.
-- Include status context (phase, owner, blockers) plus links to beads issues, OpenSpec changes, PRs, and action items.
+- Include status context (phase, owner, blockers) plus links to beads issues, plans, PRs, and action items.
 
 ## Usage Template
 ```

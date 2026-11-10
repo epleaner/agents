@@ -6,7 +6,7 @@ Reviews task plans against LLM planning best practices and provides actionable f
 
 ```bash
 # Review a task plan
-skill/review-plan/scripts/review-plan openspec/changes/<change-id>/tasks.md
+skill/review-plan/scripts/review-plan path/to/tasks.md
 
 # Target score: ≥30/40 (75%) before proceeding to implementation
 ```
@@ -73,7 +73,7 @@ See `examples/` directory:
 ## When to Use
 
 Use this skill whenever you:
-- Create a new OpenSpec proposal with tasks
+- Create a new task plan
 - Modify an existing task plan
 - Want to validate task quality before implementation
 - Need to improve a low-scoring plan
@@ -104,5 +104,5 @@ The script automatically flags critical issues:
 See `SKILL.md` for:
 - Complete best practices checklist
 - Red flags for each dimension
-- Integration with propose-new workflow
+- Integration with planning workflow
 - Detailed examples

@@ -14,7 +14,7 @@ We need to implement JWT-based authentication to support secure user sessions ac
 **Assumptions:**
 - Using Express.js framework (existing in src/app.ts)
 - Redis available for session storage (see project.md infrastructure section)
-- Following existing auth patterns from openspec/specs/authentication/spec.md
+- Following existing auth patterns from `src/auth/middleware.ts`
 
 ## Tasks
 
@@ -98,6 +98,6 @@ We need to implement JWT-based authentication to support secure user sessions ac
 
 ## Related Work
 
-- See: `openspec/specs/authentication/spec.md` for existing auth requirements
+- See: `src/auth/middleware.ts` for existing auth conventions
 - Related change: `add-user-roles` (uses same auth middleware pattern)
 - Reference: Express.js middleware best practices (https://expressjs.com/en/guide/using-middleware.html)

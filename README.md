@@ -1,6 +1,6 @@
 # agents
 
-A blueprint repository for AI-assisted development workflows. Scaffold this into any project to get a complete agentic development system with coordinated agents, slash commands, specialized skills, spec-driven development, and autonomous execution modes.
+A blueprint repository for AI-assisted development workflows. Scaffold this into any project to get coordinated agents, slash commands, specialized skills, issue tracking, and autonomous execution modes.
 
 ## Quick Start
 
@@ -25,7 +25,7 @@ This system uses a 5-agent architecture with 3 primary agents and 2 subagents.
 | Agent | Purpose |
 |-------|---------|
 | **orchestrator** | Primary coordinator that sequences planning, building, and release. Delegates work but never implements directly. |
-| **planner** | Creates OpenSpec proposals with tasks, spec deltas, and validation criteria. Researches best practices before planning. |
+| **planner** | Creates actionable task plans with validation criteria. Researches best practices before planning. |
 | **builder** | Implementation agent that executes plans. Uses skills for specialized work (qa, debugger, release). |
 
 ### Subagents
@@ -42,9 +42,9 @@ Subagents are delegated to by primary agents for specialized tasks.
 The typical workflow follows this sequence:
 
 1. **orchestrator** receives a request and determines whether it needs planning or can be executed directly
-2. **planner** creates an OpenSpec proposal with requirements, tasks, and spec deltas
-3. **builder** implements the approved proposal, using skills like `qa` and `release`
-4. **qa** validates the implementation against spec requirements
+2. **planner** defines scope, tasks, and acceptance criteria when planning is needed
+3. **builder** implements the plan, using skills like `qa` and `release`
+4. **qa** validates the implementation against acceptance criteria
 5. **release** handles git hygiene, commits, and PRs
 
 The orchestrator coordinates but never implements directly. All implementation work flows through the builder agent.
@@ -55,7 +55,7 @@ Slash commands provide entry points for common workflows:
 
 | Command | Description |
 |---------|-------------|
-| `/plan` | Break down work into actionable OpenSpec proposals |
+| `/plan` | Break down work into actionable steps |
 | `/dev` | Run the full development workflow |
 | `/research` | Look up documentation, APIs, or context |
 | `/fathom` | Work with Fathom meeting recordings and transcripts |
@@ -76,14 +76,9 @@ Skills are specialized capabilities that agents invoke for specific tasks.
 | `pm` | Sync beads, Jira/Linear, Slack status |
 | `self-improve` | **Critical**: Reflect on friction and file improvements (see below) |
 
-### OpenSpec Skills
+### Plan Review
 
-| Skill | Purpose |
-|-------|---------|
-| `propose-new` | Create change proposals |
-| `propose-go` | Implement approved proposals |
-| `propose-close` | Archive completed proposals |
-| `review-plan` | Review task plans against LLM planning best practices |
+Use `review-plan` to review task plans against LLM planning best practices.
 
 ### External Integrations
 
@@ -113,7 +108,7 @@ The `self-improve` skill is central to how this system learns and evolves. Run i
 1. Reviews the current session for friction points and insights
 2. Records findings in the appropriate ledger (`learnings/` here; `.opencode/learnings/` when scaffolded)
 3. Proposes updates to AGENTS.md, agent definitions, or skills
-4. Creates beads issues or OpenSpec proposals for larger changes
+4. Creates beads issues for larger changes
 
 ### Invocation
 
@@ -154,46 +149,6 @@ Get started with `bd onboard`. If commands are slow, run `bd doctor` for diagnos
 - **Slow startup (5+ seconds)**: Run `bd migrate --update-repo-id`
 - **Sandboxed environments**: Use `--sandbox` flag or `export BEADS_NO_DAEMON=1`
 - **Git worktrees**: Use `export BEADS_NO_DAEMON=1`
-
-## OpenSpec (Change Proposals)
-
-[OpenSpec](https://github.com/epleaner/openspec) is a spec-driven development framework. It separates current truth (specs) from proposed changes, ensuring all significant work is planned before implementation.
-
-**In this repo, agents and skills invoke openspec commands internally.** The planner agent creates proposals via the `propose-new` skill, and the builder archives them via `propose-close`. You typically interact through agents rather than running `openspec` directly.
-
-### Key Concepts
-
-- **specs/** - Current truth: what IS built
-- **changes/** - Proposals: what SHOULD change
-- Changes require approval before implementation begins
-
-### Three-Stage Workflow
-
-**1. Create** (planner agent via `propose-new` skill)
-
-When adding features, making breaking changes, or changing architecture, the planner creates:
-- `proposal.md` - Why and what changes
-- `tasks.md` - Implementation checklist
-- `design.md` - Technical decisions (optional)
-- `specs/` - Delta changes (ADDED/MODIFIED/REMOVED requirements)
-
-**2. Implement** (builder agent via `propose-go` skill)
-
-Builder executes tasks and validates against specs.
-
-**3. Archive** (builder agent via `propose-close` skill)
-
-After deployment, the change is archived and specs are updated.
-
-### Manual Commands (for reference)
-
-```bash
-openspec list              # List active changes
-openspec list --specs      # List specifications
-openspec show <item>       # View details
-openspec validate --strict # Validate changes
-openspec archive <id>      # Archive completed work
-```
 
 ## Ralph Mode (Autonomous Orchestration)
 
@@ -258,7 +213,7 @@ The learnings system captures operational insights and promotes them into action
 
 1. **Capture**: Record insights during sessions in `learnings/` (or `.opencode/learnings/` when scaffolded)
 2. **Review**: Run `self-improve` skill before closing sessions
-3. **Promote**: Update AGENTS.md, file beads issues, or create OpenSpec changes
+3. **Promote**: Update AGENTS.md or file beads issues
 4. **Track**: Mark entries as `promoted` with links to follow-up artifacts
 
 Entry statuses: `new`, `needs-agents-update`, `needs-spec-change`, `in-progress`, `promoted`, `closed`
@@ -281,7 +236,6 @@ curl -fsSL https://yepe.dev/install.sh | bash
 - **agents/** - Agent definitions
 - **command/** - Slash commands
 - **skill/** - Specialized capabilities
-- **openspec/** - Change proposal framework
 - **learnings/** - Meta-learnings ledgers
 
 ### Features

@@ -1,24 +1,3 @@
-<!-- OPENSPEC:START -->
-# OpenSpec Instructions
-
-These instructions are for AI assistants working in this project.
-
-Always open `./openspec/AGENTS.md` (or `./.opencode/openspec/AGENTS.md` when inside a scaffolded project) when the request:
-- Mentions planning or proposals (words like proposal, spec, change, plan)
-- Introduces new capabilities, breaking changes, architecture shifts, or big performance/security work
-- Sounds ambiguous and you need the authoritative spec before coding
-
-Use `./openspec/AGENTS.md` (or `./.opencode/openspec/AGENTS.md` when inside a scaffolded project) to learn:
-- How to create and apply change proposals
-- Spec format and conventions
-- Project structure and guidelines
-
-Keep this managed block so 'openspec update' can refresh the instructions.
-
-Note: OpenSpec instructions live in the current repository at `./openspec/AGENTS.md` (or `./.opencode/openspec/AGENTS.md` when scaffolded). Treat paths as repo-relative; do not reference an install location.
-
-<!-- OPENSPEC:END -->
-
 # Agent Instructions
 
 ## Communication Style (All Agents)
@@ -31,8 +10,7 @@ Note: OpenSpec instructions live in the current repository at `./openspec/AGENTS
 - No "In summary" or "To summarize" - just state the conclusion
 - Omit politeness padding - clarity over friendliness
 - If context is needed, put it after the answer in a brief note
-- **Don't ask for permission to do your job** - if you're the planner and need a spec, create the OpenSpec proposal immediately. If you're the builder and need to implement, implement.
-- **All specs must be in OpenSpec format** - NEVER create standalone specs outside the OpenSpec framework.
+- **Don't ask for permission to do your job** - planners produce actionable plans and builders implement approved work.
 
 **Bad:** "I'll help you find that information. Let me search through the meeting transcripts. After reviewing the data, I found that... In summary, the answer is X."
 
@@ -42,9 +20,9 @@ Note: OpenSpec instructions live in the current repository at `./openspec/AGENTS
 
 **Good:** "Fixed." (then show the change)
 
-**Bad (planner):** "Should I proceed with creating the OpenSpec proposal?"
+**Bad (planner):** "Should I proceed with planning?"
 
-**Good (planner):** "Creating OpenSpec proposal now..."
+**Good (planner):** "Here is the plan and its acceptance criteria."
 
 ---
 
@@ -67,7 +45,6 @@ yepe copies the following assets into `.opencode/`:
 - **agent/** - Agent definitions
 - **command/** - Slash commands
 - **skill/** - Specialized capabilities
-- **openspec/** - Change proposal framework
 - **learnings/** - Meta-learnings ledgers
 
 For more information, see the yepe documentation at `https://yepe.dev`.
@@ -89,7 +66,7 @@ This project uses 5 agents:
 | Agent | Purpose |
 | --- | --- |
 | **orchestrator** | Primary coordinator that sequences planning, building, and release |
-| **planner** | Creates OpenSpec proposals with tasks, spec deltas, and validation criteria |
+| **planner** | Creates actionable plans with tasks and validation criteria |
 | **builder** | Implementation agent that executes plans using skills |
 | **researcher** | Read-only research agent for documentation and context lookups |
 | **fathom** | Meeting assistant for transcripts, action items, and Q&A on recordings |
@@ -100,7 +77,7 @@ This project uses 5 agents:
 | --- | --- |
 | `/research` | Look up documentation, APIs, or context |
 | `/sota-research` | Research SOTA multi-agent LLM best practices and generate improvement proposals |
-| `/plan` | Break down work into actionable steps (creates OpenSpec proposals) |
+| `/plan` | Break down work into actionable steps |
 | `/dev` | Run the full development workflow |
 | `/fathom` | Work with Fathom meeting recordings, transcripts, and action items |
 | `/new-skill` | Create a new skill with SOTA prompt engineering best practices |
@@ -121,9 +98,6 @@ Skills are specialized capabilities that agents can invoke:
 | `writer` | Documentation and release notes |
 | `pm` | Sync beads, Jira/Linear, Slack status |
 | `self-improve` | Reflect on friction and file improvements |
-| `propose-new` | Create OpenSpec proposals |
-| `propose-go` | Implement proposals |
-| `propose-close` | Archive completed proposals |
 | `review-plan` | Review and improve task plans against LLM planning best practices |
 | `new-skill` | Create new skills with SOTA prompt engineering patterns |
 | `new-agent` | Create new agent definitions with SOTA prompt engineering patterns |
@@ -186,20 +160,13 @@ bd doctor              # Check for issues
   ```
   - Lists entries in `new`, `needs-agents-update`, or `needs-spec-change` states.
   - Prompts you to adjust status/owners/follow-up links and writes the updates back to both the ledger and index.
-- When an entry requires action, immediately promote it by updating the relevant AGENTS section, filing a beads issue, or drafting an OpenSpec change. Always reference the ledger entry ID in those follow-ups and mark the entry as `promoted` once done.
+- When an entry requires action, promote it by updating the relevant AGENTS section or filing a beads issue. Reference the ledger entry ID in the follow-up and mark the entry as `promoted` once done.
 
-## Using Beads and OpenSpec Together
+## Using Beads with Plans
 
-1. **Start with beads**: every task must have an issue. Use `bd ready`/`bd create` to select or add work, then claim it via `bd update <id> --status in_progress` before making spec changes.
-2. **Decide if OpenSpec is required**: when work implies a new capability, architecture shift, or ambiguous change, run `openspec list`, `openspec spec list --long`, and read `openspec/project.md` (or `.opencode/openspec/project.md` when scaffolded) to confirm whether a proposal/delta already exists.
-3. **Create/associate change IDs**: note the beads issue ID inside the OpenSpec `proposal.md` (and vice versa) so status updates stay linked. Use verb-led `change-id`s and keep them scoped to a single beads issue whenever possible.
-4. **Work in lockstep**:
-   - Use `propose-new` skill to draft proposal/tasks/spec deltas under `openspec/changes/<change-id>/` (or `.opencode/openspec/changes/<change-id>/` when scaffolded).
-   - Track progress using beads statuses (`in_progress`, `review`, `done`) and mirror the same milestones in `tasks.md`.
-   - Before implementation, run `openspec validate <change-id> --strict` and attach the output or summary back to the beads issue.
-5. **Close out**: when the change is merged/deployed, use `propose-close` skill to archive the OpenSpec change and move the beads issue to `done`. Run `bd sync` so git commits and beads metadata stay aligned.
-
-> Tip: if you are unsure whether a task needs an OpenSpec proposal, leave a beads comment with your reasoning and ask for guidance before continuing.
+1. Select or create a beads issue with `bd ready` or `bd create`; claim it via `bd update <id> --status in_progress`.
+2. For substantial or ambiguous changes, use `/plan` or the planner agent to define scope, tasks, and acceptance criteria before implementation. Link the plan from the beads issue.
+3. Track progress in beads and hand the plan to the builder. After completion, update the issue and run `bd sync`.
 
 ## Git Commit Hygiene
 
@@ -254,7 +221,7 @@ scripts/ralph.ts --resume ralph-2026-01-08-103045
 - Local sessions: `ralph/sessions.md` (gitignored)
 - Shared learnings: `ralph/meta-learnings.md` (committed)
 
-See: `openspec/changes/add-ralph-mode/design.md` (or `.opencode/openspec/changes/add-ralph-mode/design.md` when scaffolded) for full documentation.
+See `scripts/ralph.ts` and `templates/ralph.yml` for implementation and configuration.
 
 ## Quality Gates and Acceptance Criteria
 
@@ -289,7 +256,7 @@ When quality gates fail or logical errors are detected:
 - Critical errors that worker cannot resolve
 - External dependency failures
 
-See: `openspec/changes/enhance-orchestrator-reflection/` (or `.opencode/openspec/changes/enhance-orchestrator-reflection/` when scaffolded) for full specification.
+Use the quality gates above and the task's acceptance criteria to assess the result.
 
 ## Local Docker
 

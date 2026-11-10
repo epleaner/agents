@@ -5,14 +5,14 @@ description: Draft documentation, release notes, changelogs, and status updates.
 ## What I do
 - Draft and update documentation (READMEs, guides, API docs).
 - Write changelog entries and release notes.
-- Create OpenSpec summaries and spec deltas.
+- Summarize plans and implementation decisions.
 - Compose Slack/Jira status updates.
 
 ## Usage Template
 ```
 Type: <docs | changelog | release-notes | slack | jira | spec-summary>
 Subject: <what to write about>
-Context: <relevant changes, beads/OpenSpec IDs>
+Context: <relevant changes and beads issue IDs>
 Audience: <who will read this>
 ```
 
@@ -54,5 +54,5 @@ Concise status update with:
 ## Guidelines
 1. Keep voice concise and actionable.
 2. Prefer bullet lists over paragraphs.
-3. Always reference beads/OpenSpec IDs.
+3. Reference relevant beads issue IDs.
 4. Include testing status and next steps.
