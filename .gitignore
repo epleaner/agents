@@ -1,19 +1,31 @@
+# Dependencies / builds
+node_modules/
 dist/
-examples/sample-service/.opencode/shared/
-# Environment variables with secrets
+bun.lock
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# OS / editor
+.DS_Store
+
+.envrc.local
 
 # Ralph mode - local session history (do not commit)
-.opencode/ralph/sessions.md
-.opencode/ralph/archive/
+ralph/sessions.md
+ralph/archive/
 .ralph-state/
 .ralph-metrics-*.json
 
-*.DS_Store
+# Same paths when scaffolded into a repo under .opencode/
+.opencode/ralph/sessions.md
+.opencode/ralph/archive/
 
+# Local workspace / generated
 workspace/
-.envrc.local
-
-projects
+projects/
 
 # Local Docker persistent OpenCode data (may contain secrets)
 .opencode-local/

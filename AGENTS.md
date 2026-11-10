@@ -3,17 +3,19 @@
 
 These instructions are for AI assistants working in this project.
 
-Always open `@/.opencode/openspec/AGENTS.md` when the request:
+Always open `./openspec/AGENTS.md` (or `./.opencode/openspec/AGENTS.md` when inside a scaffolded project) when the request:
 - Mentions planning or proposals (words like proposal, spec, change, plan)
 - Introduces new capabilities, breaking changes, architecture shifts, or big performance/security work
 - Sounds ambiguous and you need the authoritative spec before coding
 
-Use `@/.opencode/openspec/AGENTS.md` to learn:
+Use `./openspec/AGENTS.md` (or `./.opencode/openspec/AGENTS.md` when inside a scaffolded project) to learn:
 - How to create and apply change proposals
 - Spec format and conventions
 - Project structure and guidelines
 
 Keep this managed block so 'openspec update' can refresh the instructions.
+
+Note: OpenSpec instructions live in the current repository at `./openspec/AGENTS.md` (or `./.opencode/openspec/AGENTS.md` when scaffolded). Treat paths as repo-relative; do not reference an install location.
 
 <!-- OPENSPEC:END -->
 
@@ -68,7 +70,7 @@ yepe copies the following assets into `.opencode/`:
 - **openspec/** - Change proposal framework
 - **learnings/** - Meta-learnings ledgers
 
-For more information, see the [yepe documentation](packages/yepe/README.md).
+For more information, see the yepe documentation at `https://yepe.dev`.
 
 ## Quick Reference
 
@@ -136,7 +138,7 @@ Skills are specialized capabilities that agents can invoke:
 | `fathom-get-transcript` | Fetch transcript for a specific meeting |
 | `fathom-notes` | Pull meeting transcripts + action items |
 | `slack-notify` | Broadcast status updates |
-| `jira-lookup`, `jira-update`, `linear-sync` | Sync external trackers |
+| `jira`, `linear-sync` | Sync external trackers |
 | `action-items` | Create/escalate todos with owners |
 
 ## Beads Performance Troubleshooting
@@ -176,11 +178,11 @@ bd doctor              # Check for issues
 
 ## Meta-Learnings Workflow
 
-- Capture operational/meta insights under `.opencode/learnings/` using the required template for each ledger.
-- Update `.opencode/learnings/index.md` whenever you add or modify an entry so other agents can quickly find status, owners, and follow-up links.
+- Capture operational/meta insights under `learnings/` (or `.opencode/learnings/` when scaffolded) using the required template for each ledger.
+- Update `learnings/index.md` (or `.opencode/learnings/index.md` when scaffolded) whenever you add or modify an entry so other agents can quickly find status, owners, and follow-up links.
 - Before closing a session, run the `self-improve` skill's review-learnings script:
   ```bash
-  .opencode/skill/self-improve/scripts/review-learnings
+  skill/self-improve/scripts/review-learnings  # or .opencode/skill/self-improve/scripts/review-learnings when scaffolded
   ```
   - Lists entries in `new`, `needs-agents-update`, or `needs-spec-change` states.
   - Prompts you to adjust status/owners/follow-up links and writes the updates back to both the ledger and index.
@@ -189,10 +191,10 @@ bd doctor              # Check for issues
 ## Using Beads and OpenSpec Together
 
 1. **Start with beads**: every task must have an issue. Use `bd ready`/`bd create` to select or add work, then claim it via `bd update <id> --status in_progress` before making spec changes.
-2. **Decide if OpenSpec is required**: when work implies a new capability, architecture shift, or ambiguous change, run `openspec list`, `openspec spec list --long`, and read `.opencode/openspec/project.md` to confirm whether a proposal/delta already exists.
+2. **Decide if OpenSpec is required**: when work implies a new capability, architecture shift, or ambiguous change, run `openspec list`, `openspec spec list --long`, and read `openspec/project.md` (or `.opencode/openspec/project.md` when scaffolded) to confirm whether a proposal/delta already exists.
 3. **Create/associate change IDs**: note the beads issue ID inside the OpenSpec `proposal.md` (and vice versa) so status updates stay linked. Use verb-led `change-id`s and keep them scoped to a single beads issue whenever possible.
 4. **Work in lockstep**:
-   - Use `propose-new` skill to draft proposal/tasks/spec deltas under `.opencode/openspec/changes/<change-id>/`.
+   - Use `propose-new` skill to draft proposal/tasks/spec deltas under `openspec/changes/<change-id>/` (or `.opencode/openspec/changes/<change-id>/` when scaffolded).
    - Track progress using beads statuses (`in_progress`, `review`, `done`) and mirror the same milestones in `tasks.md`.
    - Before implementation, run `openspec validate <change-id> --strict` and attach the output or summary back to the beads issue.
 5. **Close out**: when the change is merged/deployed, use `propose-close` skill to archive the OpenSpec change and move the beads issue to `done`. Run `bd sync` so git commits and beads metadata stay aligned.
@@ -227,32 +229,32 @@ Ralph mode enables autonomous multi-iteration agent execution using the Ralph Wi
 
 ```bash
 # Inline prompt (simplest)
-.opencode/scripts/ralph.ts "Implement user authentication with JWT"
+scripts/ralph.ts "Implement user authentication with JWT"
 
 # From file
-.opencode/scripts/ralph.ts --prompt task.md --max-iterations 30
+scripts/ralph.ts --prompt task.md --max-iterations 30
 
 # Inline with options
-.opencode/scripts/ralph.ts "Fix the login bug" --max-iterations 10
+scripts/ralph.ts "Fix the login bug" --max-iterations 10
 
 # Dry run (test without executing)
-.opencode/scripts/ralph.ts "Test task" --dry-run
+scripts/ralph.ts "Test task" --dry-run
 
 # Resume interrupted session
-.opencode/scripts/ralph.ts --resume ralph-2026-01-08-103045
+scripts/ralph.ts --resume ralph-2026-01-08-103045
 ```
 
 **Completion markers** - Include one of these in agent output to signal completion:
 - `- [x] TASK_COMPLETE` (markdown checkbox)
 - `RALPH_COMPLETE` (magic string)
 
-**Configuration** - Copy `.opencode/templates/ralph.yml` to project root and customize.
+**Configuration** - Copy `templates/ralph.yml` (or `.opencode/templates/ralph.yml` when scaffolded) to project root and customize.
 
 **Cross-session context**:
-- Local sessions: `.opencode/ralph/sessions.md` (gitignored)
-- Shared learnings: `.opencode/ralph/meta-learnings.md` (committed)
+- Local sessions: `ralph/sessions.md` (gitignored)
+- Shared learnings: `ralph/meta-learnings.md` (committed)
 
-See: `.opencode/openspec/changes/add-ralph-mode/design.md` for full documentation.
+See: `openspec/changes/add-ralph-mode/design.md` (or `.opencode/openspec/changes/add-ralph-mode/design.md` when scaffolded) for full documentation.
 
 ## Quality Gates and Acceptance Criteria
 
@@ -287,7 +289,7 @@ When quality gates fail or logical errors are detected:
 - Critical errors that worker cannot resolve
 - External dependency failures
 
-See: `.opencode/openspec/changes/enhance-orchestrator-reflection/` for full specification.
+See: `openspec/changes/enhance-orchestrator-reflection/` (or `.opencode/openspec/changes/enhance-orchestrator-reflection/` when scaffolded) for full specification.
 
 ## Local Docker
 
